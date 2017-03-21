@@ -1,6 +1,6 @@
 # jarduino
 
-Requirements
+System Requirements
 ---
 
 - wget
@@ -12,7 +12,7 @@ Setup
 
 It has been tested in Ubuntu 16.10
 
- - Install requirements.
+ - Install system requirements.
 
 - Run:
 
@@ -20,6 +20,12 @@ It has been tested in Ubuntu 16.10
 $ ./setup.sh
 ```
 
-It will install jarduino in ~/.jarduino
+- Install python requirements:
 
+```
+$ pip install -r requirements.txt
+```
+
+
+It will install jarduino in ~/.jarduino
 

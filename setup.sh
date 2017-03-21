@@ -27,11 +27,4 @@ cd $JARDUINO_HOME_DIR
 wget https://github.com/sudar/Arduino-Makefile/archive/$file -P $JARDUINO_HOME_DIR/tmp/
 tar xf $JARDUINO_HOME_DIR/tmp/$file -C $JARDUINO_HOME_DIR
 
-pip install pyserial
-
 rm $JARDUINO_HOME_DIR/tmp/*
-
-echo "# Jarduino env variables" >> ~/.bashrc
-echo "export ARDUINO_DIR=$ARDUINO_HOME_DIR/$ARDUINO_DIRNAME" >> ~/.bashrc
-echo "export ARDMK_DIR=$ARDUINO_HOME_DIR$ARDMK_DIR" >> ~/.bashrc
-source ~/.bashrc
