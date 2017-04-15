@@ -1,4 +1,3 @@
-
 /*
  Two-entries moisture sensure and reactive watering prototype. 
  */

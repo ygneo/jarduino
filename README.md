@@ -15,12 +15,28 @@ $ sudo apt-get install gcc-avr binutils-avr gdb-avr avr-libc avrdude
 - Run:
 
 ```
-$ ./setup.sh
+./setup.sh
 ```
+
 - Install python requirements:
 
 ```
-$ pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
-- Make Arduino 
+- Add `jarduino` to your path.
+
+Usage 
+--
+
+- Upload program to Arduino
+
+```
+./jarduino upload
+```
+
+- Read from Arduino serial port
+
+```
+./jarduino read
+```
