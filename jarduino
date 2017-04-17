@@ -24,9 +24,15 @@ def upload():
     call("MONITOR_PORT={} make upload".format(device), shell=True)
 
 
-def generate():
+def read_code_configuration():
     with open("jarduino.json", "r") as f:
         code_configuration = json.loads(f.read())
+
+    return code_configuration
+
+
+def generate():
+    code_configuration = read_code_configuration()
     with open("jarduino.tpl", "r") as f:
         template = Template(f.read())
     with open("jarduino.ino", "w") as f:
@@ -47,7 +53,7 @@ def arduino_device():
     if len(arduino_ports) > 1:
         warnings.warn('Multiple Arduinos found - using the first.')
 
-    print "[x] Arduino found in {}\n".format(arduino_device)
+    print "[x] Arduino found in {}\n".format(arduino_ports[0])
 
     return arduino_ports[0]
 

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+
+<script>
+var fs = require('fs');
+var child_process =  require("child_process");
+
+function onUploadTerminated(error, stdout, stderr) {
+    alert(error, stdout, stderr);
+}
+
+function soilMoistureValues() {
+    return "{" + document.getElementById("watering1_moisture").value + "," + document.getElementById("watering2_moisture").value + "}";
+}
+
+function update() {
+    var codeConfig = {
+        "soilMoistureMinSensorValues": soilMoistureValues(),
+        "checkingDelay": 1000,
+        "numchecksBeforeWatering": 3,
+        "wateringTime": [200, 300]
+    }
+    var json = JSON.stringify(codeConfig);
+    fs.writeFile('sketches/jarduino/jarduino.json', json, 'utf8');
+
+    child_process.exec("cd sketches/jarduino; jarduino generate && jarduino upload", onUploadTerminated);
+};
+
+
+</script>
+
+
+<html>
+  <head>
+    <title>Jarduino</title>
+  </head>
+  <body>
+    <h2>Zona de riego 1</h2>
+    <input id="watering1_moisture" type="text" value="200"></input>
+    <h2>Zona de riego 2</h2>
+    <input id="watering2_moisture" type="text" value="200"></input>
+    <hr/>
+    <input type="button" value="Actualizar" onclick="update();"></input>
+  </body>
+</html>

@@ -26,6 +26,10 @@ pip install -r requirements.txt
 
 - Add `jarduino` to your path.
 
+- Download NW.js from https://nwjs.io/
+
+- Put the binary file `nw` in your path.
+
 Usage 
 --
 
