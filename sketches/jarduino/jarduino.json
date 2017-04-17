@@ -1,0 +1,6 @@
+{
+    "soilMoistureMinSensorValues": [300, 200],
+    "checkingDelay": 1000,
+    "numchecksBeforeWatering": 3,
+    "wateringTime": [200, 300]
+}

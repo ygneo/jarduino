@@ -6,7 +6,7 @@ const int analogInPin2 = A2; // Analog input pin from moisture sensor #2
 
 const int digitalOutPin[] = {2, 3}; // Rele-Electrovalve output
 
-const int minSensorValue[] = [300, 200]; // Minimun value from the potentiometer to trigger watering
+const int minSensorValue[] = $soilMoistureMinSensorValues; // Minimun value from the potentiometer to trigger watering
 
 const int checkingDelay = 1000; // Delay in ms between checks  (for the analog-to-digital converter to settle after last reading)
 const int numChecksBeforeSending = 3; // Number of checks should be done before sending data to serial
