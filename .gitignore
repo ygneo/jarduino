@@ -89,3 +89,4 @@ ENV/
 .ropeproject
 
 build-uno/
+node_modules/

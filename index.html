@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 
+<script src="./jardui/vendor/d3.v2.js"></script>
+<script src="./jardui/vendor/rickshaw.min.js"></script>
 
 <script>
 var fs = require('fs');
 var childProcess =  require("child_process");
 var pythonShell = require('python-shell');
 var running_pyshell = null;
+var seriesData = [[],[]];
 
 
 function soilMoistureValues() {
@@ -60,14 +63,23 @@ function createJarduinoReadInputPyShell(fake_input) {
     var pyshell = new pythonShell('jarduino.py', {"args": args, "mode": "json"});
 
     pyshell.on('message', function (message) {
-        // received a message sent from the Python script (a simple "print" statement)
+        var timestamp = new Date().getTime();
+        var id = message[0];
+
         console.log(message);
+
+        value = parseInt(message[1]);
+
+        if (value) {
+            seriesData[id].push({ x: timestamp, y: parseInt(message[1])});
+        }
+        graph.update();
     });
 
     // end the input stream and allow the process to exit
     pyshell.end(function (err) {
         if (err){
-            alert(err);
+            console.log(err);
         };
         console.log('finished');
     });
@@ -76,14 +88,18 @@ function createJarduinoReadInputPyShell(fake_input) {
 }
 
 function readSerialInput(fakeSerialInput) {
+    console.log(fakeSerialInput);
+    if (fakeSerialInput == "on") {
+        fakeSerialInput = true;
+    } else {
+        fakeSerialInput = false;
+    }
     running_pyshell = createJarduinoReadInputPyShell(fakeSerialInput);
 }
 
+require('nw.gui').Window.get().maximize();
 readSerialInput();
-
 </script>
-
-
 
 <html>
   <head>
@@ -97,7 +113,41 @@ readSerialInput();
     <hr/>
     <input type="button" value="Actualizar" onclick="update();"></input>
     <hr/>
-    <label for="fake_serial">Fake Serial Input</label><input type="checkbox" id="fake_serial" onclick="readSerialInput(true)"/> 
+    <label for="fake_serial">Fake Serial Input</label><input type="checkbox" id="fake_serial" onclick="readSerialInput(this.value)"/>
+    <div id="chart"></div>
     </body>
+    <script>
+
+var graph = new Rickshaw.Graph( {
+    element: document.getElementById("chart"),
+    width: 900,
+    height: 500,
+    renderer: 'line',
+    stroke: true,
+    preserve: true,
+    series: [
+        {
+            color: 'steelblue',
+            name: 'Cats',
+            data: seriesData[0]
+        },
+        {
+            color: 'lightblue',
+            name: 'Dogs',
+            data: seriesData[1]
+        }
+    ]
+});
+
+graph.render();
+
+setInterval(function(){
+}, 1000);
+
+
+</script>
+
+
+
  
 </html>

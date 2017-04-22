@@ -65,6 +65,7 @@ def fake_arduino_output(serial_output, n=2):
     for i in range(n):
         value = str(randint(0, 1024)).zfill(4)
         serial_output.write('#{}#{}#\n'.format(i, value))
+        serial_output.write('#{}#w#\n'.format(i, value))
 
 
 def print_parsed_serial_input(fake_serial_input=False):
