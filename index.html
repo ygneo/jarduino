@@ -1,153 +1,114 @@
 <!DOCTYPE html>
 
+<meta charset="UTF-8"> 
+
 <script src="./jardui/vendor/d3.v2.js"></script>
 <script src="./jardui/vendor/rickshaw.min.js"></script>
 
-<script>
-var fs = require('fs');
-var childProcess =  require("child_process");
-var pythonShell = require('python-shell');
-var running_pyshell = null;
-var seriesData = [[],[]];
-
-
-function soilMoistureValues() {
-    return "{" + document.getElementById("watering1_moisture").value + "," + document.getElementById("watering2_moisture").value + "}";
-}
-
-
-function jarduinoUpload() {
-    var pyshell = new pythonShell('jarduino.py', {"args": ["upload"]});
-
-    pyshell.on('message', function (message) {
-        // received a message sent from the Python script (a simple "print" statement)
-        console.log(message);
-    });
-
-    // end the input stream and allow the process to exit
-    pyshell.end(function (err) {
-        if (err){
-            console.log(err);
-        };
-        console.log('finished');
-        runnig_pyshell = createJarduinoPyShell();
-    });
-}
-
-function update() {
-    var codeConfig = {
-        "soilMoistureMinSensorValues": soilMoistureValues(),
-        "checkingDelay": 1000,
-        "numchecksBeforeWatering": 3,
-        "wateringTime": [200, 300]
-    }
-    var json = JSON.stringify(codeConfig);
-    fs.writeFile('sketches/jarduino/jarduino.json', json, 'utf8');
-
-    running_pyshell.childProcess.kill();
-
-    setTimeout(jarduinoUpload, 3000);
-
-}
-
-function createJarduinoReadInputPyShell(fake_input) {
-    if (fake_input == undefined) {
-        fake_input = false;
-    }
-    var args = ["read"];
-
-    if (fake_input) {
-        args = ["readfake"];
-    }
-
-    var pyshell = new pythonShell('jarduino.py', {"args": args, "mode": "json"});
-
-    pyshell.on('message', function (message) {
-        var timestamp = new Date().getTime();
-        var id = message[0];
-
-        console.log(message);
-
-        value = parseInt(message[1]);
-
-        if (value) {
-            seriesData[id].push({ x: timestamp, y: parseInt(message[1])});
-        }
-        graph.update();
-    });
-
-    // end the input stream and allow the process to exit
-    pyshell.end(function (err) {
-        if (err){
-            console.log(err);
-        };
-        console.log('finished');
-    });
-
-    return pyshell;
-}
-
-function readSerialInput(fakeSerialInput) {
-    console.log(fakeSerialInput);
-    if (fakeSerialInput == "on") {
-        fakeSerialInput = true;
-    } else {
-        fakeSerialInput = false;
-    }
-    running_pyshell = createJarduinoReadInputPyShell(fakeSerialInput);
-}
-
-require('nw.gui').Window.get().maximize();
-readSerialInput();
-</script>
+<link rel="stylesheet" type="text/css" href="./jardui/css/jarduino.css">
 
 <html>
   <head>
     <title>Jarduino</title>
   </head>
-    <body>
-    <h2>Zona de riego 1</h2>
-    <input id="watering1_moisture" type="text" value="200"></input>
-    <h2>Zona de riego 2</h2>
-    <input id="watering2_moisture" type="text" value="200"></input>
-    <hr/>
-    <input type="button" value="Actualizar" onclick="update();"></input>
-    <hr/>
-    <label for="fake_serial">Fake Serial Input</label><input type="checkbox" id="fake_serial" onclick="readSerialInput(this.value)"/>
-    <div id="chart"></div>
-    </body>
+
+  <body>
+
+    <header>
+      <h1>Jarduino</h1>
+      <div id="jarduino_controls">
+        <div id="status">
+          <span id="icon" class="check"></span>
+          <span id="msg">Sistema de riego detectado</span>
+        </div>
+        <div id="buttons">
+          <button type="button">REPROGRAMAR</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- <div id="root"></div> -->
+
+      <section>
+        <form>
+          <fieldset>
+            <label for="name">Nombre</label>
+            <input id="name" type="text"></input>
+          </fieldset>
+          <fieldset>
+            <label for="description">Descripción</label>
+            <input id="description" type="text"></input>
+          </fieldset>
+          <fieldset class="time_interval">
+            <div id="col1">
+              <label for="watering_frequence">Frecuencia de riego</label>
+              <input id="watering_frequence" type="number"></input>
+            </div>
+            <div class="col2">
+              <label for="watering_frequence_interval">Intervalo</label>
+              <select id="watering_frequence_interval">
+                <option value="s">Segundos</option>
+                <option value="m">Minutos</option>
+                <option value="h">Horas</option>
+                <option value="d">Días</option>
+              </select>
+            </div>
+          </fieldset>
+          <fieldset class="time_interval">
+            <div id="col1">
+              <label for="watering_time">Tiempo de riego</label>
+              <input id="watering_time" type="number"></input>
+            </div>
+            <div id="col2">
+              <label for="watering_time_interval">Intervalo</label>
+              <select id="watering_time_interval">
+                <option value="s">Segundos</option>
+                <option value="m">Minutos</option>
+                <option value="h">Horas</option>
+                <option value="d">Días</option>
+              </select>
+            </div>
+          </fieldset>
+          <fieldset>
+            <label for="min_soil_moisture">Humedad mínima</label>
+            <select id="min_soil_moisture">
+                <option value="very_low">Muy baja</option>
+                <option value="low">Baja</option>
+                <option value="medium">Media</option>
+                <option value="high">Alta</option>
+                <option value="very_high">Muy alta</option>
+            </select>
+          </fieldset>
+          <div class="buttons">
+            <button>CANCELAR</button>
+            <button type="submit">GUARDAR</button>
+          </div>
+        </form>
+      </section>
+      
+       <section>
+        <div class="card">
+          <div class="create_irrigation_zone" onclick="createIrrigationZone(this)">
+            <span id="icon"></span>
+            <p>CREAR ZONA DE RIEGO</p>
+          </div>
+        </div>
+        <div class="card">
+          <span class="help">Configura una nueva zona de riego en el sistema</span>
+        </div>
+      </section>
+    </main>
+
+    <script src="./jardui/src/jarduino.js"></script>
+    <script src="./jardui/lib/index.js"></script>
     <script>
-
-var graph = new Rickshaw.Graph( {
-    element: document.getElementById("chart"),
-    width: 900,
-    height: 500,
-    renderer: 'line',
-    stroke: true,
-    preserve: true,
-    series: [
-        {
-            color: 'steelblue',
-            name: 'Cats',
-            data: seriesData[0]
-        },
-        {
-            color: 'lightblue',
-            name: 'Dogs',
-            data: seriesData[1]
-        }
-    ]
-});
-
-graph.render();
-
-setInterval(function(){
-}, 1000);
-
-
-</script>
-
-
-
- 
+    var gulp = require('gulp');
+    gulp.task('reload', function () {
+        console.log(reload);
+        if (location) location.reload();
+    });
+    gulp.watch('jardui/**/*', ['reload']);
+    </script>
+</body>
 </html>

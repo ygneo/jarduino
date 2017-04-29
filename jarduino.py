@@ -126,7 +126,7 @@ def arduino_device_names():
     return device_names
 
 
-def arduino_devices(fake_serial_input):
+def arduino_devices(fake_serial_input=False):
     device_names = arduino_device_names()
 
     if not device_names and not fake_serial_input:
@@ -135,13 +135,13 @@ def arduino_devices(fake_serial_input):
     if len(device_names) > 1:
         warnings.warn('Multiple Arduinos found - using the first.')
 
-    devices = serial_devices(device_names, fake_serial_input)
-#    print "[x] Arduino found in {}".format(devices["device_name"])
-#    if FAKE_SERIAL:
-#        print " !! THIS SERIAL DEVICE IS FAKED !!"
-#    print "\n"
+    return serial_devices(device_names, fake_serial_input)
 
-    return devices
+
+def detect_arduino():
+    devices = arduino_devices()
+    device_name = devices["device_name"]
+    print "[x] Arduino found in {}".format(device_name)
 
 
 try:
@@ -153,7 +153,9 @@ except IndexError:
 if mode == "read":
     print_parsed_serial_input()
 if mode == "readfake":
-    print_parsed_serial_input(fake_serial_input=True)
+    print_parsed_serial_input()
+if mode == "detect":
+    detect_arduino()
 if mode == "upload":
     generate()
     upload()
