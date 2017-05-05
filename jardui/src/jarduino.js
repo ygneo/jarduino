@@ -96,6 +96,6 @@ function createIrrigationZone(div) {
     div.destroy();
 }
 
-require('nw.gui').Window.get().maximize();
+require('nw.gui').aWindow.get().maximize();
 readSerialInput();
 

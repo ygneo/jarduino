@@ -2,14 +2,16 @@
     "name": "jarduino",
     "main": "index.html",
     "scripts": {
-        "build": "babel jardui/src -d jardui/lib"
+        "build": "babel jardui/src -d jardui/lib",
+        "start": "babel jardui/src -d jardui/lib && nw ."
     },
     "devDependencies": {
         "babel-preset-react": "latest",
         "babel-preset-es2015": "latest",
         "babel-preset-env": "latest",
         "babel-cli": "^6.0.0",
-        "gulp": "3.9.1"
+        "gulp": "3.9.1",
+        "gulp-run": "1.7.1"
     },
     "dependencies": {
         "react": "15.5.4",

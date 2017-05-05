@@ -28,7 +28,7 @@
     </header>
 
     <main>
-      <!-- <div id="root"></div> -->
+      <div id="root"></div>
 
       <section>
         <form>
@@ -100,15 +100,31 @@
       </section>
     </main>
 
-    <script src="./jardui/src/jarduino.js"></script>
     <script src="./jardui/lib/index.js"></script>
     <script>
-    var gulp = require('gulp');
-    gulp.task('reload', function () {
-        console.log(reload);
-        if (location) location.reload();
-    });
-    gulp.watch('jardui/**/*', ['reload']);
-    </script>
+var gulp = require('gulp');
+var run = require('gulp-run');
+
+gulp.task('rebuild', function () {
+    var r = run('npm run build').exec(gulp.dest('output'));
+
+    r.on('error', function(e) {
+        console.log(e);
+    })
+});
+
+gulp.task('reload', function () {
+    console.log("reload");
+    if (location) location.reload();
+});
+gulp.watch([
+    'index.html',
+], ['reload']);
+
+gulp.watch([
+    './jardui/src/index.js',
+], ['rebuild', 'reload']);
+
+</script>
 </body>
 </html>
