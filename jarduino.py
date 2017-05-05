@@ -139,9 +139,12 @@ def arduino_devices(fake_serial_input=False):
 
 
 def detect_arduino():
-    devices = arduino_devices()
+    try:
+        devices = arduino_devices()
+    except IOError:
+        exit(1)
     device_name = devices["device_name"]
-    print "[x] Arduino found in {}".format(device_name)
+    print device_name
 
 
 try:
