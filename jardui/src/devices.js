@@ -2,7 +2,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import pythonShell from 'python-shell'
 
-
 function DeviceStatus(props) {
     return  (
         <div className={props.status}>
@@ -13,7 +12,7 @@ function DeviceStatus(props) {
 }
 
 
-function renderDeviceStatus(status, deviceName) {
+function renderDeviceStatus(status, deviceName, element) {
     let statusMessage = {
         "success": "Dispositivo Arduino detectado (" + deviceName + ")",
         "error": "No se ha detectado ningún dispositivo Arduino",
@@ -22,20 +21,22 @@ function renderDeviceStatus(status, deviceName) {
 
     ReactDOM.render(
         <DeviceStatus status={status} msg={msg}/>,
-        document.getElementById('status')
+        element
     )
 }
 
+
+
 class ArduinoDevice {
-    detect() {
+    detect(element) {
         let pyshell = new pythonShell('jarduino.py', {"args": ["detect"]});
 
         pyshell.on('message', function (deviceName) {
-            renderDeviceStatus("success", deviceName)
+            renderDeviceStatus("success", deviceName, element)
         })
 
         pyshell.on('error', function (message) {
-            renderDeviceStatus("error")
+            renderDeviceStatus("error", "", element)
         })
 
         pyshell.end(function (err) {

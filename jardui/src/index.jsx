@@ -1,20 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import pythonShell from 'python-shell'
 import ArduinoDevice from './jardui/lib/devices.js'
-
-
-function renderDeviceStatus(status, deviceName) {
-    let statusMessage = {
-        "success": "Dispositivo Arduino detectado (" + deviceName + ")",
-        "error": "No se ha detectado ningún dispositivo Arduino",
-    }
-    let msg = statusMessage[status]
-
-    ReactDOM.render(
-        <DeviceStatus status={status} msg={msg}/>,
-        document.getElementById('status')
-    )
-}
 
 
 function IrrigationZoneButton(props) {
@@ -28,8 +15,9 @@ function IrrigationZoneButton(props) {
 
 
 function renderIrrigationZoneForm() {
-    
+
 }
+
 
 function renderCreateIrrigationZoneCard(){
     ReactDOM.render(
@@ -38,13 +26,16 @@ function renderCreateIrrigationZoneCard(){
     )
 }
 
+
 let device = new ArduinoDevice
 
-require('nw.gui').Window.get().maximize()
+window.require('nw.gui').Window.get().maximize()
 
 renderCreateIrrigationZoneCard()
 
-// maybe stop after n retries and restart on user interaction?
-setInterval(device.detect, 1500);
-
-
+document.addEventListener("DOMContentLoaded", function(event) {
+    // temp solution? webpack binding? react renadering?
+    setInterval(function(){
+        device.detect(document.getElementById('status'))
+    }, 2000)
+});
