@@ -3,33 +3,47 @@ import ReactDOM from 'react-dom'
 import pythonShell from 'python-shell'
 
 
-const e = React.createElement
+
+function renderDeviceStatus(status, deviceName) {
+    let statusMessage = {
+        "success": "Dispositivo Arduino detectado (" + deviceName + ")",
+        "error": "No se ha detectado ningún dispositivo Arduino",
+    }
+    let msg = statusMessage[status]
+
+    const element = (
+        <div className={status}>
+            <span id="icon"></span>
+            <span id="msg">{msg}</span>
+        </div>
+    )
+
+    ReactDOM.render(
+        element,
+        document.getElementById('status')
+    )
+}
+
 
 
 class ArduinoDevice {
     detect() {
         let pyshell = new pythonShell('jarduino.py', {"args": ["detect"]});
 
-        pyshell.on('message', function (message) {
-            ReactDOM.render(
-                e('h1', null, message),
-                document.getElementById('root')
-            );
-        });
+        pyshell.on('message', function (deviceName) {
+            renderDeviceStatus("success", deviceName)
+        })
 
         pyshell.on('error', function (message) {
-            ReactDOM.render(
-                e('h1', null, 'No HAY'),
-                document.getElementById('root')
-            );
-        });
+            renderDeviceStatus("error")
+        })
 
         pyshell.end(function (err) {
             if (err) {
                 console.log(err)
             }
             console.log('finished')
-        });
+        })
     }
 
 }

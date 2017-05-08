@@ -58,7 +58,6 @@ header div#jarduino_controls div {
 header div#jarduino_controls div#status {
     padding: 1ex;
     margin-right: 5ex;
-    color: #62b312;
     font-weight: bold;
 }
 
@@ -66,10 +65,24 @@ header div#jarduino_controls div#status span {
     float: left;
 }
 
-header div#jarduino_controls div#status #icon.check {
+header div#jarduino_controls div#status div.success span {
+    color: #62b312;
+}
+
+header div#jarduino_controls div#status div.success span#icon {
     height: 20px;
     width: 20px;
     background: url('/jardui/img/check.png') no-repeat;
+}
+
+header div#jarduino_controls div#status div.error span#icon {
+    height: 19px;
+    width: 22px;
+    background: url('/jardui/img/alert.png') no-repeat;
+}
+
+header div#jarduino_controls div#status div.error span {
+    color: #ff9000;
 }
 
 header div#jarduino_controls div#status #msg {

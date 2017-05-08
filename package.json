@@ -10,6 +10,7 @@
         "babel-preset-es2015": "latest",
         "babel-preset-env": "latest",
         "babel-cli": "^6.0.0",
+        "babel-plugin-transform-react-jsx": "latest",
         "gulp": "3.9.1",
         "gulp-run": "1.7.1"
     },

@@ -90,3 +90,5 @@ ENV/
 
 build-uno/
 node_modules/
+npm-debug.log.*
+output/
