@@ -1,7 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import pythonShell from 'python-shell'
-
+import ArduinoDevice from './jardui/lib/devices.js'
 
 
 function renderDeviceStatus(status, deviceName) {
@@ -11,47 +10,41 @@ function renderDeviceStatus(status, deviceName) {
     }
     let msg = statusMessage[status]
 
-    const element = (
-        <div className={status}>
-            <span id="icon"></span>
-            <span id="msg">{msg}</span>
-        </div>
-    )
-
     ReactDOM.render(
-        element,
+        <DeviceStatus status={status} msg={msg}/>,
         document.getElementById('status')
     )
 }
 
 
-
-class ArduinoDevice {
-    detect() {
-        let pyshell = new pythonShell('jarduino.py', {"args": ["detect"]});
-
-        pyshell.on('message', function (deviceName) {
-            renderDeviceStatus("success", deviceName)
-        })
-
-        pyshell.on('error', function (message) {
-            renderDeviceStatus("error")
-        })
-
-        pyshell.end(function (err) {
-            if (err) {
-                console.log(err)
-            }
-            console.log('finished')
-        })
-    }
-
+function IrrigationZoneButton(props) {
+    return (
+        <div className="create_irrigation_zone" onClick={renderIrrigationZoneForm}>
+            <span id="icon"></span>
+            <p>CREAR ZONA DE RIEGO</p>
+        </div>
+    )
 }
 
 
+function renderIrrigationZoneForm() {
+    
+}
+
+function renderCreateIrrigationZoneCard(){
+    ReactDOM.render(
+        <IrrigationZoneButton/>,
+        document.getElementById('create_irrigation_zone_card')
+    )
+}
+
 let device = new ArduinoDevice
 
+require('nw.gui').Window.get().maximize()
+
+renderCreateIrrigationZoneCard()
+
+// maybe stop after n retries and restart on user interaction?
 setInterval(device.detect, 1500);
 
-require('nw.gui').Window.get().maximize()
 
