@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import pythonShell from 'python-shell'
 
+
 function DeviceStatus(props) {
     return  (
         <div className={props.status}>
