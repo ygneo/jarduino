@@ -22,8 +22,5 @@ class CreateIrrigationZoneButton extends React.Component {
     }
 }
 
-function CreateIrrigationZoneButton(props) {
-}
-
 export default CreateIrrigationZoneButton
 

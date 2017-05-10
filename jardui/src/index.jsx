@@ -5,21 +5,6 @@ import ArduinoDevice from './jardui/lib/devices.js'
 import IrrigationZone from './jardui/lib/zones.js'
 
 
-
-
-function renderIrrigationZoneForm() {
-
-}
-
-
-function renderCreateIrrigationZoneCard(){
-    ReactDOM.render(
-        <IrrigationZoneButton/>,
-        document.getElementById('create_irrigation_zone_card')
-    )
-}
-
-
 function renderZones() {
     ReactDOM.render(
         <IrrigationZone/>,
@@ -30,7 +15,6 @@ function renderZones() {
 window.require('nw.gui').Window.get().maximize()
 
 renderZones()
-
 
 document.addEventListener("DOMContentLoaded", function(event) {
     let device = new ArduinoDevice

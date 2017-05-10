@@ -1,61 +1,90 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import fieldsets from './inputs.js'
+import ZonesStorage from './storage.js'
+
+
+const TextInputFieldSet = fieldsets.TextInputFieldSet
+const TimeIntervalFieldSet = fieldsets.TimeIntervalFieldSet
 
 
 class IrrigationZoneForm extends React.Component {
     constructor(props) {
-        super(props);
-        this.handleCancel = this.handleCancel.bind(this);
+        super(props)
+
+        this.state = {
+            name: '',
+            description: '',
+            watering_frequence: 0,
+            watering_frequence_interval: '',
+            watering_time: 0,
+            watering_time_interval: ''
+        }
+
+        this.storage = new ZonesStorage()
+
+        this.handleInputChange = this.handleInputChange.bind(this)
+        this.handleSubmit = this.handleSubmit.bind(this)
+        this.handleCancel = this.handleCancel.bind(this)
     }
 
     handleCancel(e) {
         this.props.onCancel();
     }
 
+    handleInputChange(event) {
+        const target = event.target
+        const value = target.type === 'checkbox' ? target.checked : target.value
+        const name = target.name
+
+        this.setState({
+            [name]: value
+        })
+    }
+
+    handleSubmit(event) {
+        event.preventDefault()
+
+        this.storage.addZone(this.state)
+
+        this.props.onSubmit(event);
+
+    }
+
     render () {
         return (
-            <form>
-                <fieldset>
-                    <label for="name">Nombre</label>
-                    <input id="name" type="text"></input>
-                </fieldset>
-                <fieldset>
-                    <label for="description">Descripción</label>
-                    <input id="description" type="text"></input>
-                </fieldset>
-                <fieldset className="time_interval">
-                    <div id="col1">
-                        <label for="watering_frequence">Frecuencia de riego</label>
-                        <input id="watering_frequence" type="number"></input>
-                    </div>
-                    <div className="col2">
-                        <label for="watering_frequence_interval">Intervalo</label>
-                        <select id="watering_frequence_interval">
-                            <option value="s">Segundos</option>
-                            <option value="m">Minutos</option>
-                            <option value="h">Horas</option>
-                            <option value="d">Días</option>
-                        </select>
-                    </div>
-                </fieldset>
-                <fieldset className="time_interval">
-                    <div id="col1">
-                        <label for="watering_time">Tiempo de riego</label>
-                        <input id="watering_time" type="number"></input>
-                    </div>
-                    <div id="col2">
-                        <label for="watering_time_interval">Intervalo</label>
-                        <select id="watering_time_interval">
-                            <option value="s">Segundos</option>
-                            <option value="m">Minutos</option>
-                            <option value="h">Horas</option>
-                            <option value="d">Días</option>
-                        </select>
-                    </div>
-                </fieldset>
+            <form onSubmit={this.handleSubmit}>
+                <TextInputFieldSet
+                    label="Nombre"
+                    name="name"
+                    id="name"
+                    type="text"
+                    onChange={this.handleInputChange}
+                />
+                <TextInputFieldSet
+                    label="Descripción"
+                    name="description"
+                    id="description"
+                    type="text"
+                    onChange={this.handleInputChange}
+                />
+                <TimeIntervalFieldSet
+                    frequenceLabel="Frecuencia de riego"
+                    intervalLabel="Intervalo"
+                    id="watering_frequence"
+                    name="watering_frequence"
+                    onChange={this.handleInputChange}
+                />
+                <TimeIntervalFieldSet
+                    frequenceLabel="Tiempo de riego"
+                    intervalLabel="Intervalo"
+                    id="watering_time"
+                    name="watering_time"
+                    onChange={this.handleInputChange}
+                />
                 <fieldset>
                     <label for="min_soil_moisture">Humedad</label>
-                    <select id="min_soil_moisture">
+                    <select name="min_soil_moisture" id="min_soil_moisture">
                         <option value="very_low">Muy baja</option>
                         <option value="low">Baja</option>
                         <option value="medium">Media</option>
@@ -64,7 +93,7 @@ class IrrigationZoneForm extends React.Component {
                     </select>
                 </fieldset>
                 <div className="buttons">
-                    <button onClick={this.handleCancel}>CANCELAR</button>
+                    <button type="button" onClick={this.handleCancel}>CANCELAR</button>
                     <button type="submit">GUARDAR</button>
                 </div>
             </form>

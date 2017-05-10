@@ -16,7 +16,7 @@ function DeviceStatus(props) {
 function renderDeviceStatus(status, deviceName, element) {
     let statusMessage = {
         "success": "Dispositivo Arduino detectado (" + deviceName + ")",
-        "error": "No se ha detectado ningún dispositivo Arduino",
+        "error": "No se ha detectado ningún dispositivo Arduino"
     }
     let msg = statusMessage[status]
 

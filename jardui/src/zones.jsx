@@ -1,6 +1,5 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-//import Card from './cards.js'
 import CreateIrrigationZoneButton from './buttons.js'
 import IrrigationZoneForm from './forms.js'
 
@@ -8,11 +7,14 @@ import IrrigationZoneForm from './forms.js'
 class IrrigationZone extends React.Component {
     constructor(props) {
         super(props);
+
+        this.state = {
+            mode: props.mode ? props.mode : "empty"
+        };
+
         this.renderCreateForm = this.renderCreateForm.bind(this);
         this.cancelForm = this.cancelForm.bind(this);
-        this.state = {
-            mode: props.mode ? props.mode : "empty",
-        };
+        this.submitForm = this.submitForm.bind(this);
     }
 
     render() {
@@ -36,7 +38,17 @@ class IrrigationZone extends React.Component {
             className = "form"
             element = (
                 <section className={className}>
-                    <IrrigationZoneForm onCancel={this.cancelForm}/>
+                    <IrrigationZoneForm
+                        onCancel={this.cancelForm}
+                        onSubmit={this.submitForm}
+                    />
+                </section>
+            )
+        } else if (this.state.mode == "occupied") {
+            className = "irrigation_zone"
+            element = (
+                <section className={className}>
+                    DATA
                 </section>
             )
         }
@@ -51,7 +63,11 @@ class IrrigationZone extends React.Component {
     cancelForm() {
         this.setState({mode: "empty"})
     }
-}
 
+    submitForm(event) {
+        this.setState({mode: "occupied"})
+    }
+
+}
 
 export default IrrigationZone
