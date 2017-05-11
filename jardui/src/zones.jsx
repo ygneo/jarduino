@@ -2,19 +2,66 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import CreateIrrigationZoneButton from './buttons.js'
 import IrrigationZoneForm from './forms.js'
+import ZonesStorage from './storage.js'
 
+
+class ZoneData extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            zone: props.zone
+        };
+    }
+
+    render() {
+        let zone = this.state.zone
+
+        return (
+            <div>
+                <div>
+                    <h2>{zone.name}</h2>
+                    <h3>{zone.description}</h3>
+                </div>
+                <div>
+                    <span className="label">Frecuencia de riego</span>
+                    <span className="value">
+                        cada {zone.watering_frequence} {zone.watering_frequence_interval}
+                    </span>
+                </div>
+                <div>
+                    <span className="label">Tiempo de riego</span>
+                    <span className="value">
+                        {zone.watering_frequence} {zone.watering_frequence_interval}
+                    </span>
+                </div>
+                <div>
+                    <span className="label">Umbral de humedad</span>
+                    <span className="value">
+                        {zone.min_soil_moisture}
+                    </span>
+                </div>
+
+            </div>
+        )
+    }
+
+}
 
 class IrrigationZone extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            mode: props.mode ? props.mode : "empty"
+            mode: props.mode ? props.mode : "empty",
+            zone: props.zone
         };
 
-        this.renderCreateForm = this.renderCreateForm.bind(this);
-        this.cancelForm = this.cancelForm.bind(this);
-        this.submitForm = this.submitForm.bind(this);
+        this.storage = new ZonesStorage()
+
+        this.renderCreateForm = this.renderCreateForm.bind(this)
+        this.cancelForm = this.cancelForm.bind(this)
+        this.renderZoneData = this.renderZoneData.bind(this)
     }
 
     render() {
@@ -40,15 +87,16 @@ class IrrigationZone extends React.Component {
                 <section className={className}>
                     <IrrigationZoneForm
                         onCancel={this.cancelForm}
-                        onSubmit={this.submitForm}
+                        onSubmit={this.renderZoneData}
                     />
                 </section>
             )
-        } else if (this.state.mode == "occupied") {
+        } else if (this.state.mode == "show") {
             className = "irrigation_zone"
+
             element = (
                 <section className={className}>
-                    DATA
+                    <ZoneData zone={this.state.zone}/>
                 </section>
             )
         }
@@ -64,10 +112,37 @@ class IrrigationZone extends React.Component {
         this.setState({mode: "empty"})
     }
 
-    submitForm(event) {
-        this.setState({mode: "occupied"})
-    }
+    renderZoneData(zoneId) {
+        this.setState({
+            mode: "show",
+            zoneId: zoneId
+        })
 
+    }
 }
 
-export default IrrigationZone
+
+class Zones {
+    constructor() {
+        this.storage = new ZonesStorage()
+
+        this.renderZones = this.renderZones.bind(this)
+    }
+
+    renderZones(element) {
+        let zones = this.storage.getZones()
+
+        ReactDOM.render(
+            <div id="zones">
+                {zones.map((zone,i) => {
+                     return <IrrigationZone mode="show" zone={zone} />
+                })}
+                <IrrigationZone mode="empty" />
+            </div>,
+            element
+        )
+    }
+}
+
+
+export default Zones

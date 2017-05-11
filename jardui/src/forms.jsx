@@ -45,10 +45,9 @@ class IrrigationZoneForm extends React.Component {
     handleSubmit(event) {
         event.preventDefault()
 
-        this.storage.addZone(this.state)
+        let zoneId = this.storage.addZone(this.state)
 
-        this.props.onSubmit(event);
-
+        this.props.onSubmit(zoneId);
     }
 
     render () {
@@ -83,8 +82,10 @@ class IrrigationZoneForm extends React.Component {
                     onChange={this.handleInputChange}
                 />
                 <fieldset>
-                    <label for="min_soil_moisture">Humedad</label>
-                    <select name="min_soil_moisture" id="min_soil_moisture">
+                    <label for="min_soil_moisture">Umbral de humedad</label>
+                    <select name="min_soil_moisture" id="min_soil_moisture"
+                            onChange={this.handleInputChange}
+                    >
                         <option value="very_low">Muy baja</option>
                         <option value="low">Baja</option>
                         <option value="medium">Media</option>
