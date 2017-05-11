@@ -20,6 +20,7 @@ class TextInputFieldSet extends React.Component {
                 <input name={this.props.name}
                        id={this.props.name}
                        type="text"
+                       value={this.props.value}
                        onChange={this.handleInputChange}>
                 </input>
             </fieldset>
@@ -49,6 +50,7 @@ class TimeIntervalFieldSet extends React.Component {
                     <input name={this.props.name}
                            id="{this.props.id}"
                            type="number"
+                           value={this.props.frequenceValue}
                            onChange={this.handleInputChange}
                     ></input>
                 </div>
@@ -56,11 +58,11 @@ class TimeIntervalFieldSet extends React.Component {
                     <label for={interval_name}>{this.props.intervalLabel}</label>
                     <select name={interval_name}
                             id={interval_name}
+                            value={this.props.intervalValue}
                             onChange={this.handleInputChange}>
                         <option value="s">Segundos</option>
                         <option value="m">Minutos</option>
                         <option value="h">Horas</option>
-                        <option value="d">Días</option>
                     </select>
                 </div>
             </fieldset>

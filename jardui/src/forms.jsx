@@ -13,12 +13,19 @@ class IrrigationZoneForm extends React.Component {
         super(props)
 
         this.state = {
-            name: '',
-            description: '',
-            watering_frequence: 0,
-            watering_frequence_interval: '',
-            watering_time: 0,
-            watering_time_interval: ''
+            'mode': props.mode,
+            'zone': {
+                name: '',
+                description: '',
+                watering_frequence: 0,
+                watering_frequence_interval: '',
+                watering_time: 0,
+                watering_time_interval: ''
+            }
+        }
+
+        if (props.zone) {
+            this.state.zone = props.zone
         }
 
         this.storage = new ZonesStorage()
@@ -36,21 +43,34 @@ class IrrigationZoneForm extends React.Component {
         const target = event.target
         const value = target.type === 'checkbox' ? target.checked : target.value
         const name = target.name
+        let zone
+
+        zone = this.state.zone
+        zone[name] = value
 
         this.setState({
-            [name]: value
+            'zone': zone
         })
     }
 
     handleSubmit(event) {
+        let zoneId
+
         event.preventDefault()
 
-        let zoneId = this.storage.addZone(this.state)
+        if (this.state.id) {
+            alert("edit")
+            zoneId = this.storage.editZone(this.state.id, this.state)
+        } else {
+            zoneId = this.storage.addZone(this.state)
+        }
 
         this.props.onSubmit(zoneId);
     }
 
     render () {
+        let zone = this.state.zone
+
         return (
             <form onSubmit={this.handleSubmit}>
                 <TextInputFieldSet
@@ -58,6 +78,7 @@ class IrrigationZoneForm extends React.Component {
                     name="name"
                     id="name"
                     type="text"
+                    value={zone.name}
                     onChange={this.handleInputChange}
                 />
                 <TextInputFieldSet
@@ -65,6 +86,7 @@ class IrrigationZoneForm extends React.Component {
                     name="description"
                     id="description"
                     type="text"
+                    value={zone.description}
                     onChange={this.handleInputChange}
                 />
                 <TimeIntervalFieldSet
@@ -72,6 +94,8 @@ class IrrigationZoneForm extends React.Component {
                     intervalLabel="Intervalo"
                     id="watering_frequence"
                     name="watering_frequence"
+                    frequenceValue={zone.watering_frequence}
+                    intervalValue={zone.watering_frequence_interval}
                     onChange={this.handleInputChange}
                 />
                 <TimeIntervalFieldSet
@@ -79,11 +103,14 @@ class IrrigationZoneForm extends React.Component {
                     intervalLabel="Intervalo"
                     id="watering_time"
                     name="watering_time"
+                    frequenceValue={zone.watering_time}
+                    intervalValue={zone.watering_time_interval}
                     onChange={this.handleInputChange}
                 />
                 <fieldset>
                     <label for="min_soil_moisture">Umbral de humedad</label>
                     <select name="min_soil_moisture" id="min_soil_moisture"
+                            value={zone.min_soil_moisture}
                             onChange={this.handleInputChange}
                     >
                         <option value="very_low">Muy baja</option>

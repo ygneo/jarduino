@@ -17,5 +17,5 @@ document.addEventListener("DOMContentLoaded", function(event) {
     // temp solution? webpack binding? react rendering and pass only root?
     setInterval(function(){
         device.detect(document.getElementById('status'))
-    }, 2000)
+    }, 20000)
 });

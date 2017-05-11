@@ -8,20 +8,30 @@ class ZonesStorage {
             zones = []
         }
 
+        zone.id = zones.length 
         zones.push(zone)
 
         localStorage.setItem("zones", JSON.stringify(zones))
 
-        return zones.length - 1
+        return zone.id
+    }
+
+    editZone(zoneId, data) {
+        let zones = localStorage.getItem("zones")
+
+        zones = JSON.parse(zones)
+        zones[zoneId].update(data)
+
+        localStorage.setItem("zones", JSON.stringify(zones))
+
+        return zones[zoneId]
     }
 
     getZone(zoneId) {
         let zones = localStorage.getItem("zones")
 
-        console.log(zoneId)
         zones = JSON.parse(zones)
-        console.log(zones)
-        console.log(zones[zoneId])
+        zones[zoneId].update({"id": zoneId})
 
         return zones[zoneId]
     }

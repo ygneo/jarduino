@@ -12,36 +12,59 @@ class ZoneData extends React.Component {
         this.state = {
             zone: props.zone
         };
+
+        this.handleButtonClick = this.handleButtonClick.bind(this)
+
     }
+
+    handleButtonClick(event) {
+        const target = event.target
+        const className = target.className
+
+        if (className == "edit_button") {
+            this.props.onEditButtonClick(event.target.getAttribute('data-zoneId'));
+        }
+    }
+
 
     render() {
         let zone = this.state.zone
+        let zoneId = {'data-zoneId': zone.id}
 
         return (
-            <div>
-                <div>
-                    <h2>{zone.name}</h2>
-                    <h3>{zone.description}</h3>
+            <div id="data">
+                <div id="header">
+                    <div id="content">
+                        <h2>{zone.name}</h2>
+                        <h3>{zone.description}</h3>
+                    </div>
                 </div>
-                <div>
-                    <span className="label">Frecuencia de riego</span>
-                    <span className="value">
-                        cada {zone.watering_frequence} {zone.watering_frequence_interval}
-                    </span>
+                <div className="items">
+                    <div className="item">
+                        <span className="label">Frecuencia de riego</span>
+                        <span className="value">
+                            cada {zone.watering_frequence} {zone.watering_frequence_interval}
+                        </span>
+                    </div>
+                    <div className="item">
+                        <span className="label">Tiempo de riego</span>
+                        <span className="value">
+                            {zone.watering_time} {zone.watering_time_interval}
+                        </span>
+                    </div>
+                    <div className="item">
+                        <span className="label">Umbral de humedad</span>
+                        <span className="value">
+                            {zone.min_soil_moisture}
+                        </span>
+                    </div>
                 </div>
-                <div>
-                    <span className="label">Tiempo de riego</span>
-                    <span className="value">
-                        {zone.watering_frequence} {zone.watering_frequence_interval}
-                    </span>
+                <div className="buttons">
+                    <span className="edit_button"
+                          {...zoneId}
+                          onClick={this.handleButtonClick}
+                    />
                 </div>
-                <div>
-                    <span className="label">Umbral de humedad</span>
-                    <span className="value">
-                        {zone.min_soil_moisture}
-                    </span>
-                </div>
-
             </div>
         )
     }
@@ -60,6 +83,7 @@ class IrrigationZone extends React.Component {
         this.storage = new ZonesStorage()
 
         this.renderCreateForm = this.renderCreateForm.bind(this)
+        this.renderEditForm = this.renderEditForm.bind(this)
         this.cancelForm = this.cancelForm.bind(this)
         this.renderZoneData = this.renderZoneData.bind(this)
     }
@@ -96,7 +120,23 @@ class IrrigationZone extends React.Component {
 
             element = (
                 <section className={className}>
-                    <ZoneData zone={this.state.zone}/>
+                    <ZoneData zone={this.state.zone}
+                              mode="edit"
+                              onEditButtonClick={this.renderEditForm}
+                    />
+                </section>
+            )
+        } else if (this.state.mode == "edition") {
+            className = "form"
+
+            element = (
+                <section className={className}>
+                    <IrrigationZoneForm
+                        mode="create"
+                        onCancel={this.cancelForm}
+                        onSubmit={this.renderZoneData}
+                        zone={this.state.zone}
+                    />
                 </section>
             )
         }
@@ -108,8 +148,19 @@ class IrrigationZone extends React.Component {
         this.setState({mode: "creation"})
     }
 
+    renderEditForm(zoneId) {
+        this.setState({
+            mode: "edition",
+            "zoneId": zoneId
+        })
+    }
+
     cancelForm() {
-        this.setState({mode: "empty"})
+        if (this.state.zone == null) {
+            this.setState({mode: "empty"})
+        } else {
+            this.setState({mode: "show"})
+        }
     }
 
     renderZoneData(zoneId) {
@@ -117,7 +168,6 @@ class IrrigationZone extends React.Component {
             mode: "show",
             zoneId: zoneId
         })
-
     }
 }
 
@@ -132,15 +182,24 @@ class Zones {
     renderZones(element) {
         let zones = this.storage.getZones()
 
-        ReactDOM.render(
-            <div id="zones">
-                {zones.map((zone,i) => {
-                     return <IrrigationZone mode="show" zone={zone} />
-                })}
-                <IrrigationZone mode="empty" />
-            </div>,
-            element
-        )
+        if (zones == null) {
+            ReactDOM.render(
+                <div id="zones">
+                    <IrrigationZone mode="empty" />
+                </div>,
+                element
+            )
+        } else {
+            ReactDOM.render(
+                <div id="zones">
+                    {zones.map((zone,i) => {
+                         return <IrrigationZone mode="show" zone={zone} />
+                    })}
+                    <IrrigationZone mode="empty" />
+                </div>,
+                element
+            )
+        }
     }
 }
 
