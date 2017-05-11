@@ -8,12 +8,40 @@ const TextInputFieldSet = fieldsets.TextInputFieldSet
 const TimeIntervalFieldSet = fieldsets.TimeIntervalFieldSet
 
 
-class IrrigationZoneForm extends React.Component {
+class DeleteButton extends React.Component {
     constructor(props) {
         super(props)
 
         this.state = {
             'mode': props.mode,
+            'zoneId': props.zoneId
+        }
+
+        this.handleClick = this.handleClick.bind(this)
+    }
+
+    handleClick(event) {
+        this.props.onClick(event.target.getAttribute('data-zoneId'));
+    }
+
+    render() {
+        if (this.state.mode == "on") {
+            return (
+                <span className="delete"
+                  data-zoneId={this.state.zoneId}
+                      onClick={this.handleClick}/>
+            )
+        }
+        return null
+    }
+}
+
+
+class IrrigationZoneForm extends React.Component {
+    constructor(props) {
+        super(props)
+
+        this.state = {
             'zone': {
                 name: '',
                 description: '',
@@ -32,6 +60,7 @@ class IrrigationZoneForm extends React.Component {
 
         this.handleInputChange = this.handleInputChange.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this)
+        this.handleDelete = this.handleDelete.bind(this)
         this.handleCancel = this.handleCancel.bind(this)
     }
 
@@ -53,23 +82,39 @@ class IrrigationZoneForm extends React.Component {
         })
     }
 
+    handleDelete(zoneId) {
+        var r = confirm("Se borrará la zona. ¿De acuerdo?")
+
+        if (r == true) {
+            this.storage.deleteZone(zoneId)
+        }
+
+        this.props.onDelete()
+    }
+
     handleSubmit(event) {
-        let zoneId
+        let zone
 
         event.preventDefault()
 
-        if (this.state.id) {
-            alert("edit")
-            zoneId = this.storage.editZone(this.state.id, this.state)
+        if (this.state.zone.id === undefined) {
+            zone = this.storage.addZone(this.state.zone)
+            this.props.onZoneCreated(zone);
         } else {
-            zoneId = this.storage.addZone(this.state)
+            zone = this.storage.editZone(this.state.zone.id, this.state.zone)
+            this.props.onZoneUpdated(zone);
         }
-
-        this.props.onSubmit(zoneId);
     }
 
     render () {
         let zone = this.state.zone
+        let deleteButtonMode = "off"
+        let zoneId
+
+        if (zone.id !== undefined) {
+            deleteButtonMode = "on"
+            zoneId = zone.id
+        }
 
         return (
             <form onSubmit={this.handleSubmit}>
@@ -121,8 +166,14 @@ class IrrigationZoneForm extends React.Component {
                     </select>
                 </fieldset>
                 <div className="buttons">
-                    <button type="button" onClick={this.handleCancel}>CANCELAR</button>
-                    <button type="submit">GUARDAR</button>
+                    <DeleteButton mode={deleteButtonMode}
+                                  zoneId={zoneId}
+                                  onClick={this.handleDelete}
+                    />
+                    <div className="actions">
+                        <button type="button" onClick={this.handleCancel}>CANCELAR</button>
+                        <button type="submit">GUARDAR</button>
+                    </div>
                 </div>
             </form>
         )

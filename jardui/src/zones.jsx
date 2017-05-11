@@ -14,7 +14,6 @@ class ZoneData extends React.Component {
         };
 
         this.handleButtonClick = this.handleButtonClick.bind(this)
-
     }
 
     handleButtonClick(event) {
@@ -25,7 +24,6 @@ class ZoneData extends React.Component {
             this.props.onEditButtonClick(event.target.getAttribute('data-zoneId'));
         }
     }
-
 
     render() {
         let zone = this.state.zone
@@ -68,36 +66,33 @@ class ZoneData extends React.Component {
             </div>
         )
     }
-
 }
 
-class IrrigationZone extends React.Component {
+
+class EmptyIrrigationZone extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            mode: props.mode ? props.mode : "empty",
-            zone: props.zone
+            mode: props.mode ? props.mode : "visible"
         };
 
-        this.storage = new ZonesStorage()
+        this.handleCreateZone = this.handleCreateZone.bind(this)
+    }
 
-        this.renderCreateForm = this.renderCreateForm.bind(this)
-        this.renderEditForm = this.renderEditForm.bind(this)
-        this.cancelForm = this.cancelForm.bind(this)
-        this.renderZoneData = this.renderZoneData.bind(this)
+    handleCreateZone() {
+        this.setState({mode: "hidden"})
+        this.props.onCreateZone()
     }
 
     render() {
-        let element
-        let className
+        let className = "create_irrigation_zone"
 
-        if (this.state.mode === "empty") {
-            className = "create_irrigation_zone"
-            element = (
+        if (this.state.mode === "visible") {
+            return (
                 <section className={className}>
                     <div className={`card ${className}`}>
-                        <CreateIrrigationZoneButton onClick={this.renderCreateForm}/>
+                        <CreateIrrigationZoneButton onClick={this.handleCreateZone}/>
                     </div>
                     <div className={`card {className}`}>
                         <span className="help">Configura una nueva zona de riego en el sistema</span>
@@ -105,13 +100,43 @@ class IrrigationZone extends React.Component {
                 </section>
             )
         }
-        else if (this.state.mode == "creation") {
+        return null
+    }
+}
+
+
+class IrrigationZone extends React.Component {
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            mode: props.mode,
+            zone: props.zone
+        };
+
+        this.storage = new ZonesStorage()
+
+        this.handleZoneCreation = this.handleZoneCreation.bind(this)
+        this.handleZoneDeletion = this.handleZoneDeletion.bind(this)
+        this.handleZoneUpdate = this.handleZoneUpdate.bind(this)
+
+        this.renderEditForm = this.renderEditForm.bind(this)
+        this.cancelForm = this.cancelForm.bind(this)
+    }
+
+    render() {
+        let className
+        let element = null
+
+        if (this.state.mode == "creation") {
             className = "form"
             element = (
                 <section className={className}>
                     <IrrigationZoneForm
                         onCancel={this.cancelForm}
-                        onSubmit={this.renderZoneData}
+                        onDelete={this.deleteZone}
+                        onZoneCreated={this.handleZoneCreation}
                     />
                 </section>
             )
@@ -121,7 +146,7 @@ class IrrigationZone extends React.Component {
             element = (
                 <section className={className}>
                     <ZoneData zone={this.state.zone}
-                              mode="edit"
+                              onCancel={this.cancelForm}
                               onEditButtonClick={this.renderEditForm}
                     />
                 </section>
@@ -132,9 +157,9 @@ class IrrigationZone extends React.Component {
             element = (
                 <section className={className}>
                     <IrrigationZoneForm
-                        mode="create"
                         onCancel={this.cancelForm}
-                        onSubmit={this.renderZoneData}
+                        onZoneUpdated={this.handleZoneUpdate}
+                        onDelete={this.handleZoneDeletion}
                         zone={this.state.zone}
                     />
                 </section>
@@ -144,62 +169,122 @@ class IrrigationZone extends React.Component {
         return element
     }
 
-    renderCreateForm() {
-        this.setState({mode: "creation"})
+    renderData(zone) {
+        this.setState({
+            mode: "show",
+            zone: zone
+        })
     }
 
+    handleZoneCreation(zone) {
+        this.renderData(zone)
+        this.props.onZoneCreated()
+    }
+
+    handleZoneDeletion() {
+        this.props.onZoneDeletion()
+    }
+
+    handleZoneUpdate(zone) {
+        this.renderData(zone)
+        this.props.onZoneUpdated()
+    }
+
+
     renderEditForm(zoneId) {
+        let zone = this.storage.getZone(zoneId)
+
         this.setState({
-            mode: "edition",
-            "zoneId": zoneId
+            "mode": "edition",
+            "zone": zone
         })
     }
 
     cancelForm() {
-        if (this.state.zone == null) {
-            this.setState({mode: "empty"})
-        } else {
+        if (this.state.zone !== undefined) {
             this.setState({mode: "show"})
+        } else {
+            this.setState({mode: "dead"})
+            this.props.onZoneDeletion()
         }
-    }
-
-    renderZoneData(zoneId) {
-        this.setState({
-            mode: "show",
-            zoneId: zoneId
-        })
     }
 }
 
 
-class Zones {
-    constructor() {
+class Zones extends React.Component {
+    constructor(props) {
+        let zones
+
+        super(props)
+
         this.storage = new ZonesStorage()
 
-        this.renderZones = this.renderZones.bind(this)
+        zones = this.storage.getZones()
+
+        this.state = {
+            "zones": zones ? zones : [],
+            "mode": "normal"
+        }
+
+        this.handleZoneCreation = this.handleZoneCreation.bind(this);
+        this.handleZoneCreated = this.handleZoneCreated.bind(this);
+        this.handleZoneUpdated = this.handleZoneUpdated.bind(this);
+        this.handleZoneDeletion = this.handleZoneDeletion.bind(this);
     }
 
-    renderZones(element) {
-        let zones = this.storage.getZones()
+    handleZoneCreation() {
+        this.setState({"mode": "creating"})
+    }
 
-        if (zones == null) {
-            ReactDOM.render(
-                <div id="zones">
-                    <IrrigationZone mode="empty" />
-                </div>,
-                element
-            )
+    handleZoneCreated() {
+        this.setState({
+            "mode": "normal",
+            "zones": this.storage.getZones()
+        })
+    }
+
+    handleZoneDeletion() {
+        this.setState(
+            {
+                "mode": "normal",
+                "zones": this.storage.getZones()
+            })
+    }
+
+    handleZoneUpdated() {
+        
+    }
+
+    render() {
+        let numZones = this.state.zones.length
+        let emptyIrrigationZone = <EmptyIrrigationZone onCreateZone={this.handleZoneCreation}/>
+        let zoneElements = []
+
+        this.state.zones.map((zone,i) => {
+            zoneElements.push(<IrrigationZone
+                                  mode="show"
+                                  zone={zone}
+                                  onZoneDeletion={this.handleZoneDeletion}
+                                  onZoneUpdated={this.handleZoneCreated}
+                              />)
+        })
+
+        if (this.state.mode =="creating") {
+            zoneElements.push(<IrrigationZone
+                                  mode="creation"
+                                  onZoneCreated={this.handleZoneCreated}
+                                  onZoneUpdated={this.handleZoneCreated}
+                                  onZoneDeletion={this.handleZoneDeletion}
+                              />)
         } else {
-            ReactDOM.render(
-                <div id="zones">
-                    {zones.map((zone,i) => {
-                         return <IrrigationZone mode="show" zone={zone} />
-                    })}
-                    <IrrigationZone mode="empty" />
-                </div>,
-                element
-            )
+            zoneElements.push(emptyIrrigationZone)
         }
+
+        return (
+        <div id="zones">
+            {zoneElements}
+        </div>
+        )
     }
 }
 

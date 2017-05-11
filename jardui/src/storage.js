@@ -8,30 +8,42 @@ class ZonesStorage {
             zones = []
         }
 
-        zone.id = zones.length 
+        zone.id = zones.length
         zones.push(zone)
 
         localStorage.setItem("zones", JSON.stringify(zones))
 
-        return zone.id
+        return zone
     }
 
     editZone(zoneId, data) {
         let zones = localStorage.getItem("zones")
 
         zones = JSON.parse(zones)
-        zones[zoneId].update(data)
+        Object.assign(zones[zoneId], data)
 
         localStorage.setItem("zones", JSON.stringify(zones))
 
         return zones[zoneId]
     }
 
+    deleteZone(zoneId) {
+        let zones = localStorage.getItem("zones")
+
+        zones = JSON.parse(zones)
+        console.log(zones)
+        zones.splice(zoneId, 1)
+        console.log(zones)
+
+        localStorage.setItem("zones", JSON.stringify(zones))
+
+        return true
+    }
+
     getZone(zoneId) {
         let zones = localStorage.getItem("zones")
 
         zones = JSON.parse(zones)
-        zones[zoneId].update({"id": zoneId})
 
         return zones[zoneId]
     }

@@ -168,7 +168,6 @@ div#main section form {
 
 div#main section form div.buttons {
     margin-top: 3ex;
-    float: right;
 }
 
 div#main section form button {
@@ -177,8 +176,6 @@ div#main section form button {
     padding: 0;
     color: #17a1e6;
     font-weight: bold;
-    margin-top: 4ex;
-    margin-left: 2ex;
     cursor: pointer;
 }
 
@@ -289,6 +286,9 @@ div#main section div#data div.items div.item span.value {
 div#main section div#data div.buttons {
     clear: both;
     width: 90%;
+    margin-top: 4ex;
+    margin-left: 2ex;
+
 }
 
 div#main section div#data div.buttons span.edit_button {
@@ -303,3 +303,24 @@ div#main section div#data div.buttons span.edit_button {
 div#main section div#data div.buttons span.edit_button:hover {
     background: url('/jardui/img/configure_hover.png') no-repeat;
 }
+
+div#main section form div.buttons span.delete {
+    display: block;
+    background: url('/jardui/img/delete.png') no-repeat;
+    width: 20px;
+    height: 20px;
+    float: left;
+    cursor: pointer;
+}
+
+div#main section form div.buttons span.delete:hover {
+    background: url('/jardui/img/delete_hover.png') no-repeat;
+}
+
+div#main section form div.buttons div.actions {
+    float: right;
+}
+
+div#main section form div.buttons button {
+    float: left;
+    margin-left: 2ex;
