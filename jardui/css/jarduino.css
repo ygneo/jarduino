@@ -91,13 +91,23 @@ header div#jarduino_controls div#status #msg {
 
 header div#jarduino_controls div#buttons button {
     border-radius: 4px;
-    color: #cccccc;
-    background: #f2f2f2;
     padding: 2ex;
     width: 16em;
     border-color: transparent;
     box-shadow: 0px 2px 0px #e0e0e0;
     font-weight: bold;
+}
+
+header div#jarduino_controls div#buttons button.disabled {
+    color: #cccccc;
+    background: #f2f2f2;
+    cursor: not-allowed;
+}
+
+header div#jarduino_controls div#buttons button.enabled {
+    background: #17A1E6;
+    color: white;
+    cursor: pointer;
 }
 
 div#main {

@@ -252,7 +252,7 @@ class Zones extends React.Component {
     }
 
     handleZoneUpdated() {
-        
+        this.props.onZonesUpdated()
     }
 
     render() {
@@ -265,7 +265,7 @@ class Zones extends React.Component {
                                   mode="show"
                                   zone={zone}
                                   onZoneDeletion={this.handleZoneDeletion}
-                                  onZoneUpdated={this.handleZoneCreated}
+                                  onZoneUpdated={this.handleZoneUpdated}
                               />)
         })
 
@@ -273,7 +273,7 @@ class Zones extends React.Component {
             zoneElements.push(<IrrigationZone
                                   mode="creation"
                                   onZoneCreated={this.handleZoneCreated}
-                                  onZoneUpdated={this.handleZoneCreated}
+                                  onZoneUpdated={this.handleZoneUpdated}
                                   onZoneDeletion={this.handleZoneDeletion}
                               />)
         } else {
