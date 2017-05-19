@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import pythonShell from 'python-shell'
+import DeviceSearcher from './device_searcher.js'
 
 
 class DeviceStatus extends React.Component {
@@ -9,74 +10,87 @@ class DeviceStatus extends React.Component {
 
         this.state = {
             "status": props.status,
-            "device_found": false
+            "found": false
         }
+
+        this.deviceSearcher = new DeviceSearcher
 
         this.searching_device_statuses = ["searching", "detection_error"]
         this.status_className = {
             "searching": "",
+            "uploading": "",
             "detection_error": "error",
             "changes_ready": "error",
+            "changes_upload_error": "error",
+            "changes_uploaded": "success",
             "success": "success"
         }
 
         this.handleDetected = this.handleDetected.bind(this)
         this.handleDetectionError = this.handleDetectionError.bind(this)
-        this.handleArduinoDetection = this.handleArduinoDetection.bind(this)
+        this.startDeviceSearch = this.startDeviceSearch.bind(this)
+        this.stoptDeviceSearch = this.stopDeviceSearch.bind(this)
 
-        this.searchingDevice = this.searchingDevice.bind(this)
+        this.startDeviceSearch()
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.searchingDevice() === false) {
-            this.setState({
-                "status": nextProps.status
-            })
+        this.setState({
+            "status": nextProps.status
+        })
+
+        if (nextProps.status === "searching" ||
+            nextProps.status === "changes_uploaded"
+        ) {
+            this.startDeviceSearch()
+        } else if (nextProps.status === "uploading") {
+            this.stopDeviceSearch()
+            this.props.onReadyForUpload()
         }
     }
 
-    componentDidMount() {
-        setInterval(this.handleArduinoDetection, 2000)
-    }
-
-    searchingDevice() {
-        return (this.searching_device_statuses.includes(this.state.status))
-    }
-
-    handleArduinoDetection() {
+    startDeviceSearch() {
         let handlers  = {
             onDetected: this.handleDetected,
             onError: this.handleDetectionError
         }
 
-        detectArduinoDevice(handlers)
+        this.deviceSearcher.startSearch(handlers)
     }
 
-    handleDetected(deviceName) {
-        if (this.searchingDevice() === true) {
+    stopDeviceSearch() {
+        this.deviceSearcher.stopSearch()
+    }
+
+    handleDetected(device) {
+        if (this.state.found === false) {
             this.setState({
                 "status": "success",
-                "deviceName": deviceName
+                "deviceName": device.name,
+                "found": true
             })
 
-            this.props.onDeviceFound()
+            this.props.onDeviceFound(device)
         }
     }
 
     handleDetectionError() {
         this.setState({
-            "status": "detection_error"
+            "status": "detection_error",
+            "found": false
         })
 
         this.props.onDeviceNotFound()
     }
 
-    render () {
+    render() {
         let statusMessage = {
             "success": "Dispositivo Arduino detectado (" + this.state.deviceName + ")",
             "detection_error": "No se ha detectado ningún dispositivo Arduino",
-            "changes_ready": "Para que los cambios tengan efecto es necesario reprogramar Arduino.",
-            "updated": "El dispositivo Arduino ha sido reprogramado"
+            "changes_ready": "Para que los cambios tengan efecto es necesario reprogramar Arduino",
+            "changes_uploaded": "El dispositivo Arduino ha sido reprogramado",
+            "changes_upload_error": "Error intentando reprogramar el dispositivo Arduino",
+            "uploading": "Reprogramando Arduino... (" + this.state.deviceName + ")"
         }
         let msg = statusMessage[this.state.status]
         let className = this.status_className[this.state.status]
@@ -88,20 +102,6 @@ class DeviceStatus extends React.Component {
             </div>
         )
     }
-}
-
-
-function detectArduinoDevice(handlers) {
-    let pyshell = new pythonShell('jarduino.py', {"args": ["detect"]});
-
-    pyshell.on('message', function (deviceName) {
-        handlers.onDetected(deviceName)
-    })
-
-    pyshell.on('error', function (message) {
-        handlers.onError(message)
-    })
-
 }
 
 

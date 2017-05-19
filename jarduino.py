@@ -102,6 +102,9 @@ def read_code_configuration():
     with open("{}jarduino.json".format(SKETCKES_DIR), "r") as f:
         code_configuration = json.loads(f.read())
 
+    for key, value in code_configuration.iteritems():
+        code_configuration[key] = str(code_configuration[key]).replace("[", "{").replace("]", "}")
+
     return code_configuration
 
 

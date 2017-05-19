@@ -51,7 +51,9 @@ class ZonesStorage {
     getZones() {
         let zones = localStorage.getItem("zones")
 
-        return JSON.parse(zones)
+        zones = JSON.parse(zones)
+
+        return Object.keys(zones).map(x => zones[x])
     }
 }
 
