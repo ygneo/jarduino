@@ -63,15 +63,17 @@ class ArduinoDevice {
             console.log(message);
         });
 
+        this.pyshell.on('error', function (message) {
+            console.log(message);
+        });
+
         this.pyshell.end(function (err) {
-            /// CAREFUL by now we are ignoring a weird error
-            // if (err) {
-            //     console.log(err);
-            //     handlers.onUploadError()
-            // } else {
-            //     handlers.onUploaded()
-            // }
-            handlers.onUploaded()
+            if (!err.toString().includes("never used")) {
+                 console.log(err);
+                 handlers.onUploadError()
+             } else {
+                 handlers.onUploaded()
+             }
         });
     }
 
