@@ -1,9 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import pythonShell from 'python-shell'
 import DeviceStatus from './jardui/lib/device_status.js'
 import Zones from './jardui/lib/zones.js'
 import ZonesStorage from './jardui/lib/storage.js'
+import UploadCodeToDeviceButton from './jardui/lib/widgets/buttons/upload_code.js'
 
 
 window.require('nw.gui').Window.get().maximize()
@@ -16,7 +16,7 @@ class App extends React.Component {
 
         this.state = {
             "status": "searching",
-            "device_found": false
+            "deviceFound": false
         }
 
         this.storage = new ZonesStorage
@@ -39,7 +39,7 @@ class App extends React.Component {
     handleDeviceFound(device) {
         this.setState({
             "status": "success",
-            "device_found": true,
+            "deviceFound": true,
             "device": device
         })
     }
@@ -47,7 +47,7 @@ class App extends React.Component {
     handleDeviceNotFound() {
         this.setState({
             "status": "detection_error",
-            "device_found": false
+            "deviceFound": false
         })
     }
 
@@ -80,12 +80,6 @@ class App extends React.Component {
     }
 
     render() {
-        let uploadButtonClassName = "disabled"
-
-        if (this.state.device_found === true) {
-            uploadButtonClassName = "enabled"
-        }
-
         return (
             <div id="app">
                 <head>
@@ -104,11 +98,10 @@ class App extends React.Component {
                                 />
                             </div>
                             <div id="buttons">
-                                <button
-                                    type="button"
-                                    className={uploadButtonClassName}
+                                <UploadCodeToDeviceButton
+                                    enabled={this.state.deviceFound}
                                     onClick={this.uploadCodeToDevice}
-                                >REPROGRAMAR</button>
+                                />
                             </div>
                         </div>
                     </header>

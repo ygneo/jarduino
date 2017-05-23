@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import CreateIrrigationZoneButton from './buttons.js'
+import CreateIrrigationZoneButton from './widgets/buttons/create_zone.js'
 import IrrigationZoneForm from './forms.js'
 import ZonesStorage from './storage.js'
 
