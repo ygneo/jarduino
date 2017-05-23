@@ -33,16 +33,18 @@ class ArduinoDevice {
 
     update_code_config(zones) {
         let moistureValues = []
+        let wateringTimes = []
 
         zones.map((zone,i) => {
             moistureValues.push(moistureLeveltoMoistureValue(zone.min_soil_moisture))
+            wateringTimes.push(wateringTimeToMs(zone.watering_time, zone.watering_time_interval))
         })
 
         var codeConfig = {
             "soilMoistureMinSensorValues": moistureValues,
             "checkingDelay": 1000,
             "numchecksBeforeWatering": 3,
-            "wateringTime": [200, 300]
+            "wateringTimes": wateringTimes
         }
         var json = JSON.stringify(codeConfig)
         fs.writeFile('sketches/jarduino/jarduino.json', json, 'utf8')
@@ -90,6 +92,16 @@ function moistureLeveltoMoistureValue(level) {
         "very_high": 200
     }
     return levelToMoistureValue[level]
+}
+
+
+function wateringTimeToMs(time, interval) {
+    let multiplier = {
+        "s": 1000,
+        "m": 60000,
+        "h": 360000
+    }
+    return time * multiplier[interval];
 }
 
 

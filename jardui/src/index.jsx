@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom'
 import pythonShell from 'python-shell'
 import DeviceStatus from './jardui/lib/device_status.js'
 import Zones from './jardui/lib/zones.js'
-import DeviceSearcher from './jardui/lib/device_searcher.js'
 import ZonesStorage from './jardui/lib/storage.js'
 
 
@@ -21,7 +20,6 @@ class App extends React.Component {
         }
 
         this.storage = new ZonesStorage
-        this.device_searcher = new DeviceSearcher
 
         this.handleZonesUpdated = this.handleZonesUpdated.bind(this)
         this.handleDeviceFound = this.handleDeviceFound.bind(this)
