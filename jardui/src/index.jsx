@@ -4,6 +4,7 @@ import DeviceStatus from './jardui/lib/device_status.js'
 import Zones from './jardui/lib/zones.js'
 import ZonesStorage from './jardui/lib/storage.js'
 import UploadCodeToDeviceButton from './jardui/lib/widgets/buttons/upload_code.js'
+import DeviceReader from './jardui/lib/devices/reader.js'
 
 
 window.require('nw.gui').Window.get().maximize()
@@ -42,6 +43,21 @@ class App extends React.Component {
             "deviceFound": true,
             "device": device
         })
+
+        this.handleReadFromDevice()
+    }
+
+    handleReadFromDevice() {
+        this.deviceReader = new DeviceReader(this.state.device)
+
+        this.deviceReader.startReading({
+            "onMessage": function (message) {
+                console.log(message)
+            },
+            "onError": function (error) {
+                console.log(error)
+            }
+        })
     }
 
     handleDeviceNotFound() {
@@ -53,6 +69,7 @@ class App extends React.Component {
 
     handleCodeUploaded() {
         this.setState({
+
             status: "changes_uploaded"
         })
     }
