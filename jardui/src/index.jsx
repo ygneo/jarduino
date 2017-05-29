@@ -55,7 +55,7 @@ class App extends React.Component {
 
         this.deviceReader.startReading({
             "onMessage": function (message) {
-                this.setState(
+                this_instance.setState(
                     {"zonesData": parseZonesData(message)}
                 )
             },
@@ -74,7 +74,6 @@ class App extends React.Component {
 
     handleCodeUploaded() {
         this.setState({
-
             status: "changes_uploaded"
         })
     }
