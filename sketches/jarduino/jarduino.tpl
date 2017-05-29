@@ -12,19 +12,35 @@ const int checkingDelay = 1000; // Delay in ms between checks  (for the analog-t
 const int numChecksBeforeSending = 3; // Number of checks should be done before sending data to serial
 const int wateringTime[] = $wateringTimes; // Watering time in ms for every plant
 
-void sendToSerial (int id, int value)
+
+void sendValuesToSerial (int values[])
 {
+  Serial.print("#sensors#");
+  
+  for (unsigned int i=0; i<sizeof(values); i++) {
+    String valuesString;
+    
+    valuesString += i;
+    valuesString += ",";
+    valuesString += values[i];
+    valuesString += "#";   
+    Serial.print(valuesString);  
+  }
+  
+  Serial.print("\n");
+}
+
+void sendWateringEventToSerial (int id) 
+{
+  String valuesString;
+
   Serial.print("#");
-  Serial.print(id);
-  if (value == -1) {
-    Serial.println("#w#");
-  }
-  else {
-    Serial.print("#");
-    Serial.print(value);
-    Serial.print("#");
-    Serial.print("\n");
-  }
+  Serial.print("actuators");
+  Serial.print("#");
+  valuesString += id;
+  valuesString += ",w#";   
+  Serial.print(valuesString);  
+  Serial.print("\n");
 }
 
 void setup() {
@@ -43,7 +59,6 @@ boolean mustWater(int id, int value) {
 
 int doWatering(int id) {
   digitalWrite(digitalOutPin[id], HIGH);
-  sendToSerial(id, -1);
   delay(wateringTime[id]);
   digitalWrite(digitalOutPin[id], LOW);
   return wateringTime[id];
@@ -53,7 +68,7 @@ void loop() {
   static int checksDone;
   static int sum[2];
   int sensorValue[2];
-  int mean[] = {0, 0};
+  int means[] = {0, 0};
   int wateringDelay[] = {0, 0};
   int delayTime = 0;
   
@@ -64,18 +79,23 @@ void loop() {
   sum[0] += sensorValue[0];
   sum[1] += sensorValue[1];
   if (checksDone >= numChecksBeforeSending) {
-    mean[0] = sum[0] / checksDone;
-    mean[1] = sum[1] / checksDone;
-    sendToSerial(0, mean[0]);
-    sendToSerial(1, mean[1]);
+    means[0] = sum[0] / checksDone;
+    means[1] = sum[1] / checksDone;
+
+    sendValuesToSerial(means);
+   
     checksDone = 0;
     sum[0] = 0;
     sum[1] = 0;
-    if (mustWater(0, mean[0])) {
+   
+    if (mustWater(0, means[0])) {
       wateringDelay[0] = doWatering(0);
+      sendWateringEventToSerial(0);
     }
-    if (mustWater(1, mean[1])) {
+    
+    if (mustWater(1, means[1])) {
       wateringDelay[1] = doWatering(1);
+      sendWateringEventToSerial(1);
     }
   }   
  

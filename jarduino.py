@@ -16,12 +16,15 @@ from random import randint
 SKETCKES_DIR = "./sketches/jarduino/"
 
 
+
 class JarduinoParser(object):
 
     def __init__(self, serial_device, fake_serial_input=False):
         self.fake_serial_input = fake_serial_input
         self.serial = serial_device
-        self.value_pattern = re.compile("^#([0-9])#([0-9]+|w)#$")
+        self.sensors_values_pattern = re.compile("^#sensors#([0-9],[0-9]+)#([0-9],[0-9]+)#$")
+        self.actuators_values_pattern = re.compile("^#actuators#([0-9],w)#$")
+        self.sensors_data = []
 
     def read_serial_data(self):
         if self.fake_serial_input:
@@ -30,14 +33,52 @@ class JarduinoParser(object):
 
     def parse(self):
         try:
-            data = self.read_serial_data()
-            match = self.value_pattern.match(data.strip())
-            if match:
-                values = match.groups()
-                return '["{}","{}"]'.format(str(values[0]), str(values[1]))
+            data = self.read_serial_data().strip()
+            sensors_match = self.sensors_values_pattern.match(data)
+            actuators_match = self.actuators_values_pattern.match(data)
+
+            if sensors_match:
+                return self.sensors_parsed_data(sensors_match.groups())
+
+            if actuators_match:
+                return self.actuators_parsed_data(actuators_match.groups())
+
             return None
         except serial.SerialException:
             pass
+
+    def sensors_parsed_data(self, sensors_data):
+        data = {
+            "timestamp": str(time.time()),
+            "type": "sensors",
+            "sensorsData": []
+        }
+
+        for sensor_data in sensors_data:
+            id, value = sensor_data.split(",")
+            data["sensorsData"].append({
+                "id": id,
+                "type": "soil_moisture",
+                "value": value,
+            })
+
+        return data
+
+    def actuators_parsed_data(self, actuators_data):
+        id, _ = actuators_data[0].split(",")
+
+        data = {
+            "timestamp": str(time.time()),
+            "type": "actuators",
+            "actuatorsData": [
+                {
+                    "id": id,
+                    "type": "irrigation",
+                }
+            ]
+        }
+
+        return data
 
 
 def serial_devices(arduino_device_names=[], fake_serial_input=False):
@@ -84,7 +125,7 @@ def print_parsed_serial_input(fake_serial_input=False):
                 fake_arduino_output(serial_output)
             output = parser.parse()
             if output:
-                print output
+                print json.dumps(output)
             sys.stdout.flush()
             time.sleep(1)
         except KeyboardInterrupt:

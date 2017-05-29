@@ -5,6 +5,7 @@ import Zones from './jardui/lib/zones.js'
 import ZonesStorage from './jardui/lib/storage.js'
 import UploadCodeToDeviceButton from './jardui/lib/widgets/buttons/upload_code.js'
 import DeviceReader from './jardui/lib/devices/reader.js'
+import parseZonesData from './jardui/lib/parser.js'
 
 
 window.require('nw.gui').Window.get().maximize()
@@ -17,9 +18,9 @@ class App extends React.Component {
 
         this.state = {
             "status": "searching",
-            "deviceFound": false
+            "deviceFound": false,
+            "zonesData": []
         }
-
         this.storage = new ZonesStorage
 
         this.handleZonesUpdated = this.handleZonesUpdated.bind(this)
@@ -48,11 +49,15 @@ class App extends React.Component {
     }
 
     handleReadFromDevice() {
+        let this_instance = this
+
         this.deviceReader = new DeviceReader(this.state.device)
 
         this.deviceReader.startReading({
             "onMessage": function (message) {
-                console.log(message)
+                this.setState(
+                    {"zonesData": parseZonesData(message)}
+                )
             },
             "onError": function (error) {
                 console.log(error)
@@ -124,7 +129,10 @@ class App extends React.Component {
                     </header>
 
                     <div id="main">
-                        <Zones onZonesUpdated={this.handleZonesUpdated}/>
+                        <Zones
+                            onZonesUpdated={this.handleZonesUpdated}
+                            data={this.state.zonesData}
+                        />
                     </div>
                 </body>
             </div>
