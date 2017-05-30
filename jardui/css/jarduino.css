@@ -126,7 +126,7 @@ div#main section {
     margin-right: 5ex;
     padding-bottom: 2ex;
     background: white;
-    width: 22em;
+    width: 25em;
     border-radius: 4px;
     border: 1px solid #f2f2f2;
     box-shadow: 0px 2px 0px #e0e0e0;
@@ -244,6 +244,123 @@ div#main section div#data div#header div#content  {
     height: 28ex;
 }
 
+div#main section div#data div#header div#content div.attributes  {
+    float: left;
+}
+
+
+div#main section div#data div#header div.soil_moisture_level  {
+    float: right;
+    background: url('/jardui/img/cube.png') no-repeat;
+    width: 40px;
+    height: 161px;
+    margin-right: 2em;
+    margin-top: 4ex;
+}
+
+div#main section div#data div#header div.soil_moisture_level div.level1 {
+    width: 10px;
+    height: 16px;
+    background: white;
+    border-radius: 5px;
+    position: relative;
+    left: 15px;
+    top: 93px;
+}
+
+div#main section div#data div#header div.soil_moisture_level div.level2 {
+    width: 10px;
+    height: 28px;
+    background: white;
+    border-radius: 5px;
+    position: relative;
+    left: 15px;
+    top: 84px;
+}
+
+
+div#main section div#data div#header div.soil_moisture_level div.level3 {
+    width: 10px;
+    height: 40px;
+    background: white;
+    border-radius: 5px;
+    position: relative;
+    left: 15px;
+    top: 75px;
+}
+
+div#main section div#data div#header div.soil_moisture_level div.level4 {
+    width: 10px;
+    height: 52px;
+    background: white;
+    border-radius: 5px;
+    position: relative;
+    left: 15px;
+    top: 63px;
+}
+
+
+div#main section div#data div#header div.soil_moisture_level div.level5 {
+    width: 10px;
+    height: 64px;
+    background: white;
+    border-radius: 5px;
+    position: relative;
+    left: 15px;
+    top: 51px;
+}
+
+div#main section div#data div#header div.soil_moisture_level div.level6 {
+    width: 10px;
+    height: 76px;
+    background: white;
+    border-radius: 5px;
+    position: relative;
+    left: 15px;
+    top: 39px;
+}
+
+div#main section div#data div#header div.soil_moisture_level div.level7 {
+    width: 10px;
+    height: 88px;
+    background: white;
+    border-radius: 5px;
+    position: relative;
+    left: 15px;
+    top: 27px;
+}
+
+div#main section div#data div#header div.soil_moisture_level div.level8 {
+    width: 10px;
+    height: 90px;
+    background: white;
+    border-radius: 5px;
+    position: relative;
+    left: 15px;
+    top: 20px;
+}
+
+div#main section div#data div#header div.soil_moisture_level div.level9 {
+    width: 10px;
+    height: 100px;
+    background: white;
+    border-radius: 5px;
+    position: relative;
+    left: 15px;
+    top: 9px;
+}
+
+div#main section div#data div#header div.soil_moisture_level div.level10 {
+    width: 10px;
+    height: 112px;
+    background: white;
+    border-radius: 5px;
+    position: relative;
+    left: 15px;
+    top: 0px;
+}
+
+
 
 div#main section div#data div#header h2 {
     color: white;
@@ -257,7 +374,6 @@ div#main section div#data div#header h3 {
     color: grey;
     margin: 0;
     padding: 0;
-    padding-top: 20px;
     padding-left: 20px;
 }
 

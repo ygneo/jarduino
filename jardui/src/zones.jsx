@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import CreateIrrigationZoneButton from './widgets/buttons/create_zone.js'
 import IrrigationZoneForm from './forms.js'
 import ZonesStorage from './storage.js'
+import SoilMoistureLevel from './widgets/soil_moisture_level.js'
 
 
 function zeroPadding(n, digits=2) {
@@ -57,7 +58,7 @@ class ZoneData extends React.Component {
 
         if (this.state.data) {
             lastReadTime = timeConverter(this.state.data.timestamp)
-            return <h3>Última lectura {lastReadTime}</h3>
+            return <h3>Última lectura<br/>{lastReadTime}</h3>
         }
     }
 
@@ -66,8 +67,8 @@ class ZoneData extends React.Component {
 
         if (this.state.data) {
             lastValue = this.state.data.value
-            return <h3>{lastValue}</h3>
         }
+        return lastValue
     }
 
     render() {
@@ -80,10 +81,14 @@ class ZoneData extends React.Component {
             <div id="data">
                 <div id="header">
                     <div id="content">
-                        <h2>{zone.name}</h2>
-                        <h3>{zone.description}</h3>
-                        {lastReadTime}
-                        {lastValue}
+                        <div className="attributes">
+                            <h2>{zone.name}</h2>
+                            <h3>{zone.description}</h3>
+                            {lastReadTime}
+                            <h3>{lastValue}</h3>
+                        </div>
+                        <SoilMoistureLevel
+                            value={lastValue} />
                     </div>
                 </div>
                 <div className="items">
@@ -106,6 +111,7 @@ class ZoneData extends React.Component {
                         </span>
                     </div>
                 </div>
+
                 <div className="buttons">
                     <span className="edit_button"
                           {...zoneId}

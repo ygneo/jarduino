@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom'
 class CreateIrrigationZoneButton extends React.Component {
     constructor(props) {
         super(props);
+
         this.handleClick = this.handleClick.bind(this);
     }
 
