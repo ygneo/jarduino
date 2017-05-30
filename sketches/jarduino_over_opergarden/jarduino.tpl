@@ -1,40 +1,59 @@
-/*
- Two-entries moisture sensure and reactive watering prototype. 
- */
+#include <OpenGarden.h>
+#include "Wire.h" 
+
 const int analogInPin1 = A0; // Analog input pin from moisture sensor #1
-const int analogInPin2 = A2; // Analog input pin from moisture sensor #2
+const int analogInPin2 = A1; // Analog input pin from moisture sensor #2
 
 const int digitalOutPin[] = {2, 3}; // Rele-Electrovalve output
 
-const int minSensorValue[] = $soilMoistureMinSensorValues; // Minimun value from the potentiometer to trigger watering
+const int minSensorValue[] = $soilMoistureMinSensorValues; // Array of minimun values from the potentiometer to trigger watering
 
 const int checkingDelay = 1000; // Delay in ms between checks  (for the analog-to-digital converter to settle after last reading)
-const int numChecksBeforeSending = 3; // Number of checks should be done before sending data to serial
-const int wateringTime[] = {200, 300}; // Watering time in ms for every plant
+const int numChecksBeforeSending = 1; // Number of checks should be done before sending data to serial
+const int wateringTime[] = $wateringTimes; // Watering time in ms for every plant
 
-void sendToSerial (int id, int value)
+
+void sendValuesToSerial (int values[])
 {
+  Serial.print("#sensors#");
+  
+  for (unsigned int i=0; i<sizeof(values); i++) {
+    String valuesString;
+    
+    valuesString += i;
+    valuesString += ",";
+    valuesString += values[i];
+    valuesString += "#";   
+    Serial.print(valuesString);  
+  }
+  
+  Serial.print("\n");
+}
+
+void sendWateringEventToSerial (int id) 
+{
+  String valuesString;
+
   Serial.print("#");
-  Serial.print(id);
-  if (value == -1) {
-    Serial.println("#w#");
-  }
-  else {
-    Serial.print("#");
-    Serial.print(value);
-    Serial.print("#");
-    Serial.print("\n");
-  }
+  Serial.print("actuators");
+  Serial.print("#");
+  valuesString += id;
+  valuesString += ",w#";   
+  Serial.print(valuesString);  
+  Serial.print("\n");
 }
 
 void setup() {
   // initialize serial communications at 9600 bps:
   Serial.begin(9600);
-  pinMode(digitalOutPin[0], OUTPUT);
-  pinMode(digitalOutPin[1], OUTPUT);
-  digitalWrite(digitalOutPin[0], LOW);
-  digitalWrite(digitalOutPin[1], LOW);
 
+  OpenGarden.initIrrigation(1);
+  OpenGarden.initIrrigation(2);
+
+  OpenGarden.irrigationOFF(1);
+  OpenGarden.irrigationOFF(2);
+
+  OpenGarden.initSensors();
 }
 
 boolean mustWater(int id, int value) {
@@ -42,40 +61,62 @@ boolean mustWater(int id, int value) {
 }
 
 int doWatering(int id) {
-  digitalWrite(digitalOutPin[id], HIGH);
-  sendToSerial(id, -1);
+  int valve_number = id + 1;
+
+  OpenGarden.irrigationON(valve_number);
+
   delay(wateringTime[id]);
-  digitalWrite(digitalOutPin[id], LOW);
+
+  OpenGarden.irrigationOFF(valve_number);
+
   return wateringTime[id];
 }
+
+int readSoilMoisture(int sensor_id) {
+  OpenGarden.sensorPowerON(); //Turns on the sensor power supply
+  
+  delay(500); // Time for initializing the sensor
+  
+  int soilMoisture = OpenGarden.readSoilMoisture(); //Read the sensor
+  
+  OpenGarden.sensorPowerOFF(); //Turns off the sensor power supply
+
+  return 1023 - soilMoisture;
+}
+
 
 void loop() {
   static int checksDone;
   static int sum[2];
   int sensorValue[2];
-  int mean[] = {0, 0};
+  int means[] = {0, 0};
   int wateringDelay[] = {0, 0};
   int delayTime = 0;
   
-  sensorValue[0] = analogRead(analogInPin1);
-  sensorValue[1] = analogRead(analogInPin2);
+  sensorValue[0] = readSoilMoisture(1);
+  sensorValue[1] = 0;
   checksDone++;
  
   sum[0] += sensorValue[0];
   sum[1] += sensorValue[1];
   if (checksDone >= numChecksBeforeSending) {
-    mean[0] = sum[0] / checksDone;
-    mean[1] = sum[1] / checksDone;
-    sendToSerial(0, mean[0]);
-    sendToSerial(1, mean[1]);
+    means[0] = sum[0] / checksDone;
+    means[1] = sum[1] / checksDone;
+
+    sendValuesToSerial(means);
+   
     checksDone = 0;
     sum[0] = 0;
     sum[1] = 0;
-    if (mustWater(0, mean[0])) {
+   
+    if (mustWater(0, means[0])) {
       wateringDelay[0] = doWatering(0);
+      sendWateringEventToSerial(0);
     }
-    if (mustWater(1, mean[1])) {
+    
+    if (mustWater(1, means[1])) {
       wateringDelay[1] = doWatering(1);
+      sendWateringEventToSerial(1);
     }
   }   
  

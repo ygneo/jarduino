@@ -2,7 +2,7 @@
  Two-entries moisture sensure and reactive watering prototype. 
  */
 const int analogInPin1 = A0; // Analog input pin from moisture sensor #1
-const int analogInPin2 = A2; // Analog input pin from moisture sensor #2
+const int analogInPin2 = A1; // Analog input pin from moisture sensor #2
 
 const int digitalOutPin[] = {2, 3}; // Rele-Electrovalve output
 
@@ -72,8 +72,8 @@ void loop() {
   int wateringDelay[] = {0, 0};
   int delayTime = 0;
   
-  sensorValue[0] = analogRead(analogInPin1);
-  sensorValue[1] = analogRead(analogInPin2);
+  sensorValue[0] = 1023 - analogRead(analogInPin1);
+  sensorValue[1] = 1023 - analogRead(analogInPin2);
   checksDone++;
  
   sum[0] += sensorValue[0];

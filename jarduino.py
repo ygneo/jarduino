@@ -13,7 +13,7 @@ from subprocess import call
 from random import randint
 
 
-SKETCKES_DIR = "./sketches/jarduino/"
+SKETCKES_DIR = "./sketches/jarduino_over_opergarden/"
 
 
 

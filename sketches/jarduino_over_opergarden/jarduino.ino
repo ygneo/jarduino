@@ -1,15 +1,15 @@
-/*
- Two-entries moisture sensure and reactive watering prototype. 
- */
+#include <OpenGarden.h>
+#include "Wire.h" 
+
 const int analogInPin1 = A0; // Analog input pin from moisture sensor #1
-const int analogInPin2 = A1; // Analog input pin from moisture sensor #2
+const int analogInPin2 = A2; // Analog input pin from moisture sensor #2
 
 const int digitalOutPin[] = {2, 3}; // Rele-Electrovalve output
 
 const int minSensorValue[] = {1000, 200}; // Array of minimun values from the potentiometer to trigger watering
 
 const int checkingDelay = 1000; // Delay in ms between checks  (for the analog-to-digital converter to settle after last reading)
-const int numChecksBeforeSending = 3; // Number of checks should be done before sending data to serial
+const int numChecksBeforeSending = 1; // Number of checks should be done before sending data to serial
 const int wateringTime[] = {1000, 2000}; // Watering time in ms for every plant
 
 
@@ -46,11 +46,14 @@ void sendWateringEventToSerial (int id)
 void setup() {
   // initialize serial communications at 9600 bps:
   Serial.begin(9600);
-  pinMode(digitalOutPin[0], OUTPUT);
-  pinMode(digitalOutPin[1], OUTPUT);
-  digitalWrite(digitalOutPin[0], LOW);
-  digitalWrite(digitalOutPin[1], LOW);
 
+  OpenGarden.initIrrigation(1);
+  OpenGarden.initIrrigation(2);
+
+  OpenGarden.irrigationOFF(1);
+  OpenGarden.irrigationOFF(2);
+
+  OpenGarden.initSensors();
 }
 
 boolean mustWater(int id, int value) {
@@ -58,11 +61,29 @@ boolean mustWater(int id, int value) {
 }
 
 int doWatering(int id) {
-  digitalWrite(digitalOutPin[id], HIGH);
+  int valve_number = id + 1;
+
+  OpenGarden.irrigationON(valve_number);
+
   delay(wateringTime[id]);
-  digitalWrite(digitalOutPin[id], LOW);
+
+  OpenGarden.irrigationOFF(valve_number);
+
   return wateringTime[id];
 }
+
+int readSoilMoisture(int sensor_id) {
+  OpenGarden.sensorPowerON(); //Turns on the sensor power supply
+  
+  delay(500); // Time for initializing the sensor
+  
+  int soilMoisture = OpenGarden.readSoilMoisture(); //Read the sensor
+  
+  OpenGarden.sensorPowerOFF(); //Turns off the sensor power supply
+
+  return soilMoisture;
+}
+
 
 void loop() {
   static int checksDone;
@@ -72,8 +93,8 @@ void loop() {
   int wateringDelay[] = {0, 0};
   int delayTime = 0;
   
-  sensorValue[0] = 1023 - analogRead(analogInPin1);
-  sensorValue[1] = 1023 - analogRead(analogInPin2);
+  sensorValue[0] = readSoilMoisture(1);
+  sensorValue[1] = 0;
   checksDone++;
  
   sum[0] += sensorValue[0];
