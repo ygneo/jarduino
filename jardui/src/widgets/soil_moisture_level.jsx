@@ -23,12 +23,12 @@ class SoilMoistureLevel extends React.Component {
         })
     }
 
-    convertMoistureValue2Level(value, max_value=1024) {
+    convertMoistureValue2Level(value, max_value=1023) {
         return Math.round((this.max_level * value) / max_value);
     }
 
     render () {
-        let className = "level" + this.state.level
+        let className = "level level" + this.state.level
 
         return (
             <div className="soil_moisture_level">

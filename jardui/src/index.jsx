@@ -109,7 +109,7 @@ class App extends React.Component {
 
                 <body>
                     <header>
-                        <h1>Jarduino</h1>
+                        <h1 id="logo"></h1>
                         <div id="jarduino_controls">
                             <div id="status">
                                 <DeviceStatus status={this.state.status}
