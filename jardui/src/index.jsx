@@ -4,6 +4,8 @@ import DeviceStatus from './jardui/lib/device_status.js'
 import Zones from './jardui/lib/zones.js'
 import ZonesStorage from './jardui/lib/storage.js'
 import UploadCodeToDeviceButton from './jardui/lib/widgets/buttons/upload_code.js'
+import SettingsButton from './jardui/lib/widgets/buttons/settings.js'
+import SettingsModal from './jardui/lib/widgets/modals/settings.js'
 import DeviceReader from './jardui/lib/devices/reader.js'
 import parseData from './jardui/lib/parser.js'
 
@@ -19,7 +21,8 @@ class App extends React.Component {
         this.state = {
             "status": "searching",
             "deviceFound": false,
-            "zonesData": null
+            "zonesData": null,
+            showSettingsModal: false
         }
 
         this.storage = new ZonesStorage
@@ -30,6 +33,9 @@ class App extends React.Component {
         this.handleCodeUploaded = this.handleCodeUploaded.bind(this)
         this.handleCodeUploadError = this.handleCodeUploadError.bind(this)
         this.handleCodeUpload = this.handleCodeUpload.bind(this)
+        this.handleOpenSettingsModal = this.handleOpenSettingsModal.bind(this)
+        this.handleCloseSettingsModal = this.handleCloseSettingsModal.bind(this)
+
         this.uploadCodeToDevice = this.uploadCodeToDevice.bind(this)
         this.isUploadButtonEnabled = this.isUploadButtonEnabled.bind(this)
     }
@@ -112,8 +118,20 @@ class App extends React.Component {
         })
     }
 
+
     isUploadButtonEnabled() {
         return (this.state.deviceFound && this.state.status !== "uploading")
+
+    handleOpenSettingsModal () {
+        this.setState({
+            showSettingsModal: true
+        })
+    }
+
+    handleCloseSettingsModal () {
+        this.setState({
+            showSettingsModal: false
+        })
     }
 
     render() {
@@ -128,15 +146,19 @@ class App extends React.Component {
                 <body>
                     <header>
                         <h1 id="logo"></h1>
+                        <div id="status">
+                            <DeviceStatus status={this.state.status}
+                                          onDeviceFound={this.handleDeviceFound}
+                                          onDeviceNotFound={this.handleDeviceNotFound}
+                                          onReadyForUpload={this.handleCodeUpload}
+                            />
+                        </div>
+
                         <div id="jarduino_controls">
-                            <div id="status">
-                                <DeviceStatus status={this.state.status}
-                                              onDeviceFound={this.handleDeviceFound}
-                                              onDeviceNotFound={this.handleDeviceNotFound}
-                                              onReadyForUpload={this.handleCodeUpload}
-                                />
-                            </div>
                             <div id="buttons">
+                                <SettingsButton
+                                    onClick={this.handleOpenSettingsModal}
+                                />
                                 <UploadCodeToDeviceButton
                                     enabled={isUploadButtonEnabled}
                                     onClick={this.uploadCodeToDevice}
@@ -144,6 +166,11 @@ class App extends React.Component {
                             </div>
                         </div>
                     </header>
+
+                    <SettingsModal
+                        isOpen={this.state.showSettingsModal}
+                        onClose={this.handleCloseSettingsModal}
+                    />
 
                     <div id="main">
                         <Zones

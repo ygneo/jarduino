@@ -60,56 +60,83 @@ header div#jarduino_controls div {
     float: left;
 }
 
-header div#jarduino_controls div#status {
+header div#status {
+    float: left;
     padding: 1ex;
-    margin-right: 5ex;
+    margin-top: 3.5ex;
+    margin-left: 5ex;
     font-weight: bold;
 }
 
-header div#jarduino_controls div#status span {
+header div#status span {
     float: left;
 }
 
-header div#jarduino_controls div#status div.success span {
+
+header div#status div.success span {
     color: #62b312;
 }
 
-header div#jarduino_controls div#status div.success span#icon {
+header div#status div.success span#icon {
     height: 20px;
     width: 20px;
     background: url('/jardui/img/check.png') no-repeat;
 }
 
-header div#jarduino_controls div#status div.error span#icon {
+header div#status div.error span#icon {
     height: 19px;
     width: 22px;
     background: url('/jardui/img/alert.png') no-repeat;
 }
 
-header div#jarduino_controls div#status div.error span {
+header div#status div.error span {
     color: #ff9000;
 }
 
-header div#jarduino_controls div#status #msg {
+header div#status #msg {
     margin-left: 1ex;
 }
 
 header div#jarduino_controls div#buttons button {
+    cursor: pointer;
+}
+
+header div#jarduino_controls div#buttons button#settings {
+    border-color: transparent;
+    color: #17A1E6;
+    background: transparent;
+    font-weight: bold;
+    margin-right: 2em;
+    font-size: 90%;
+    margin-top: 1.5ex;
+}
+
+header div#jarduino_controls div#buttons button#settings span.icon {
+    float: left;
+    height: 20px;
+    width: 21px;
+    margin-top: -3px;
+    margin-right: 1ex;
+    background: url('/jardui/img/configure_hover.png') no-repeat;
+}
+
+header div#jarduino_controls div#buttons button#upload {
     border-radius: 4px;
     padding: 2ex;
     width: 16em;
     border-color: transparent;
     box-shadow: 0px 2px 0px #e0e0e0;
     font-weight: bold;
+    font-size: 90%;
 }
 
-header div#jarduino_controls div#buttons button.disabled {
+header div#jarduino_controls div#buttons button#upload.disabled {
     color: #cccccc;
     background: #f2f2f2;
     cursor: not-allowed;
 }
 
-header div#jarduino_controls div#buttons button.enabled {
+header div#jarduino_controls div#buttons button#upload.enabled {
     background: #17A1E6;
     color: white;
     cursor: pointer;
@@ -480,4 +507,47 @@ div#main section form div.buttons button {
 
 rect {
     fill-opacity: 0.2;
+}
+
+.modal {
+    position: absolute; 
+    z-index: 1; /* Sit on top */
+    width: 300px; 
+    height: 300px;
+    left: 50%;
+    top: 80%; 
+    margin-left: -150px;
+    margin-top: -150px;
+    overflow: auto; /* Enable scroll if needed */
+    border: 1px solid black;
+    background: white;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    width: 80%; /* Could be more or less, depending on screen size */
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    margin-right: 1em;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.title {
+    text-align: left;
+    color: black;
+    font-size: 90%;
+
 }

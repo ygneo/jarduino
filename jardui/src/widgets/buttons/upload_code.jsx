@@ -34,6 +34,7 @@ class UploadCodeToDeviceButton extends React.Component {
         return (
             <button
                 type="button"
+                id="upload"
                 className={uploadButtonClassName}
                 onClick={this.handleClick}
             >REPROGRAMAR</button>
