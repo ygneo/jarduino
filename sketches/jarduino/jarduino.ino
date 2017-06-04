@@ -6,18 +6,18 @@ const int analogInPin2 = A1; // Analog input pin from moisture sensor #2
 
 const int digitalOutPin[] = {2, 3}; // Rele-Electrovalve output
 
-const int minSensorValue[] = {1000, 200}; // Array of minimun values from the potentiometer to trigger watering
+const int minSensorValue[] = {150, 150}; // Array of minimun values from the potentiometer to trigger watering
 
 const int checkingDelay = 1000; // Delay in ms between checks  (for the analog-to-digital converter to settle after last reading)
 const int numChecksBeforeSending = 3; // Number of checks should be done before sending data to serial
-const int wateringTime[] = {1000, 2000}; // Watering time in ms for every plant
+const int wateringTime[] = {1000, 1000}; // Watering time in ms for every plant
 
 
-void sendValuesToSerial (int values[])
+void sendValuesToSerial (int values[], int size)
 {
   Serial.print("#sensors#");
   
-  for (unsigned int i=0; i<sizeof(values); i++) {
+  for (int i=0; i<size; i++) {
     String valuesString;
     
     valuesString += i;
@@ -30,27 +30,40 @@ void sendValuesToSerial (int values[])
   Serial.print("\n");
 }
 
-void sendWateringEventToSerial (int id) 
+
+void sendWateringEventsToSerial (int wateringDelays[], int size) 
 {
   String valuesString;
 
-  Serial.print("#");
-  Serial.print("actuators");
-  Serial.print("#");
-  valuesString += id;
-  valuesString += ",w#";   
-  Serial.print(valuesString);  
-  Serial.print("\n");
+  Serial.print("#actuators#");
+  for (int i=0; i<size; i++) {
+    if (wateringDelays[i]) {
+      valuesString += i;
+      valuesString += ",";
+      valuesString += wateringDelays[i];
+      valuesString += "#";   
+    }
+  }
+  Serial.println(valuesString);  
+
 }
+
+
+void sendToSerial (int values[], int wateringDelays[], int size) {
+  sendValuesToSerial(values, size);
+  sendWateringEventsToSerial(wateringDelays, size);
+}
+
 
 void setup() {
   // initialize serial communications at 9600 bps:
   Serial.begin(9600);
+
   pinMode(digitalOutPin[0], OUTPUT);
   pinMode(digitalOutPin[1], OUTPUT);
+
   digitalWrite(digitalOutPin[0], LOW);
   digitalWrite(digitalOutPin[1], LOW);
-
 }
 
 boolean mustWater(int id, int value) {
@@ -65,45 +78,50 @@ int doWatering(int id) {
 }
 
 void loop() {
-  static int checksDone;
-  static int sum[2];
-  int sensorValue[2];
+  static int checksDone = 0;
+  static int sum[] = {0, 0};
+  int sensorValue[] = {0, 0};
   int means[] = {0, 0};
-  int wateringDelay[] = {0, 0};
+  int wateringDelays[] = {0, 0};
   int delayTime = 0;
-  
-  sensorValue[0] = 1023 - analogRead(analogInPin1);
-  sensorValue[1] = 1023 - analogRead(analogInPin2);
+  int totalWateringDelay = 0;
+  int numSensors = sizeof(sensorValue)/sizeof(int);
+
+  int analogValues[] = {analogRead(analogInPin1), analogRead(analogInPin2)};
+    
+  sensorValue[0] = 1023 - analogValues[0];
+  sensorValue[1] = 1023 - analogValues[1];
   checksDone++;
  
   sum[0] += sensorValue[0];
   sum[1] += sensorValue[1];
+
   if (checksDone >= numChecksBeforeSending) {
     means[0] = sum[0] / checksDone;
     means[1] = sum[1] / checksDone;
 
-    sendValuesToSerial(means);
-   
     checksDone = 0;
     sum[0] = 0;
     sum[1] = 0;
-   
-    if (mustWater(0, means[0])) {
-      wateringDelay[0] = doWatering(0);
-      sendWateringEventToSerial(0);
+
+    for (int i=0; i<numSensors; i++) {
+      if (mustWater(i, means[i])) {
+        wateringDelays[i] = doWatering(i);
+      }
     }
-    
-    if (mustWater(1, means[1])) {
-      wateringDelay[1] = doWatering(1);
-      sendWateringEventToSerial(1);
-    }
+
+  sendToSerial(means, wateringDelays, numSensors);
   }   
+
+  for (int i=0; i<numSensors; i++) {
+     totalWateringDelay += wateringDelays[i];
+   }
  
-  delayTime = checkingDelay - (wateringDelay[0] + wateringDelay[1]);
-  if (delayTime > 0) {
-    delay(delayTime);
-  }
-  else {
-    delay(1000); // at least, to settle analog-digital converter
-  }
+   delayTime = checkingDelay - totalWateringDelay;
+   if (delayTime > 0) {
+     delay(delayTime);
+   }
+   else {
+     delay(1000); // at least, to settle analog-digital converter
+   }
 }

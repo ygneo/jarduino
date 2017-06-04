@@ -7,13 +7,16 @@ class DeviceReader {
     }
 
     startReading(handlers) {
-        let pyshell = new pythonShell('jarduino.py', {"args": "read"})
+        this.pyshell = new pythonShell('jarduino.py', {"args": "read", "mode": "json"})
 
-        pyshell.on('message', function (message) {
+
+        this.pyshell.on('message', function (message) {
+            console.log(message)
             handlers.onMessage(message)
         })
 
-        pyshell.on('error', function (error) {
+        this.pyshell.on('error', function (error) {
+            console.log(error)
             handlers.onError(error)
         })
     }

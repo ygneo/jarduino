@@ -5,7 +5,7 @@ import Zones from './jardui/lib/zones.js'
 import ZonesStorage from './jardui/lib/storage.js'
 import UploadCodeToDeviceButton from './jardui/lib/widgets/buttons/upload_code.js'
 import DeviceReader from './jardui/lib/devices/reader.js'
-import parseZonesData from './jardui/lib/parser.js'
+import parseData from './jardui/lib/parser.js'
 
 
 window.require('nw.gui').Window.get().maximize()
@@ -55,9 +55,7 @@ class App extends React.Component {
 
         this.deviceReader.startReading({
             "onMessage": function (message) {
-                this_instance.setState(
-                    {"zonesData": parseZonesData(message)}
-                )
+                this_instance.setState({zonesData: parseData(message)})
             },
             "onError": function (error) {
                 console.log(error)
@@ -73,6 +71,8 @@ class App extends React.Component {
     }
 
     handleCodeUploaded() {
+        this.handleReadFromDevice()
+
         this.setState({
             status: "changes_uploaded"
         })
@@ -85,6 +85,10 @@ class App extends React.Component {
     }
 
     handleCodeUpload() {
+        if (this.deviceReader) {
+            this.deviceReader.stopReading();
+        }
+
         this.state.device.upload(
             this.storage.getZones(),
             {

@@ -2,7 +2,7 @@
 #include "Wire.h" 
 
 const int analogInPin1 = A0; // Analog input pin from moisture sensor #1
-const int analogInPin2 = A2; // Analog input pin from moisture sensor #2
+const int analogInPin2 = A1; // Analog input pin from moisture sensor #2
 
 const int digitalOutPin[] = {2, 3}; // Rele-Electrovalve output
 
@@ -81,7 +81,7 @@ int readSoilMoisture(int sensor_id) {
   
   OpenGarden.sensorPowerOFF(); //Turns off the sensor power supply
 
-  return soilMoisture;
+  return 1023 - soilMoisture;
 }
 
 

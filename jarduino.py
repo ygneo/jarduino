@@ -11,20 +11,23 @@ import serial.tools.list_ports
 from string import Template
 from subprocess import call
 from random import randint
+from optparse import OptionParser
 
 
-SKETCKES_DIR = "./sketches/jarduino_over_opergarden/"
+SKETCKES_DIR = "./sketches/jarduino/"
 
 
 
 class JarduinoParser(object):
 
-    def __init__(self, serial_device, fake_serial_input=False):
+    def __init__(self, serial_device, fake_serial_input=False, debug=False):
         self.fake_serial_input = fake_serial_input
         self.serial = serial_device
-        self.sensors_values_pattern = re.compile("^#sensors#([0-9],[0-9]+)#([0-9],[0-9]+)#$")
-        self.actuators_values_pattern = re.compile("^#actuators#([0-9],w)#$")
+        self.sensors_values_pattern = re.compile("^#sensors#([0-9],\d+)#([0-9],\d+)#$")
+        self.actuators_values_pattern = re.compile("^#actuators#([0-9],\d+)#([0-9],\d+)?#?$")
         self.sensors_data = []
+        self.actuators_data = []
+        self.debug = debug
 
     def read_serial_data(self):
         if self.fake_serial_input:
@@ -34,29 +37,36 @@ class JarduinoParser(object):
     def parse(self):
         try:
             data = self.read_serial_data().strip()
+            sensorsData = {}
+            actuatorsData = {}
+
+            if self.debug:
+                print data
             sensors_match = self.sensors_values_pattern.match(data)
             actuators_match = self.actuators_values_pattern.match(data)
 
             if sensors_match:
-                return self.sensors_parsed_data(sensors_match.groups())
+                self.sensors_data = self.sensors_parsed_data(sensors_match.groups())
 
             if actuators_match:
-                return self.actuators_parsed_data(actuators_match.groups())
+                self.actuators_data = self.actuators_parsed_data(actuators_match.groups())
 
-            return None
+            if self.sensors_data and self.actuators_data:
+                return {
+                    "timestamp": str(time.time()),
+                    "sensorsData": self.sensors_data,
+                    "actuatorsData": self.actuators_data
+                }
+
         except serial.SerialException:
             pass
 
     def sensors_parsed_data(self, sensors_data):
-        data = {
-            "timestamp": str(time.time()),
-            "type": "sensors",
-            "sensorsData": []
-        }
+        data = []
 
         for sensor_data in sensors_data:
             id, value = sensor_data.split(",")
-            data["sensorsData"].append({
+            data.append({
                 "id": id,
                 "type": "soil_moisture",
                 "value": value,
@@ -65,18 +75,18 @@ class JarduinoParser(object):
         return data
 
     def actuators_parsed_data(self, actuators_data):
-        id, _ = actuators_data[0].split(",")
+        data = []
 
-        data = {
-            "timestamp": str(time.time()),
-            "type": "actuators",
-            "actuatorsData": [
-                {
-                    "id": id,
-                    "type": "irrigation",
-                }
-            ]
-        }
+        for actuator_data in actuators_data:
+            try:
+                id, value = actuator_data.split(",")
+            except AttributeError:
+                continue
+            data.append({
+                "id": id,
+                "type": "irrigation",
+                "value": value,
+            })
 
         return data
 
@@ -109,9 +119,9 @@ def fake_arduino_output(serial_output, n=2):
         serial_output.write('#{}#w#\n'.format(i, value))
 
 
-def print_parsed_serial_input(fake_serial_input=False):
+def print_parsed_serial_input(debug=False, fake_serial_input=False):
     serial_input, serial_output, serial_name = arduino_devices(fake_serial_input).values()
-    parser = JarduinoParser(serial_input, fake_serial_input)
+    parser = JarduinoParser(serial_input, fake_serial_input, debug)
 
     def signal_term_handler(signal, frame):
         serial_input.close()
@@ -191,14 +201,19 @@ def detect_arduino():
     print device_name
 
 
+parser = OptionParser()
+parser.add_option("-d", "--debug", dest="debug_mode",
+                  help="Activate debug mode", action="store_true", default=False)
+
+(options, args) = parser.parse_args()
+
 try:
-    mode = sys.argv[1]
+    mode = args[0]
 except IndexError:
     mode = "read"
 
-
 if mode == "read":
-    print_parsed_serial_input()
+    print_parsed_serial_input(debug=options.debug_mode)
 if mode == "readfake":
     print_parsed_serial_input()
 if mode == "detect":

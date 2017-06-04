@@ -250,6 +250,14 @@ div#main section div#data div#header div#content div.attributes  {
     float: left;
 }
 
+div#main section div#data div#header div#content div.attributes  div.irrigating {
+    height: 46px;
+    width: 37px;
+    margin-top: 4ex;
+    margin-left: 2ex;
+    background: url('/jardui/img/drops.png') no-repeat;
+}
+
 
 div#main section div#data div#header div.soil_moisture_level  {
     float: right;
@@ -329,6 +337,7 @@ div#main section div#data div#header div.soil_moisture_level div.level10 {
     height: 112px;
     top: -21px;
 }
+
 
 
 div#main section div#data div#header hr.mark {

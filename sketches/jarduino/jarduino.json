@@ -1,1 +1,1 @@
-{"soilMoistureMinSensorValues":[1000,200],"checkingDelay":1000,"numchecksBeforeWatering":3,"wateringTimes":[1000,2000]}
+{"soilMoistureMinSensorValues":[150,150],"checkingDelay":1000,"numchecksBeforeWatering":3,"wateringTimes":[1000,1000]}

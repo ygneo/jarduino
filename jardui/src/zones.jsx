@@ -21,6 +21,7 @@ function timeConverter(UNIX_timestamp) {
     var min = zeroPadding(a.getMinutes());
     var sec = zeroPadding(a.getSeconds());
     var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+
     return time;
 }
 
@@ -28,22 +29,31 @@ function timeConverter(UNIX_timestamp) {
 
 class ZoneData extends React.Component {
     constructor(props) {
-        super(props);
+        super(props)
 
         this.state = {
             zone: props.zone,
-            data: props.data
+            data: props.data,
         };
 
         this.handleButtonClick = this.handleButtonClick.bind(this)
         this.getLastReadTime = this.getLastReadTime.bind(this)
+        this.getLastValue = this.getLastValue.bind(this)
+
+        this.isIrrigating = this.isIrrigating.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
+        let data = nextProps.data
+
         this.setState({
-            "zone": nextProps.zone,
-            "data": nextProps.data
+            zone: nextProps.zone,
+            data: data
         })
+    }
+
+    isIrrigating() {
+        return (this.state.data && this.state.data.actuatorsData && this.state.data.actuatorsData.id == this.state.zone.id)
     }
 
     handleButtonClick(event) {
@@ -55,21 +65,23 @@ class ZoneData extends React.Component {
         }
     }
 
-    getLastReadTime(){
+    getLastReadTime() {
         let lastReadTime
 
         if (this.state.data) {
             lastReadTime = timeConverter(this.state.data.timestamp)
-            return lastReadTime
         }
+
+        return lastReadTime
     }
 
     getLastValue() {
         let lastValue
 
         if (this.state.data) {
-            lastValue = this.state.data.value
+            lastValue = this.state.data.sensorsData.value
         }
+
         return lastValue
     }
 
@@ -78,6 +90,11 @@ class ZoneData extends React.Component {
         let zoneId = {'data-zoneId': zone.id}
         let lastReadTime = this.getLastReadTime()
         let lastValue = this.getLastValue()
+        let irrigatingClassName = ""
+
+        if (this.isIrrigating()) {
+            irrigatingClassName = "irrigating"
+        }
 
         return (
             <div id="data">
@@ -87,6 +104,7 @@ class ZoneData extends React.Component {
                             <h2>{zone.name}</h2>
                             <h3>{zone.description}</h3>
                             <h3>Última lectura<br/>{lastReadTime}</h3>
+                            <div className={irrigatingClassName}></div>
                         </div>
                         <SoilMoistureLevel
                             time={lastReadTime}
@@ -298,6 +316,7 @@ class Zones extends React.Component {
         this.handleZoneCreated = this.handleZoneCreated.bind(this);
         this.handleZoneUpdated = this.handleZoneUpdated.bind(this);
         this.handleZoneDeletion = this.handleZoneDeletion.bind(this);
+
         this.getZoneData = this.getZoneData.bind(this);
     }
 
@@ -305,37 +324,20 @@ class Zones extends React.Component {
         let data = nextProps.data
 
         if (data) {
-            if (data.type === "sensors") {
-                this.updateSensorsData(data)
-            }
+            this.setState({
+                data: data
+            })
         }
     }
 
     getZoneData(id) {
-        let data = {}
-
-        if (this.state.data) {
-            data = this.state.data[id]
+        if (this.state.data.sensorsData && this.state.data.actuatorsData) {
+            return {
+                timestamp: this.state.data.timestamp,
+                sensorsData: this.state.data.sensorsData[id],
+                actuatorsData: this.state.data.actuatorsData[id]
+            }
         }
-
-        return data
-    }
-
-    updateSensorsData(data) {
-        let zonesData = []
-
-        data.sensorsData.map((sensorData, i) => {
-            zonesData.push({
-                "timestamp": data.timestamp,
-                "type": data.type,
-                "id": sensorData.id,
-                "value": sensorData.value
-            })
-        })
-
-        this.setState({
-            "data": zonesData
-        })
     }
 
     handleZoneCreation() {
@@ -366,9 +368,9 @@ class Zones extends React.Component {
         let emptyIrrigationZone = <EmptyIrrigationZone onCreateZone={this.handleZoneCreation}/>
         let zoneElements = []
 
+
         this.state.zones.map((zone,i) => {
             let data = this.getZoneData(i)
-
             zoneElements.push(<IrrigationZone
                                   mode="show"
                                   zone={zone}
