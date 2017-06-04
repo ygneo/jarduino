@@ -265,71 +265,100 @@ div#main section div#data div#header div.soil_moisture_level div.level {
     border-radius: 5px;
     position: relative;
     left: 15px;
+    height: 0px;
 }
 
 div#main section div#data div#header div.soil_moisture_level div.level1 {
     width: 10px;
     height: 16px;
-    top: 93px;
+    top: 75px;
 }
 
 div#main section div#data div#header div.soil_moisture_level div.level2 {
     width: 10px;
     height: 28px;
-    top: 84px;
+    top: 63px;
 }
 
 
 div#main section div#data div#header div.soil_moisture_level div.level3 {
     width: 10px;
     height: 40px;
-    top: 75px;
+    top: 51px;
 }
 
 div#main section div#data div#header div.soil_moisture_level div.level4 {
     width: 10px;
     height: 52px;
-    top: 63px;
+    top: 39px;
 }
 
 
 div#main section div#data div#header div.soil_moisture_level div.level5 {
     width: 10px;
     height: 64px;
-    top: 51px;
+    top: 27px;
 }
 
 div#main section div#data div#header div.soil_moisture_level div.level6 {
     width: 10px;
     height: 76px;
-    top: 39px;
+    top: 15px;
 }
 
 div#main section div#data div#header div.soil_moisture_level div.level7 {
     width: 10px;
     height: 88px;
-    top: 27px;
+    top: 3px;
 }
 
 div#main section div#data div#header div.soil_moisture_level div.level8 {
     width: 10px;
     height: 90px;
-    top: 20px;
+    top: 1px;
 }
 
 div#main section div#data div#header div.soil_moisture_level div.level9 {
     width: 10px;
     height: 100px;
-    top: 9px;
+    top: -9px;
 }
 
 div#main section div#data div#header div.soil_moisture_level div.level10 {
     width: 10px;
     height: 112px;
-    top: 0px;
+    top: -21px;
 }
 
 
+div#main section div#data div#header hr.mark {
+    position: relative;
+    border: none;
+    border-top: 1px dotted white;
+    background-color: transparent;
+    height: 1px;
+    width: 70%;
+}   
+
+div#main section div#data div#header hr.mark1 {
+    top: 84px;
+}
+
+div#main section div#data div#header hr.mark3 {
+    top: 68px;
+}
+
+div#main section div#data div#header hr.mark4 {
+    top: 52px;
+}
+
+div#main section div#data div#header hr.mark6 {
+    top: 36px;
+}
+
+div#main section div#data div#header hr.mark7 {
+    top: 19px;
+}
 
 div#main section div#data div#header h2 {
     color: white;
@@ -419,3 +448,5 @@ div#main section form div.buttons div.actions {
 div#main section form div.buttons button {
     float: left;
     margin-left: 2ex;
+
+

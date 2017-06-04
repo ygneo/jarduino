@@ -1,5 +1,23 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import moistureLevel2MoistureValue from '../sensors/soil_moisture_sensor.js'
+
+
+const MAXLEVEL = 10
+const MAXVALUE = 1023
+
+
+
+function convertMinSoilMoisture2Level(value) {
+    let moisture_value = moistureLevel2MoistureValue(value)
+
+    return convertMoistureValue2Level(moisture_value)
+}
+
+
+function convertMoistureValue2Level(value) {
+    return Math.round((MAXLEVEL * value) / MAXVALUE)
+}
 
 
 class SoilMoistureLevel extends React.Component {
@@ -7,32 +25,36 @@ class SoilMoistureLevel extends React.Component {
         super(props);
 
         this.state = {
-            "level": 0,
-            "value": 0
+            time: props.time,
+            value: props.value,
+            level: convertMoistureValue2Level(props.value),
+            mark: convertMinSoilMoisture2Level(props.zone.min_soil_moisture)
         }
-
-        this.max_level = 10
-
-        this.convertMoistureValue2Level = this.convertMoistureValue2Level.bind(this);
     }
 
     componentWillReceiveProps(nextProps) {
+        let level = convertMoistureValue2Level(nextProps.value)
+        let mark = convertMinSoilMoisture2Level(nextProps.zone.min_soil_moisture)
+
         this.setState({
-            "value": nextProps.value,
-            "level": this.convertMoistureValue2Level(nextProps.value)
+            value: nextProps.value,
+            mark: mark,
+            level: level,
+            time: nextProps.time
         })
     }
 
-    convertMoistureValue2Level(value, max_value=1023) {
-        return Math.round((this.max_level * value) / max_value);
-    }
-
     render () {
-        let className = "level level" + this.state.level
+        let levelClassName = "level level"+ this.state.level
+        let markClassName = "mark mark" + this.state.mark
+        let title = "Ult. lectura " + this.state.time + " | Valor  " + this.state.value
+
 
         return (
-            <div className="soil_moisture_level">
-                <div className={className}></div>
+            <div className="soil_moisture_level" title={title}>
+                <hr className={markClassName} />
+                <div className={levelClassName}>
+                </div>
             </div>
         )
     }

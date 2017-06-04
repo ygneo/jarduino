@@ -1,5 +1,6 @@
 import pythonShell from 'python-shell'
 import fs from 'fs'
+import moistureLevel2MoistureValue from '../sensors/soil_moisture_sensor.js'
 
 
 class ArduinoDevice {
@@ -36,7 +37,7 @@ class ArduinoDevice {
         let wateringTimes = []
 
         zones.map((zone,i) => {
-            moistureValues.push(moistureLeveltoMoistureValue(zone.min_soil_moisture))
+            moistureValues.push(moistureLevel2MoistureValue(zone.min_soil_moisture))
             wateringTimes.push(wateringTimeToMs(zone.watering_time, zone.watering_time_interval))
         })
 
@@ -79,19 +80,6 @@ class ArduinoDevice {
         });
     }
 
-}
-
-
-// this could go to a sensor.jsx service/class/whatever converting user values to sensor values
-function moistureLeveltoMoistureValue(level) {
-    let levelToMoistureValue = {
-        "very_low": 1000,
-        "low": 800,
-        "medium": 600,
-        "high": 400,
-        "very_high": 200
-    }
-    return levelToMoistureValue[level]
 }
 
 

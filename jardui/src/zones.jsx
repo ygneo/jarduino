@@ -11,18 +11,19 @@ function zeroPadding(n, digits=2) {
 }
 
 
-function timeConverter(UNIX_timestamp){
-    let a = new Date(UNIX_timestamp * 1000);
-    let year = zeroPadding(a.getFullYear());
-    let month = zeroPadding(a.getMonth());
-    let date = zeroPadding(a.getDate());
-    let hour = zeroPadding(a.getHours());
-    let min = zeroPadding(a.getMinutes());
-    let sec = zeroPadding(a.getSeconds());
-    let time = date + '/' + month + '/' + year + ' ' + hour + ':' + min + ':' + sec ;
-
+function timeConverter(UNIX_timestamp) {
+    var a = new Date(UNIX_timestamp * 1000);
+    var months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    var year = a.getFullYear();
+    var month = months[a.getMonth()];
+    var date = a.getDate();
+    var hour = a.getHours();
+    var min = zeroPadding(a.getMinutes());
+    var sec = zeroPadding(a.getSeconds());
+    var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
     return time;
 }
+
 
 
 class ZoneData extends React.Component {
@@ -40,6 +41,7 @@ class ZoneData extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         this.setState({
+            "zone": nextProps.zone,
             "data": nextProps.data
         })
     }
@@ -58,11 +60,11 @@ class ZoneData extends React.Component {
 
         if (this.state.data) {
             lastReadTime = timeConverter(this.state.data.timestamp)
-            return <h3>Última lectura<br/>{lastReadTime}</h3>
+            return lastReadTime
         }
     }
 
-    getLastValue(){
+    getLastValue() {
         let lastValue
 
         if (this.state.data) {
@@ -84,11 +86,13 @@ class ZoneData extends React.Component {
                         <div className="attributes">
                             <h2>{zone.name}</h2>
                             <h3>{zone.description}</h3>
-                            {lastReadTime}
-                            <h3>{lastValue}</h3>
+                            <h3>Última lectura<br/>{lastReadTime}</h3>
                         </div>
                         <SoilMoistureLevel
-                            value={lastValue} />
+                            time={lastReadTime}
+                            value={lastValue}
+                            zone={zone}
+                        />
                     </div>
                 </div>
                 <div className="items">
