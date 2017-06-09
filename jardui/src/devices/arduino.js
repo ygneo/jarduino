@@ -3,6 +3,10 @@ import fs from 'fs'
 import moistureLevel2MoistureValue from '../sensors/soil_moisture_sensor.js'
 
 
+const SKETCH_DIR = 'sketches/jarduino_over_opengarden/'
+
+
+
 class ArduinoDevice {
     constructor(handlers) {
         this.detect = this.detect.bind(this)
@@ -48,7 +52,7 @@ class ArduinoDevice {
             "wateringTimes": wateringTimes
         }
         var json = JSON.stringify(codeConfig)
-        fs.writeFile('sketches/jarduino/jarduino.json', json, 'utf8')
+        fs.writeFile(SKETCH_DIR + '/jarduino.json', json, 'utf8')
     }
 
     upload_code(handlers) {
