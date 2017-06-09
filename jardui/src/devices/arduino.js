@@ -56,11 +56,7 @@ class ArduinoDevice {
     }
 
     upload_code(handlers) {
-        let this_instance = this;
-
-        setTimeout(function () {
-            this_instance.try_to_upload_code(handlers)
-        }, 3000)
+        this.try_to_upload_code(handlers)
     }
 
     try_to_upload_code(handlers) {
@@ -70,6 +66,7 @@ class ArduinoDevice {
             console.log(message);
         });
 
+        // FIXME this is probably redundant
         this.pyshell.on('error', function (message) {
             console.log(message);
         });

@@ -70,8 +70,6 @@ void sendValuesToSerial (int values[], int size)
     valuesString += "#";   
     Serial.print(valuesString);  
   }
-  
-  Serial.print("\n");
 }
 
 

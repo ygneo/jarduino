@@ -5,7 +5,7 @@ const int analogInPins[] = {A0}; // Analog input pins
 
 const int digitalOutPin[] = {2, 3}; // Rele-Electrovalve output
 
-const int minSensorValue[] = {150, 450}; // Array of minimun values from the potentiometer to trigger watering
+const int minSensorValue[] = {150, 750}; // Array of minimun values from the potentiometer to trigger watering
 
 const int checkingDelay = 1000; // Delay in ms between checks  (for the analog-to-digital converter to settle after last reading)
 const int numChecksBeforeSending = 3; // Number of checks should be done before sending data to serial
@@ -70,8 +70,6 @@ void sendValuesToSerial (int values[], int size)
     valuesString += "#";   
     Serial.print(valuesString);  
   }
-  
-  Serial.print("\n");
 }
 
 

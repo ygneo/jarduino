@@ -19,8 +19,7 @@ class JarduinoParser(object):
     def __init__(self, serial_device, fake_serial_input=False, debug=False):
         self.fake_serial_input = fake_serial_input
         self.serial = serial_device
-        self.sensors_values_pattern = re.compile("^#sensors#([0-9],\d+)#([0-9],\d+)#$")
-        self.actuators_values_pattern = re.compile("^#actuators#([0-9],\d+)?#?([0-9],\d+)?#?$")
+        self.data_pattern = re.compile("^#sensors#([0-9],\d+)#([0-9],\d+)##actuators#([0-9],\d+)?#?([0-9],\d+)?#?$")
         self.sensors_data = []
         self.actuators_data = []
         self.debug = debug
@@ -36,14 +35,15 @@ class JarduinoParser(object):
 
             if self.debug:
                 print data
-            sensors_match = self.sensors_values_pattern.match(data)
-            actuators_match = self.actuators_values_pattern.match(data)
+            data_match = self.data_pattern.match(data)
 
-            if sensors_match:
-                self.sensors_data = self.sensors_parsed_data(sensors_match.groups())
+            if data_match:
+                matches = data_match.groups()
+                sensors_matches = matches[0:2]
+                actuators_matches = matches[2:]
 
-            if actuators_match:
-                self.actuators_data = self.actuators_parsed_data(actuators_match.groups())
+                self.sensors_data = self.sensors_parsed_data(sensors_matches)
+                self.actuators_data = self.actuators_parsed_data(actuators_matches)
 
             if self.sensors_data or self.actuators_data:
                 return {
@@ -119,6 +119,7 @@ def print_parsed_serial_input(debug=False, fake_serial_input=False):
 
     def signal_term_handler(signal, frame):
         serial_input.close()
+        sys.stdout.flush()
         sys.exit(0)
 
     signal.signal(signal.SIGTERM, signal_term_handler)
@@ -127,10 +128,13 @@ def print_parsed_serial_input(debug=False, fake_serial_input=False):
         try:
             if fake_serial_input:
                 fake_arduino_output(serial_output)
+
             output = parser.parse()
             if output:
                 print json.dumps(output)
+
             sys.stdout.flush()
+
             time.sleep(1)
         except KeyboardInterrupt:
             serial_input.close()

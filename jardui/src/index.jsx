@@ -21,6 +21,7 @@ class App extends React.Component {
             "deviceFound": false,
             "zonesData": []
         }
+
         this.storage = new ZonesStorage
 
         this.handleZonesUpdated = this.handleZonesUpdated.bind(this)
@@ -71,11 +72,11 @@ class App extends React.Component {
     }
 
     handleCodeUploaded() {
-        this.handleReadFromDevice()
-
         this.setState({
             status: "changes_uploaded"
         })
+
+        this.handleReadFromDevice()
     }
 
     handleCodeUploadError() {
@@ -86,7 +87,7 @@ class App extends React.Component {
 
     handleCodeUpload() {
         if (this.deviceReader) {
-            this.deviceReader.stopReading();
+            this.deviceReader.stopReading()
         }
 
         this.state.device.upload(

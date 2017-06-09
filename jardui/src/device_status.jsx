@@ -1,6 +1,5 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import pythonShell from 'python-shell'
 import DeviceSearcher from './device_searcher.js'
 
 
