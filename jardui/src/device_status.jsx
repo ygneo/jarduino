@@ -62,6 +62,7 @@ class DeviceStatus extends React.Component {
     }
 
     handleDetected(device) {
+        this.stopDeviceSearch()
         if (this.state.found === false) {
             this.setState({
                 "status": "success",
