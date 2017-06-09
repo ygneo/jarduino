@@ -1,7 +1,7 @@
-/*
- Two-entries moisture sensure and reactive watering prototype. 
- */
-const int analogInPins[] = {A0, A1}; // Analog input pins
+#include <OpenGarden.h>
+#include "Wire.h" 
+
+const int analogInPins[] = {A0}; // Analog input pins
 
 const int digitalOutPin[] = {2, 3}; // Rele-Electrovalve output
 
@@ -16,22 +16,43 @@ void setup() {
   // initialize serial communications at 9600 bps:
   Serial.begin(9600);
 
-  pinMode(digitalOutPin[0], OUTPUT);
-  pinMode(digitalOutPin[1], OUTPUT);
+  OpenGarden.initIrrigation(1);
+  OpenGarden.initIrrigation(2);
 
-  digitalWrite(digitalOutPin[0], LOW);
-  digitalWrite(digitalOutPin[1], LOW);
+  OpenGarden.irrigationOFF(1);
+  OpenGarden.irrigationOFF(2);
+
+  OpenGarden.initSensors();
 }
 
 int doWatering(int id) {
-  digitalWrite(digitalOutPin[id], HIGH);
+  int valve_number = id + 1;
+
+  OpenGarden.irrigationON(valve_number);
+
   delay(wateringTime[id]);
-  digitalWrite(digitalOutPin[id], LOW);
+
+  OpenGarden.irrigationOFF(valve_number);
+
   return wateringTime[id];
 }
 
 int readSoilMoisture(int sensor_id) {
-  return 1023 - analogRead(analogInPins[sensor_id]);
+  int soilMoisture = 0;
+
+  if (sensor_id == 0) {
+    OpenGarden.sensorPowerON(); // Turns on the sensor power supply
+
+    soilMoisture = OpenGarden.readSoilMoisture(); //Read the sensor
+
+    delay(500); // Time for initializing the sensor
+
+    OpenGarden.sensorPowerOFF(); //Turns off the sensor power supply
+  } else {
+    soilMoisture = 1023 - analogRead(analogInPins[sensor_id - 1]);
+  }
+    
+  return soilMoisture;
 }
 
 /* ---- */
