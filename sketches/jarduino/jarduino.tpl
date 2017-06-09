@@ -1,8 +1,7 @@
 /*
  Two-entries moisture sensure and reactive watering prototype. 
  */
-const int analogInPin1 = A0; // Analog input pin from moisture sensor #1
-const int analogInPin2 = A1; // Analog input pin from moisture sensor #2
+const int analogInPins[] = {A0, A1}; // Analog input pins
 
 const int digitalOutPin[] = {2, 3}; // Rele-Electrovalve output
 
@@ -12,6 +11,30 @@ const int checkingDelay = 1000; // Delay in ms between checks  (for the analog-t
 const int numChecksBeforeSending = 3; // Number of checks should be done before sending data to serial
 const int wateringTime[] = $wateringTimes; // Watering time in ms for every plant
 
+
+void setup() {
+  // initialize serial communications at 9600 bps:
+  Serial.begin(9600);
+
+  pinMode(digitalOutPin[0], OUTPUT);
+  pinMode(digitalOutPin[1], OUTPUT);
+
+  digitalWrite(digitalOutPin[0], LOW);
+  digitalWrite(digitalOutPin[1], LOW);
+}
+
+int doWatering(int id) {
+  digitalWrite(digitalOutPin[id], HIGH);
+  delay(wateringTime[id]);
+  digitalWrite(digitalOutPin[id], LOW);
+  return wateringTime[id];
+}
+
+int readSoilMoisture(int sensor_id) {
+  return 1023 - analogRead(analogInPins[sensor_id]);
+}
+
+/* ---- */
 
 void sendValuesToSerial (int values[], int size)
 {
@@ -48,33 +71,13 @@ void sendWateringEventsToSerial (int wateringDelays[], int size)
 
 }
 
-
 void sendToSerial (int values[], int wateringDelays[], int size) {
   sendValuesToSerial(values, size);
   sendWateringEventsToSerial(wateringDelays, size);
 }
 
-
-void setup() {
-  // initialize serial communications at 9600 bps:
-  Serial.begin(9600);
-
-  pinMode(digitalOutPin[0], OUTPUT);
-  pinMode(digitalOutPin[1], OUTPUT);
-
-  digitalWrite(digitalOutPin[0], LOW);
-  digitalWrite(digitalOutPin[1], LOW);
-}
-
 boolean mustWater(int id, int value) {
   return (value <= minSensorValue[id]);
-}
-
-int doWatering(int id) {
-  digitalWrite(digitalOutPin[id], HIGH);
-  delay(wateringTime[id]);
-  digitalWrite(digitalOutPin[id], LOW);
-  return wateringTime[id];
 }
 
 void loop() {
@@ -85,16 +88,17 @@ void loop() {
   int wateringDelays[] = {0, 0};
   int delayTime = 0;
   int totalWateringDelay = 0;
+  int sensorValues[] = {0, 0};
   int numSensors = sizeof(sensorValue)/sizeof(int);
 
-  int analogValues[] = {analogRead(analogInPin1), analogRead(analogInPin2)};
-    
-  sensorValue[0] = 1023 - analogValues[0];
-  sensorValue[1] = 1023 - analogValues[1];
+  for (int i=0; i<numSensors; i++) {
+    sensorValue[i] = readSoilMoisture(i);
+  }
   checksDone++;
- 
-  sum[0] += sensorValue[0];
-  sum[1] += sensorValue[1];
+
+  for (int i=0; i<numSensors; i++) {
+      sum[i] += sensorValue[i];
+  }
 
   if (checksDone >= numChecksBeforeSending) {
     means[0] = sum[0] / checksDone;
