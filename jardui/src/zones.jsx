@@ -33,7 +33,7 @@ class ZoneData extends React.Component {
 
         this.state = {
             zone: props.zone,
-            data: props.data,
+            data: props.data
         };
 
         this.handleButtonClick = this.handleButtonClick.bind(this)
@@ -296,6 +296,18 @@ class IrrigationZone extends React.Component {
 }
 
 
+function getForZoneId(data, zoneId) {
+    let item = {}
+
+    data.map((dataItem, i) => {
+        if (dataItem.id && dataItem.id == zoneId) {
+            item = dataItem;
+        }
+    })
+
+    return item;
+}
+
 class Zones extends React.Component {
     constructor(props) {
         let zones
@@ -331,13 +343,14 @@ class Zones extends React.Component {
     }
 
     getZoneData(id) {
-        if (this.state.data.sensorsData && this.state.data.actuatorsData) {
-            return {
+        if (this.state.data.sensorsData || this.state.data.actuatorsData) {
+            return  {
                 timestamp: this.state.data.timestamp,
-                sensorsData: this.state.data.sensorsData[id],
-                actuatorsData: this.state.data.actuatorsData[id]
+                sensorsData: getForZoneId(this.state.data.sensorsData, id),
+                actuatorsData: getForZoneId(this.state.data.actuatorsData, id)
             }
         }
+
     }
 
     handleZoneCreation() {
@@ -371,6 +384,7 @@ class Zones extends React.Component {
 
         this.state.zones.map((zone,i) => {
             let data = this.getZoneData(i)
+
             zoneElements.push(<IrrigationZone
                                   mode="show"
                                   zone={zone}
