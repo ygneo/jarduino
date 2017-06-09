@@ -14,10 +14,6 @@ from random import randint
 from optparse import OptionParser
 
 
-SKETCKES_DIR = "./sketches/jarduino/"
-
-
-
 class JarduinoParser(object):
 
     def __init__(self, serial_device, fake_serial_input=False, debug=False):
@@ -37,8 +33,6 @@ class JarduinoParser(object):
     def parse(self):
         try:
             data = self.read_serial_data().strip()
-            sensorsData = {}
-            actuatorsData = {}
 
             if self.debug:
                 print data
@@ -143,14 +137,14 @@ def print_parsed_serial_input(debug=False, fake_serial_input=False):
             exit(1)
 
 
-def upload():
+def upload(sketch_dir):
     device_name = arduino_devices()["device_name"]
-    call("cd {}; MONITOR_PORT={} make".format(SKETCKES_DIR, device_name), shell=True)
-    call("cd {}; MONITOR_PORT={} make upload".format(SKETCKES_DIR, device_name), shell=True)
+    call("cd {}; MONITOR_PORT={} make".format(sketch_dir, device_name), shell=True)
+    call("cd {}; MONITOR_PORT={} make upload".format(sketch_dir, device_name), shell=True)
 
 
-def read_code_configuration():
-    with open("{}jarduino.json".format(SKETCKES_DIR), "r") as f:
+def read_code_configuration(sketch_dir):
+    with open("{}jarduino.json".format(sketch_dir), "r") as f:
         code_configuration = json.loads(f.read())
 
     for key, value in code_configuration.iteritems():
@@ -159,13 +153,13 @@ def read_code_configuration():
     return code_configuration
 
 
-def generate():
-    code_configuration = read_code_configuration()
+def generate(sketch_dir):
+    code_configuration = read_code_configuration(sketch_dir)
 
-    with open("{}jarduino.tpl".format(SKETCKES_DIR), "r") as f:
+    with open("{}jarduino.tpl".format(sketch_dir), "r") as f:
         template = Template(f.read())
 
-    with open("{}jarduino.ino".format(SKETCKES_DIR), "w") as f:
+    with open("{}jarduino.ino".format(sketch_dir), "w") as f:
         f.write(template.substitute(**code_configuration))
 
 
@@ -202,8 +196,15 @@ def detect_arduino():
 
 
 parser = OptionParser()
-parser.add_option("-d", "--debug", dest="debug_mode",
-                  help="Activate debug mode", action="store_true", default=False)
+parser.add_option("-d", "--debug",
+                  dest="debug_mode",
+                  help="Activate debug mode",
+                  action="store_true",
+                  default=False)
+parser.add_option("-s", "--sketch-dir",
+                  dest="sketch_dir",
+                  help="Sketch directory", action="store",
+                  default="./sketches/jarduino_over_opengarden/")
 
 (options, args) = parser.parse_args()
 
@@ -219,5 +220,5 @@ if mode == "readfake":
 if mode == "detect":
     detect_arduino()
 if mode == "upload":
-    generate()
-    upload()
+    generate(options.sketch_dir)
+    upload(options.sketch_dir)
