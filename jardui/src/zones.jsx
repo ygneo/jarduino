@@ -4,27 +4,7 @@ import CreateIrrigationZoneButton from './widgets/buttons/create_zone.js'
 import IrrigationZoneForm from './forms.js'
 import ZonesStorage from './storage.js'
 import SoilMoistureLevel from './widgets/soil_moisture_level.js'
-
-
-function zeroPadding(n, digits=2) {
-    return ('00'+n).slice(-digits);
-}
-
-
-function timeConverter(UNIX_timestamp) {
-    var a = new Date(UNIX_timestamp * 1000);
-    var months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-    var year = a.getFullYear();
-    var month = months[a.getMonth()];
-    var date = a.getDate();
-    var hour = a.getHours();
-    var min = zeroPadding(a.getMinutes());
-    var sec = zeroPadding(a.getSeconds());
-    var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
-
-    return time;
-}
-
+import ZoneDataHeader from './zones/zone_data_header.js'
 
 
 class ZoneData extends React.Component {
@@ -32,15 +12,12 @@ class ZoneData extends React.Component {
         super(props)
 
         this.state = {
+            mode: props.mode ? props.mode : "graph",
             zone: props.zone,
             data: props.data
         };
 
         this.handleButtonClick = this.handleButtonClick.bind(this)
-        this.getLastReadTime = this.getLastReadTime.bind(this)
-        this.getLastValue = this.getLastValue.bind(this)
-
-        this.isIrrigating = this.isIrrigating.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -52,9 +29,6 @@ class ZoneData extends React.Component {
         })
     }
 
-    isIrrigating() {
-        return (this.state.data && this.state.data.actuatorsData && this.state.data.actuatorsData.id == this.state.zone.id)
-    }
 
     handleButtonClick(event) {
         const target = event.target
@@ -65,54 +39,17 @@ class ZoneData extends React.Component {
         }
     }
 
-    getLastReadTime() {
-        let lastReadTime
-
-        if (this.state.data) {
-            lastReadTime = timeConverter(this.state.data.timestamp)
-        }
-
-        return lastReadTime
-    }
-
-    getLastValue() {
-        let lastValue
-
-        if (this.state.data) {
-            lastValue = this.state.data.sensorsData.value
-        }
-
-        return lastValue
-    }
 
     render() {
         let zone = this.state.zone
         let zoneId = {'data-zoneId': zone.id}
-        let lastReadTime = this.getLastReadTime()
-        let lastValue = this.getLastValue()
-        let irrigatingClassName = ""
-
-        if (this.isIrrigating()) {
-            irrigatingClassName = "irrigating"
-        }
 
         return (
             <div id="data">
-                <div id="header">
-                    <div id="content">
-                        <div className="attributes">
-                            <h2>{zone.name}</h2>
-                            <h3>{zone.description}</h3>
-                            <h3>Última lectura<br/>{lastReadTime}</h3>
-                            <div className={irrigatingClassName}></div>
-                        </div>
-                        <SoilMoistureLevel
-                            time={lastReadTime}
-                            value={lastValue}
-                            zone={zone}
-                        />
-                    </div>
-                </div>
+                <ZoneDataHeader
+                    zone={zone}
+                    data={this.state.data}
+                />
                 <div className="items">
                     <div className="item">
                         <span className="label">Frecuencia de riego</span>

@@ -5,6 +5,9 @@
 <script src="./jardui/vendor/d3.v2.js"></script>
 <script src="./jardui/vendor/rickshaw.min.js"></script>
 
+<link rel="stylesheet" type="text/css" href="./jardui/vendor/graph.css">
+<link rel="stylesheet" type="text/css" href="./jardui/vendor/detail.css">
+<link rel="stylesheet" type="text/css" href="./jardui/vendor/legend.css">
 <link rel="stylesheet" type="text/css" href="./jardui/css/jarduino.css">
 
 <html>
@@ -12,30 +15,29 @@
 
     <script src="./jardui/lib/index.js"></script>
     <script>
-var gulp = require('gulp');
-var run = require('gulp-run');
+     var gulp = require('gulp');
+     var run = require('gulp-run');
 
-gulp.task('rebuild', function () {
-    var r = run('npm run build').exec(gulp.dest('output'));
+     gulp.task('rebuild', function () {
+         var r = run('npm run build').exec(gulp.dest('output'));
 
-    r.on('error', function(e) {
-        console.log(e);
-    })
-});
+         r.on('error', function(e) {
+             console.log(e);
+         })
+     });
 
-gulp.task('reload', function () {
-    console.log("reload");
-    if (location) location.reload();
-});
-gulp.watch([
-   './jardui/css/*',
-    'index.html',
-], ['reload']);
+     gulp.task('reload', function () {
+         console.log("reload");
+         if (location) location.reload();
+     });
+     gulp.watch([
+         './jardui/css/*',
+         'index.html',
+     ], ['reload']);
 
-gulp.watch([
-   './jardui/src/*',
-], ['rebuild', 'reload']);
+     gulp.watch([
+         './jardui/src/*',
+     ], ['rebuild', 'reload']);
 
-</script>
-</body>
+    </script>
 </html>
