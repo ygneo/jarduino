@@ -236,18 +236,19 @@ div#main section div#data  {
 div#main section div#data div#header  {
     background: #b23811;
     border-radius: 4px 4px 0 0;
-    height: 28ex;
+    height: 36ex;
     width: 100%;
 }
 
 div#main section div#data div#header div#content  {
     background: linear-gradient(transparent, #8F2D0E);
     border-radius: 4px 4px 0 0;
-    height: 28ex;
+    height: 36ex;
 }
 
 div#main section div#data div#header div#content div.attributes  {
     float: left;
+    margin-bottom: 1.5ex;
 }
 
 div#main section div#data div#header div#content div.attributes  div.irrigating {
@@ -459,20 +460,20 @@ div#main section form div.buttons button {
     margin-left: 2ex;
 }
 
-
 .graph {
     position: relative;
     display: block;
     width: 100%;
     height: 180px;
-    top: -209px;
-    left: 5px;
+    top: -294px;
+    left: 9px;
 }
 
 .graph-content {
-    padding-top: 2ex;
+    padding-top: 1.5ex;
     padding-bottom: 2ex;
-    padding-left: 5ex;
+    padding-left: 1.5ex;
+    height: 200px;
 }
 
 .y-axis text {
@@ -485,6 +486,17 @@ div#main section form div.buttons button {
 
 .y-axis .rickshaw_graph {
     padding-top: 10px;
-    padding-left: 5px;
+    padding-left: 1ex;
     padding-bottom: 12px;
+}
+
+.rickshaw_graph .y_ticks path {
+    stroke: white;
+}
+
+.timeline {
+    position: relative;
+    top: -305px;
+    width: 355px;
+    left: 5px;
 }

@@ -38,6 +38,9 @@ export default class ZoneDataHeader extends React.Component {
         this.getLastReadTime = this.getLastReadTime.bind(this)
         this.getLastValue = this.getLastValue.bind(this)
         this.isIrrigating = this.isIrrigating.bind(this)
+        this.renderGraph = this.renderGraph.bind(this)
+        this.updateGraph = this.updateGraph.bind(this)
+        this.annotateIrrigatingEvent = this.annotateIrrigatingEvent.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -53,7 +56,7 @@ export default class ZoneDataHeader extends React.Component {
         // render graph with historic data
     }
 
-    prepareGraph(threshold) {
+    renderGraph(threshold) {
         let graph = new Rickshaw.Graph( {
             element: this.refs.graph,
             renderer: 'line',
@@ -61,8 +64,8 @@ export default class ZoneDataHeader extends React.Component {
             max: 100,
             stroke: true,
             preserve: true,
-            width: 300,
-            height: 180,
+            width: 350,
+            height: 170,
             series:  [{
                 color: 'white',
                 data: this.seriesData,
@@ -91,7 +94,6 @@ export default class ZoneDataHeader extends React.Component {
 
         let yAxis = new Rickshaw.Graph.Axis.Y({
             graph: graph,
-            orientation: "right",
             ticksTreatment: 'y-axis',
             element: this.refs.yAxis,
             tickValues: [0, 50, threshold, 100],
@@ -100,16 +102,35 @@ export default class ZoneDataHeader extends React.Component {
 
         yAxis.render();
 
+        this.graphAnnotator = new Rickshaw.Graph.Annotate({
+            graph: graph,
+            element: this.refs.timeline
+        });
+
         return graph
     }
+
+    annotateIrrigatingEvent() {
+        if (this.isIrrigating()) {
+            let time = timeConverter(this.state.data.timestamp)
+            this.graphAnnotator.add(this.state.data.timestamp, "Riego ("+ time +")");
+            this.graphAnnotator.update();
+        }
+    }
+
+    updateGraph() {
+        this.graph.update()
+        this.annotateIrrigatingEvent()
+    }
+
 
     componentWillUpdate() {
         if (this.state.data && this.state.mode === "graph") {
             let threshold = Math.round(moistureLevel2MoistureValue(this.state.zone.min_soil_moisture) * 100 / 1023, 0)
 
             if (!this.seriesData) {
-                    return this.seriesData = []
-                }
+                return this.seriesData = []
+            }
 
             this.seriesData.push({
                 x: parseInt(this.state.data.timestamp),
@@ -117,10 +138,10 @@ export default class ZoneDataHeader extends React.Component {
             })
 
             if (!this.graph) {
-                this.graph = this.prepareGraph(threshold)
+                this.graph = this.renderGraph(threshold)
                 this.graph.render();
             } else {
-                this.graph.update();
+                this.updateGraph()
             }
         }
     }
@@ -181,9 +202,14 @@ export default class ZoneDataHeader extends React.Component {
             return (
                 <div id="header">
                     <div id="content">
+                        <div className="attributes">
+                            <h2>{this.state.zone.name}</h2>
+                            <h3>{this.state.zone.description}</h3>
+                        </div>
                         <div className="graph-content">
                             <div className="y-axis" ref="yAxis"></div>
                             <div className="graph" ref="graph"></div>
+                            <div className="timeline" ref="timeline"></div>
                         </div>
                     </div>
                 </div>
