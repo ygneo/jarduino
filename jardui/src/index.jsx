@@ -31,6 +31,7 @@ class App extends React.Component {
         this.handleCodeUploadError = this.handleCodeUploadError.bind(this)
         this.handleCodeUpload = this.handleCodeUpload.bind(this)
         this.uploadCodeToDevice = this.uploadCodeToDevice.bind(this)
+        this.isUploadButtonEnabled = this.isUploadButtonEnabled.bind(this)
     }
 
     handleZonesUpdated() {
@@ -105,7 +106,13 @@ class App extends React.Component {
         })
     }
 
+    isUploadButtonEnabled() {
+        return (this.state.deviceFound && this.state.status !== "uploading")
+    }
+
     render() {
+        let isUploadButtonEnabled = this.isUploadButtonEnabled()
+
         return (
             <div id="app">
                 <head>
@@ -125,7 +132,7 @@ class App extends React.Component {
                             </div>
                             <div id="buttons">
                                 <UploadCodeToDeviceButton
-                                    enabled={this.state.deviceFound}
+                                    enabled={isUploadButtonEnabled}
                                     onClick={this.uploadCodeToDevice}
                                 />
                             </div>
