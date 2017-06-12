@@ -25,6 +25,9 @@ fieldset {
     margin-top: 2ex;
 }
 
+button {
+    cursor: pointer;
+}
 
 header {
     height: 12ex;
@@ -244,6 +247,8 @@ div#main section div#data div#header div#content  {
     background: linear-gradient(transparent, #8F2D0E);
     border-radius: 4px 4px 0 0;
     height: 27ex;
+    float: left;
+    width: 100%;
 }
 
 div#main section div#data div#header div#content div.attributes  {
@@ -386,6 +391,23 @@ div#main section div#data div#header h3 {
     padding-left: 20px;
 }
 
+div#main section div#data div#header div.header-container {
+    float: left;
+    width: 100%;
+}
+
+
+div#main section div#data div#header div.header-container .attributes {
+    float: left;
+}
+
+div#main section div#data div#header div.header-container .actions {
+    float: right;
+    margin-top: 2.5ex;
+    margin-right: 2ex;
+}
+
+
 div#main section div#data {
     float: left;
     width: 100%;
@@ -466,7 +488,7 @@ div#main section form div.buttons button {
     display: block;
     width: 100%;
     height: 180px;
-    top: -294px;
+    top: -210px;
     left: 9px;
 }
 .graph-content {
@@ -501,7 +523,7 @@ div#main section form div.buttons button {
 
 .timeline {
     position: relative;
-    top: -305px;
+    top: -220px;
     width: 355px;
     left: 5px;
 }

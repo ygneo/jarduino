@@ -31,13 +31,11 @@ export default class ZoneDataContent extends React.Component {
     constructor(props) {
         super(props)
 
-        this.defaultMode = "symbolic"
-        this.waitingMode = "waiting"
-
         this.state = {
             mode: props.mode ? props.mode : "waiting",
             zone: props.zone,
-            data: props.data
+            data: props.data,
+            seriesData: []
         };
 
         this.getLastReadTime = this.getLastReadTime.bind(this)
@@ -49,39 +47,48 @@ export default class ZoneDataContent extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        let nextMode
+        let nextMode = "waiting"
+        let seriesData = this.state.seriesData
 
         if (this.state.data) {
-            nextMode = nextMode ? nextMode : "symbolic"
-        } else {
-            nextMode = "waiting"
+            if (this.state.mode) {
+                if (this.state.mode === "waiting") {
+                    nextMode = "symbolic"
+                } else if (nextProps.mode) {
+                    nextMode = nextProps.mode
+                } else {
+                    nextMode = this.state.mode
+                }
+            }
+        }
+
+        if (nextProps.data) {
+            seriesData.push({
+                x: parseInt(nextProps.data.timestamp),
+                y: parseInt(nextProps.data.sensorsData.value) * 100 / 1023
+            })
         }
 
         this.setState({
             mode: nextMode,
             zone: nextProps.zone,
-            data: nextProps.data
+            data: nextProps.data,
+            seriesData: seriesData
         })
     }
 
-    componentWillUpdate() {
-        if (this.state.data && this.state.mode === "graph") {
+    componentWillUpdate(nextProps, nextState) {
+        if (this.state.seriesData && this.state.mode === "graph") {
             let threshold = Math.round(moistureLevel2MoistureValue(this.state.zone.min_soil_moisture) * 100 / 1023, 0)
-
-            if (!this.seriesData) {
-                return this.seriesData = []
-            }
-
-            this.seriesData.push({
-                x: parseInt(this.state.data.timestamp),
-                y: parseInt(this.state.data.sensorsData.value) * 100 / 1023
-            })
 
             if (!this.graph) {
                 this.graph = this.renderGraph(threshold)
-                this.graph.render();
-            } else {
+            }  else {
                 this.updateGraph()
+            }
+
+            if (nextProps.mode === "symbolic") {
+                this.graph = null
             }
         }
     }
@@ -98,7 +105,7 @@ export default class ZoneDataContent extends React.Component {
             height: 170,
             series:  [{
                 color: 'white',
-                data: this.seriesData,
+                data: this.state.seriesData,
                 name: "Humedad sustrato"
             }],
             padding: {top: 1, left: 1, right: 1, bottom: 1}
@@ -136,6 +143,8 @@ export default class ZoneDataContent extends React.Component {
             graph: graph,
             element: this.refs.timeline
         });
+
+        graph.render()
 
         return graph
     }
@@ -213,15 +222,11 @@ export default class ZoneDataContent extends React.Component {
 
             return (
                 <div id="content">
-                        <div className="attributes">
-                            <h2>{this.state.zone.name}</h2>
-                            <h3>{this.state.zone.description}</h3>
-                        </div>
-                        <div className="graph-content">
-                            <div className="y-axis" ref="yAxis"></div>
-                            <div className="graph" ref="graph"></div>
-                            <div className="timeline" ref="timeline"></div>
-                        </div>
+                    <div className="graph-content">
+                        <div className="y-axis" ref="yAxis"></div>
+                        <div className="graph" ref="graph"></div>
+                        <div className="timeline" ref="timeline"></div>
+                    </div>
                 </div>
             )
         }
