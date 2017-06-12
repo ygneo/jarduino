@@ -12,7 +12,7 @@ class ZoneData extends React.Component {
         super(props)
 
         this.state = {
-            mode: props.mode ? props.mode : "graph",
+            mode: props.mode,
             zone: props.zone,
             data: props.data
         };

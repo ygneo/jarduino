@@ -243,7 +243,7 @@ div#main section div#data div#header  {
 div#main section div#data div#header div#content  {
     background: linear-gradient(transparent, #8F2D0E);
     border-radius: 4px 4px 0 0;
-    height: 36ex;
+    height: 27ex;
 }
 
 div#main section div#data div#header div#content div.attributes  {
@@ -251,7 +251,8 @@ div#main section div#data div#header div#content div.attributes  {
     margin-bottom: 1.5ex;
 }
 
-div#main section div#data div#header div#content div.attributes  div.irrigating {
+div#main section div#data div#header div#content div.irrigating {
+    float: left;
     height: 46px;
     width: 37px;
     margin-top: 4ex;
@@ -503,4 +504,31 @@ div#main section form div.buttons button {
     top: -305px;
     width: 355px;
     left: 5px;
+}
+
+.loader-area {
+    padding: 6ex;
+    color: white;
+    text-align: center;
+}
+
+.loader-area p {
+    margin-top: 1ex;
+}
+
+
+.loader {
+    margin: 0 auto;
+    border: 4px solid rgba(255, 255, 255, .1);
+    border-top: 4px solid white; 
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 2s linear infinite;
+}
+
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
