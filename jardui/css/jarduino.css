@@ -468,7 +468,6 @@ div#main section form div.buttons button {
     top: -294px;
     left: 9px;
 }
-
 .graph-content {
     padding-top: 1.5ex;
     padding-bottom: 2ex;
@@ -483,6 +482,11 @@ div#main section form div.buttons button {
 .rickshaw_graph .y_grid .tick {
     stroke: white;
 }
+
+.rickshaw_graph .y_grid .tick[data-y-value=''] {
+    stroke-dasharray: 1000;
+}
+
 
 .y-axis .rickshaw_graph {
     padding-top: 10px;

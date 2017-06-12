@@ -87,7 +87,7 @@ export default class ZoneDataHeader extends React.Component {
 		            50: '50',
 		            100: '100'
 	          };
-            map[threshold] = '< ' + threshold
+            map[threshold] = ''
 
 	          return map[n];
         }
