@@ -16,8 +16,8 @@ const int digitalOutPin[] = {2, 3}; // Rele-Electrovalve output
 const int minSensorValue[] = $soilMoistureMinSensorValues; // Array of minimun values from the potentiometer to trigger watering
 
 const int checkingDelay = 1000; // Delay in ms between checks  (for the analog-to-digital converter to settle after last reading)
-const int numChecksBeforeSending = 1; // Number of checks should be done before sending data to serial
-const int wateringTime[] = $wateringTimes; // Watering time in ms for every plant
+const int numChecksBeforeSending = 3; // Number of checks should be done before sending data to serial
+const long int wateringTime[] = $wateringTimes; // Watering time in ms for every plant
 
 
 void setup() {
@@ -52,13 +52,13 @@ int readSoilMoisture(int sensor_id) {
     OpenGarden.sensorPowerON();
 
     soilMoisture = OpenGarden.readSoilMoisture();
-    //soilMoisture = map(soilMoisture, 0, 1023, 1, 100);
+    soilMoisture = map(soilMoisture, 0, 1023, 1, 100);
     delay(500);
 
     OpenGarden.sensorPowerOFF();
   } else {
     soilMoisture = analogRead(analogInPins[sensor_id - 1]);
-    //    soilMoisture = map(soilMoisture, 1023, 0, 1, 100);
+    soilMoisture = map(soilMoisture, 1023, 0, 1, 100);
   }
     
   return soilMoisture;
@@ -78,8 +78,7 @@ int readAirTemperature() {
   OpenGarden.sensorPowerON();
   delay(1000);
   float airTemperature = OpenGarden.readAirTemperature();
-  OpenGarden.sensorPowerOFF(); //Turns off the sensor power supply
-
+  OpenGarden.sensorPowerOFF();
   return airTemperature;
 }
 
@@ -145,8 +144,8 @@ void loop() {
 
   for (int i=0; i<numZones; i++) {
     sensorValues[i][SOIL_MOISTURE] = readSoilMoisture(i);
-    sensorValues[i][AIR_TEMPERATURE] = readAirHumidity();
-    sensorValues[i][AIR_HUMIDITY] =  readAirTemperature();
+    sensorValues[i][AIR_TEMPERATURE] = readAirTemperature();
+    sensorValues[i][AIR_HUMIDITY] =  readAirHumidity();
   }
   checksDone++;
 

@@ -4,7 +4,7 @@ import moistureLevel2MoistureValue from '../sensors/soil_moisture_sensor.js'
 
 
 const MAXLEVEL = 10
-const MAXVALUE = 1023
+const MAXVALUE = 100
 
 
 

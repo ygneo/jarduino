@@ -1,15 +1,23 @@
 #include <OpenGarden.h>
 #include "Wire.h" 
 
+#define SOIL_MOISTURE     0
+#define AIR_TEMPERATURE   1
+#define AIR_HUMIDITY      2
+
+const int numSensorTypes = 3;
+
+const int numZones = 2;
+
 const int analogInPins[] = {A0}; // Analog input pins
 
 const int digitalOutPin[] = {2, 3}; // Rele-Electrovalve output
 
-const int minSensorValue[] = {150, 750}; // Array of minimun values from the potentiometer to trigger watering
+const int minSensorValue[] = {50, 10}; // Array of minimun values from the potentiometer to trigger watering
 
 const int checkingDelay = 1000; // Delay in ms between checks  (for the analog-to-digital converter to settle after last reading)
-const int numChecksBeforeSending = 3; // Number of checks should be done before sending data to serial
-const int wateringTime[] = {1000, 1000}; // Watering time in ms for every plant
+const int numChecksBeforeSending = 1; // Number of checks should be done before sending data to serial
+const long int wateringTime[] = {1000, 1000}; // Watering time in ms for every plant
 
 
 void setup() {
@@ -41,15 +49,16 @@ int readSoilMoisture(int sensor_id) {
   int soilMoisture = 0;
 
   if (sensor_id == 0) {
-    OpenGarden.sensorPowerON(); // Turns on the sensor power supply
+    OpenGarden.sensorPowerON();
 
-    soilMoisture = OpenGarden.readSoilMoisture(); //Read the sensor
+    soilMoisture = OpenGarden.readSoilMoisture();
+    soilMoisture = map(soilMoisture, 0, 1023, 1, 100);
+    delay(500);
 
-    delay(500); // Time for initializing the sensor
-
-    OpenGarden.sensorPowerOFF(); //Turns off the sensor power supply
+    OpenGarden.sensorPowerOFF();
   } else {
-    soilMoisture = 1023 - analogRead(analogInPins[sensor_id - 1]);
+    soilMoisture = analogRead(analogInPins[sensor_id - 1]);
+    soilMoisture = map(soilMoisture, 1023, 0, 1, 100);
   }
     
   return soilMoisture;
@@ -57,28 +66,54 @@ int readSoilMoisture(int sensor_id) {
 
 /* ---- */
 
-void sendValuesToSerial (int values[], int size)
+int readAirHumidity() {
+  OpenGarden.sensorPowerON();
+  delay(1000);
+  float airHumidity = OpenGarden.readAirHumidity();
+  OpenGarden.sensorPowerOFF();
+  return airHumidity;
+}
+
+int readAirTemperature() {
+  OpenGarden.sensorPowerON();
+  delay(1000);
+  float airTemperature = OpenGarden.readAirTemperature();
+  OpenGarden.sensorPowerOFF();
+
+  return airTemperature;
+}
+
+void sendValuesToSerial (int values[][numSensorTypes])
 {
   Serial.print("#sensors#");
   
-  for (int i=0; i<size; i++) {
+  for (int i=0; i<numZones; i++) {
     String valuesString;
-    
     valuesString += i;
-    valuesString += ",";
-    valuesString += values[i];
+    valuesString += "/[";
+    for (int sensorType=0; sensorType < numSensorTypes; sensorType++) {
+      valuesString += "[";
+      valuesString += sensorType;
+      valuesString += ",";
+      valuesString += values[i][sensorType];
+      valuesString += "]";
+      if (sensorType != numSensorTypes - 1) {
+        valuesString += ",";
+      }
+    }
+    valuesString += "]";
     valuesString += "#";   
     Serial.print(valuesString);  
   }
 }
 
 
-void sendWateringEventsToSerial (int wateringDelays[], int size) 
+void sendWateringEventsToSerial (int wateringDelays[]) 
 {
   String valuesString;
 
   Serial.print("#actuators#");
-  for (int i=0; i<size; i++) {
+  for (int i=0; i < numZones; i++) {
     if (wateringDelays[i]) {
       valuesString += i;
       valuesString += ",";
@@ -90,9 +125,9 @@ void sendWateringEventsToSerial (int wateringDelays[], int size)
 
 }
 
-void sendToSerial (int values[], int wateringDelays[], int size) {
-  sendValuesToSerial(values, size);
-  sendWateringEventsToSerial(wateringDelays, size);
+void sendToSerial (int values[][numSensorTypes], int wateringDelays[]) {
+  sendValuesToSerial(values);
+  sendWateringEventsToSerial(wateringDelays);
 }
 
 boolean mustWater(int id, int value) {
@@ -106,36 +141,40 @@ void loop() {
   int wateringDelays[] = {0, 0};
   int delayTime = 0;
   int totalWateringDelay = 0;
-  int sensorValues[] = {0, 0};
-  int numSensors = sizeof(sensorValues)/sizeof(int);
+  int sensorValues[numZones][numSensorTypes];
 
-  for (int i=0; i<numSensors; i++) {
-    sensorValues[i] = readSoilMoisture(i);
+  for (int i=0; i<numZones; i++) {
+    sensorValues[i][SOIL_MOISTURE] = readSoilMoisture(i);
+    sensorValues[i][AIR_TEMPERATURE] = readAirHumidity();
+    sensorValues[i][AIR_HUMIDITY] =  readAirTemperature();
   }
   checksDone++;
 
-  for (int i=0; i<numSensors; i++) {
-      sum[i] += sensorValues[i];
+  for (int i=0; i<numZones; i++) {
+      sum[i] += sensorValues[i][SOIL_MOISTURE];
   }
 
   if (checksDone >= numChecksBeforeSending) {
-    means[0] = sum[0] / checksDone;
-    means[1] = sum[1] / checksDone;
+    for (int i=0; i<numZones; i++) {
+      means[i] = sum[i] / checksDone;
+      sensorValues[i][SOIL_MOISTURE] = means[i];
+    }
 
     checksDone = 0;
-    sum[0] = 0;
-    sum[1] = 0;
+    for (int i=0; i<numZones; i++) {
+      sum[i] = 0;
+    }
 
-    for (int i=0; i<numSensors; i++) {
+    for (int i=0; i<numZones; i++) {
       if (mustWater(i, means[i])) {
         wateringDelays[i] = doWatering(i);
       }
     }
 
-    sendToSerial(means, wateringDelays, numSensors);
+    sendToSerial(sensorValues, wateringDelays);
   }   
 
-  for (int i=0; i<numSensors; i++) {
+  for (int i=0; i<numZones; i++) {
      totalWateringDelay += wateringDelays[i];
    }
  

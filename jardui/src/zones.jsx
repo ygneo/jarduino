@@ -236,11 +236,14 @@ class IrrigationZone extends React.Component {
 function getForZoneId(data, zoneId) {
     let item = {}
 
-    data.map((dataItem, i) => {
-        if (dataItem.id && dataItem.id == zoneId) {
-            item = dataItem;
-        }
-    })
+    if (data) {
+        data.map((dataItem, i) => {
+            if (dataItem.zoneId == zoneId) {
+                item = dataItem.data;
+            }
+        })
+    }
+
 
     return item;
 }
@@ -258,7 +261,7 @@ class Zones extends React.Component {
         this.state = {
             "zones": zones ? zones : [],
             "mode": "normal",
-            "data": []
+            "data": null
         }
 
         this.handleZoneCreation = this.handleZoneCreation.bind(this);
@@ -280,14 +283,32 @@ class Zones extends React.Component {
     }
 
     getZoneData(id) {
-        if (this.state.data.sensorsData || this.state.data.actuatorsData) {
-            return  {
+        let data
+
+        if (this.state.data) {
+            let sensorsData = getForZoneId(this.state.data.sensorsData, id)
+            let actuatorsData = getForZoneId(this.state.data.actuatorsData, id)
+            let sensorsDataPerType = {}
+
+            let sensorTypes = ["soilMoisture", "airTemperature", "airHumidity"]
+            for (let i in sensorTypes) {
+                let sensorType = sensorTypes[i]
+
+                let sensorData = sensorsData.find(function (sensorData) {
+                    return sensorData.type === sensorTypes[i]
+                })
+
+                sensorsDataPerType[sensorType] = sensorData.value
+            }
+
+            data = {
                 timestamp: this.state.data.timestamp,
-                sensorsData: getForZoneId(this.state.data.sensorsData, id),
-                actuatorsData: getForZoneId(this.state.data.actuatorsData, id)
+                sensorsData: sensorsDataPerType,
+                actuatorsData: actuatorsData
             }
         }
 
+        return data
     }
 
     handleZoneCreation() {

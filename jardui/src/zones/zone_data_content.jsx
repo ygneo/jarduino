@@ -24,8 +24,6 @@ function timeConverter(UNIX_timestamp) {
     return time;
 }
 
-
-
 export default class ZoneDataContent extends React.Component {
 
     constructor(props) {
@@ -35,11 +33,15 @@ export default class ZoneDataContent extends React.Component {
             mode: props.mode ? props.mode : "waiting",
             zone: props.zone,
             data: props.data,
-            seriesData: []
+            seriesData: {
+                soilMoisture: [],
+                airTemperature: [],
+                airHumidity: []
+            }
         };
 
         this.getLastReadTime = this.getLastReadTime.bind(this)
-        this.getLastValue = this.getLastValue.bind(this)
+        this.getSensorValue = this.getSensorValue.bind(this)
         this.isIrrigating = this.isIrrigating.bind(this)
         this.renderGraph = this.renderGraph.bind(this)
         this.updateGraph = this.updateGraph.bind(this)
@@ -63,10 +65,10 @@ export default class ZoneDataContent extends React.Component {
         }
 
         if (nextProps.data) {
-            seriesData.push({
-                x: parseInt(nextProps.data.timestamp),
-                y: parseInt(nextProps.data.sensorsData.value) * 100 / 1023
-            })
+            this.pushSensorsDataToSeriesData(
+                seriesData,
+                nextProps.data.timestamp,
+                nextProps.data.sensorsData)
         }
 
         this.setState({
@@ -79,7 +81,7 @@ export default class ZoneDataContent extends React.Component {
 
     componentWillUpdate(nextProps, nextState) {
         if (this.state.seriesData && this.state.mode === "graph") {
-            let threshold = Math.round(moistureLevel2MoistureValue(this.state.zone.min_soil_moisture) * 100 / 1023, 0)
+            let threshold = moistureLevel2MoistureValue(this.state.zone.min_soil_moisture)
 
             if (!this.graph) {
                 this.graph = this.renderGraph(threshold)
@@ -93,6 +95,25 @@ export default class ZoneDataContent extends React.Component {
         }
     }
 
+    pushSensorsDataToSeriesData(seriesData, timestamp, sensorsData) {
+        seriesData['soilMoisture'].push(
+            {
+                x: parseInt(timestamp),
+                y: parseInt(sensorsData.soilMoisture)
+            })
+        seriesData['airTemperature'].push(
+            {
+                x: parseInt(timestamp),
+                y: parseInt(sensorsData.airTemperature)
+            }
+        )
+        seriesData['airHumidity'].push(
+             {
+                x: parseInt(timestamp),
+                y: parseInt(sensorsData.airHumidity)
+            })
+    }
+
     renderGraph(threshold) {
         let graph = new Rickshaw.Graph( {
             element: this.refs.graph,
@@ -103,11 +124,23 @@ export default class ZoneDataContent extends React.Component {
             preserve: true,
             width: 350,
             height: 170,
-            series:  [{
-                color: 'white',
-                data: this.state.seriesData,
-                name: "Humedad sustrato"
-            }],
+            series:  [
+                {
+                    color: 'white',
+                    data: this.state.seriesData.soilMoisture,
+                    name: "Humedad sustrato",
+                },
+                {
+                    data: this.state.seriesData.airTemperature,
+                    name: "Temperatura del aire",
+                    color: 'red'
+                },
+                {
+                    data: this.state.seriesData.airHumidity,
+                    name: "Humedad del aire",
+                    color: 'blue'
+                }
+            ],
             padding: {top: 1, left: 1, right: 1, bottom: 1}
         });
 
@@ -165,7 +198,7 @@ export default class ZoneDataContent extends React.Component {
     isIrrigating() {
         return (this.state.data &&
                 this.state.data.actuatorsData &&
-                this.state.data.actuatorsData.id == this.state.zone.id)
+                this.state.data.actuatorsData.length)
     }
 
     irrigatingClassName() {
@@ -182,13 +215,14 @@ export default class ZoneDataContent extends React.Component {
         return null
     }
 
-    getLastValue() {
+    getSensorValue(type) {
+        let sensorData
+
         if (this.state.data) {
-            return this.state.data.sensorsData.value
+            return this.state.data.sensorsData[type]
         }
         return null
     }
-
 
     render() {
         if (this.state.mode === "waiting") {
@@ -204,18 +238,24 @@ export default class ZoneDataContent extends React.Component {
             )
         } else if (this.state.mode === "symbolic") {
             let lastReadTime = this.getLastReadTime()
-            let lastValue = this.getLastValue()
+            let soilMoisture = this.getSensorValue("soilMoisture")
+            let airTemperature = this.getSensorValue("airTemperature")
+            let airHumidity = this.getSensorValue("airHumidity")
             let irrigatingClassName = this.irrigatingClassName()
 
             return (
                 <div id="content">
                     <div className={irrigatingClassName}></div>
+                    <div className="sensor_values">
+                        <div><span className="icon-air-temp"/>{airTemperature} ºC</div>
+                        <div><span className="icon-air-humidity"/>{airHumidity} %</div>
+                    </div>
                     <SoilMoistureLevel
                         time={lastReadTime}
-                        value={lastValue}
+                        value={soilMoisture}
                         zone={this.state.zone}
                     />
-                    </div>
+                </div>
             )
         } else if (this.state.mode === "graph") {
             let graphId = "graph" + this.state.zone.id;

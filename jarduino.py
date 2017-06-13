@@ -14,12 +14,18 @@ from random import randint
 from optparse import OptionParser
 
 
+SENSOR_TYPES = ["soilMoisture", "airTemperature", "airHumidity"]
+
+
+
 class JarduinoParser(object):
 
     def __init__(self, serial_device, fake_serial_input=False, debug=False):
         self.fake_serial_input = fake_serial_input
         self.serial = serial_device
-        self.data_pattern = re.compile("^#sensors#([0-9],\d+)#([0-9],\d+)##actuators#([0-9],\d+)?#?([0-9],\d+)?#?$")
+        sensors_pattern = "^#sensors#([0-9]/.+)#([0-9]/.+)#"
+        actuators_pattern = "#actuators#([0-9],\d+)?#?([0-9],\d+)?#?$"
+        self.data_pattern = re.compile("{}{}".format(sensors_pattern, actuators_pattern))
         self.sensors_data = []
         self.actuators_data = []
         self.debug = debug
@@ -59,11 +65,21 @@ class JarduinoParser(object):
         data = []
 
         for sensor_data in sensors_data:
-            id, value = sensor_data.split(",")
+            zone_id, sensor_tuples = sensor_data.split("/")
+            zone_id = int(zone_id)
+            sensor_tuples = json.loads(sensor_tuples)
+
+            data_from_sensors = []
+            for sensor_tuple in sensor_tuples:
+                sensor_type_id, value = sensor_tuple
+                data_from_sensors.append({
+                    "type": SENSOR_TYPES[sensor_type_id],
+                    "value": value
+                })
+
             data.append({
-                "id": id,
-                "type": "soil_moisture",
-                "value": value,
+                "zoneId": zone_id,
+                "data": data_from_sensors
             })
 
         return data
@@ -73,13 +89,15 @@ class JarduinoParser(object):
 
         for actuator_data in actuators_data:
             try:
-                id, value = actuator_data.split(",")
+                zone_id, value = actuator_data.split(",")
             except AttributeError:
                 continue
             data.append({
-                "id": id,
-                "type": "irrigation",
-                "value": value,
+                "zoneId": zone_id,
+                "data": [{
+                    "type": "irrigation",
+                    "value": value,
+                }]
             })
 
         return data

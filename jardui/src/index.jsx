@@ -19,7 +19,7 @@ class App extends React.Component {
         this.state = {
             "status": "searching",
             "deviceFound": false,
-            "zonesData": []
+            "zonesData": null
         }
 
         this.storage = new ZonesStorage

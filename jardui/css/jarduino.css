@@ -275,6 +275,21 @@ div#main section div#data div#header div.soil_moisture_level  {
     margin-top: 4ex;
 }
 
+div#main section div#data div#header div.sensor_values  {
+    float: left;
+    color: white;
+    font-size: 150%;
+}
+
+div#main section div#data div#header div.sensor_values .icon-air-temp {
+}
+
+div#main section div#data div#header div.sensor_values .icon-air-humidity {
+    height: 46px;
+    width: 37px;
+    background: url('/jardui/img/drops.png') no-repeat;
+}
+
 div#main section div#data div#header div.soil_moisture_level div.level {
     background: white;
     border-radius: 5px;

@@ -1,10 +1,10 @@
 export default function moistureLevel2MoistureValue(level) {
     let levelToMoistureValue = {
-        "very_low": 150,
-        "low": 300,
-        "medium": 450,
-        "high": 600,
-        "very_high": 750
+        "very_low": 10,
+        "low": 30,
+        "medium": 50,
+        "high": 70,
+        "very_high": 90
     }
 
     return levelToMoistureValue[level]
