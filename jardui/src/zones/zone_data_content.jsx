@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import SoilMoistureLevel from '../widgets/soil_moisture_level.js'
 import Rickshaw from 'rickshaw'
 import moistureLevel2MoistureValue from '../sensors/soil_moisture_sensor.js'
+import ZonesStorage from '../storage.js'
 
 
 function zeroPadding(n, digits=2) {
@@ -33,34 +34,31 @@ export default class ZoneDataContent extends React.Component {
             mode: props.mode,
             zone: props.zone,
             data: props.data,
-            seriesData: {
-                soilMoisture: [],
-                airTemperature: [],
-                airHumidity: []
-            }
-        };
+            seriesData: null
+        }
+
+        this.storage = new ZonesStorage
 
         this.getLastReadTime = this.getLastReadTime.bind(this)
         this.getSensorValue = this.getSensorValue.bind(this)
         this.isIrrigating = this.isIrrigating.bind(this)
         this.renderGraph = this.renderGraph.bind(this)
         this.updateGraph = this.updateGraph.bind(this)
-        this.annotateIrrigatingEvent = this.annotateIrrigatingEvent.bind(this)
+        this.getSeriesData = this.getSeriesData.bind(this)
+        this.pushtToSeriesData = this.pushToSeriesData.bind(this)
+        this.seriesDataAvaliable = this.seriesDataAvaliable.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
         let seriesData = this.state.seriesData
         let nextMode = "waiting"
 
-        if (this.state.data || nextProps.data) {
+        if (this.state.data || nextProps.data || this.seriesDataAvaliable()) {
             nextMode = "chart"
         }
 
         if (nextProps.data) {
-            this.pushSensorsDataToSeriesData(
-                seriesData,
-                nextProps.data.timestamp,
-                nextProps.data.sensorsData)
+            this.pushToSeriesData(nextProps.data, seriesData)
         }
 
         this.setState({
@@ -71,35 +69,79 @@ export default class ZoneDataContent extends React.Component {
         })
     }
 
+    componentDidMount(nextProps, nextState) {
+        let seriesData = this.getSeriesData()
+
+        if (seriesData) {
+            this.setState({
+                mode: "chart",
+                seriesData: this.getSeriesData()
+            })
+        }
+    }
+
     componentDidUpdate(nextProps, nextState) {
-        if (nextProps.data) {
+        if (nextProps.data || this.state.seriesData) {
             let threshold = moistureLevel2MoistureValue(this.state.zone.min_soil_moisture)
 
             if (!this.graph) {
                 this.graph = this.renderGraph(threshold)
             }  else {
-            this.updateGraph()
+                this.updateGraph()
             }
         }
     }
 
-    pushSensorsDataToSeriesData(seriesData, timestamp, sensorsData) {
+    seriesDataAvaliable() {
+        return (this.state.seriesData.soilMoisture.length)
+    }
+
+    getSeriesData() {
+        let data = this.storage.getZoneData(this.state.zone.id)
+        let seriesData = null
+        let this_instance = this
+
+        if (data.length) {
+            seriesData = {
+                "soilMoisture": [],
+                "airTemperature": [],
+                "airHumidity": []
+            }
+
+            data.forEach(function (datum) {
+                this_instance.pushToSeriesData(datum, seriesData)
+            })
+        }
+
+        return seriesData
+    }
+
+    pushToSeriesData(data, seriesData) {
         seriesData['soilMoisture'].push(
             {
-                x: parseInt(timestamp),
-                y: parseInt(sensorsData.soilMoisture)
+                x: parseInt(data.timestamp),
+                y: parseInt(data.sensorsData.soilMoisture)
             })
         seriesData['airTemperature'].push(
             {
-                x: parseInt(timestamp),
-                y: parseInt(sensorsData.airTemperature)
+                x: parseInt(data.timestamp),
+                y: parseInt(data.sensorsData.airTemperature)
             }
         )
         seriesData['airHumidity'].push(
-             {
-                x: parseInt(timestamp),
-                y: parseInt(sensorsData.airHumidity)
+            {
+                x: parseInt(data.timestamp),
+                y: parseInt(data.sensorsData.airHumidity)
             })
+
+        if (data.actuatorsData.length) {
+            seriesData['airHumidity'].push(
+                {
+                    x: parseInt(data.timestamp),
+                    y: 100
+                })
+        }
+
     }
 
     renderGraph(threshold) {
@@ -127,7 +169,13 @@ export default class ZoneDataContent extends React.Component {
                     data: this.state.seriesData.airHumidity,
                     name: "Humedad del aire",
                     color: 'green'
-                }
+                },
+                {
+                    data: this.state.seriesData.actuatorsEvents || [],
+                    name: "Riego",
+                    color: 'blue'
+                },
+
             ],
             padding: {top: 1, left: 1, right: 1, bottom: 1}
         });
@@ -170,16 +218,14 @@ export default class ZoneDataContent extends React.Component {
         return graph
     }
 
-    annotateIrrigatingEvent() {
+    updateGraph() {
+        this.graph.update()
+
         if (this.isIrrigating()) {
             let time = timeConverter(this.state.data.timestamp)
             this.graphAnnotator.add(this.state.data.timestamp, "Riego ("+ time +")");
             this.graphAnnotator.update();
         }
-    }
-
-    updateGraph() {
-        this.graph.update()
     }
 
     isIrrigating() {

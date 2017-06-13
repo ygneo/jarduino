@@ -5,6 +5,27 @@ import IrrigationZoneForm from './forms.js'
 import ZonesStorage from './storage.js'
 import SoilMoistureLevel from './widgets/soil_moisture_level.js'
 import ZoneDataHeader from './zones/zone_data_header.js'
+import getForZoneId from './zones/getForZoneId.js'
+
+
+function zeroPadding(n, digits=2) {
+    return ('00'+n).slice(-digits);
+}
+
+
+function timeConverter(UNIX_timestamp) {
+    var a = new Date(UNIX_timestamp * 1000);
+    var months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    var year = a.getFullYear();
+    var month = months[a.getMonth()];
+    var date = a.getDate();
+    var hour = a.getHours();
+    var min = zeroPadding(a.getMinutes());
+    var sec = zeroPadding(a.getSeconds());
+    var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+
+    return time;
+}
 
 
 class ZoneData extends React.Component {
@@ -37,10 +58,14 @@ class ZoneData extends React.Component {
         }
     }
 
-
     render() {
         let zone = this.state.zone
         let zoneId = {'data-zoneId': zone.id}
+        let timestamp = null
+
+        if (this.state.data) {
+            timestamp = timeConverter(this.state.data.timestamp)
+        }
 
         return (
             <div id="data">
@@ -49,22 +74,23 @@ class ZoneData extends React.Component {
                     data={this.state.data}
                 />
                 <div className="items">
+                    Ultima lectura: {timestamp}
                     <div className="item">
-                        <span className="label">Frecuencia de riego</span>
+                        <span className="label">Umbral del sustrato</span>
                         <span className="value">
-                            cada {zone.watering_frequence} {zone.watering_frequence_interval}
+                            XX %
                         </span>
                     </div>
                     <div className="item">
-                        <span className="label">Tiempo de riego</span>
+                        <span className="label">Humedad relativa</span>
                         <span className="value">
-                            {zone.watering_time} {zone.watering_time_interval}
+                            XX %
                         </span>
                     </div>
                     <div className="item">
-                        <span className="label">Umbral de humedad</span>
+                        <span className="label">Temperatura ambiente</span>
                         <span className="value">
-                            {zone.min_soil_moisture}
+                            XX ºC
                         </span>
                     </div>
                 </div>
@@ -231,21 +257,6 @@ class IrrigationZone extends React.Component {
 }
 
 
-function getForZoneId(data, zoneId) {
-    let item = {}
-
-    if (data) {
-        data.map((dataItem, i) => {
-            if (dataItem.zoneId == zoneId) {
-                item = dataItem.data;
-            }
-        })
-    }
-
-
-    return item;
-}
-
 class Zones extends React.Component {
     constructor(props) {
         let zones
@@ -259,7 +270,7 @@ class Zones extends React.Component {
         this.state = {
             "zones": zones ? zones : [],
             "mode": "normal",
-            "data": null
+            "data": props.data
         }
 
         this.handleZoneCreation = this.handleZoneCreation.bind(this);

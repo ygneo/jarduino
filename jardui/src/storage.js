@@ -1,4 +1,66 @@
+
+
+function getForZoneId(zoneId, data) {
+    let item = {}
+
+    if (data) {
+        data.map((dataItem, i) => {
+            if (dataItem.zoneId == zoneId) {
+                item = dataItem.data;
+            }
+        })
+    }
+
+
+    return item;
+}
+
+
 class ZonesStorage {
+
+    parsedData(id, data) {
+        let sensorsData = getForZoneId(id, data.sensorsData)
+        let actuatorsData = getForZoneId(id, data.actuatorsData)
+        let sensorsDataPerType = {}
+
+        let sensorTypes = ["soilMoisture", "airTemperature", "airHumidity"]
+        for (let i in sensorTypes) {
+            let sensorType = sensorTypes[i]
+
+            let sensorData = sensorsData.find(function (sensorData) {
+                return sensorData.type === sensorTypes[i]
+            })
+
+            sensorsDataPerType[sensorType] = sensorData.value
+        }
+
+        return {
+            timestamp: data.timestamp,
+            sensorsData: sensorsDataPerType,
+            actuatorsData: actuatorsData
+        }
+    }
+
+    addZonesData(data) {
+        let zones = localStorage.getItem("zones")
+
+        zones = JSON.parse(zones)
+
+        for (let id in zones) {
+            zones[id].data.push(this.parsedData(id, data))
+        }
+
+        localStorage.setItem("zones", JSON.stringify(zones))
+    }
+
+    getZoneData(id) {
+        let zones = localStorage.getItem("zones")
+
+        zones = JSON.parse(zones)
+
+        return zones[id].data
+    }
+
     addZone(zone) {
         let zones = localStorage.getItem("zones")
 
@@ -9,6 +71,7 @@ class ZonesStorage {
         }
 
         zone.id = zones.length
+        zone.data = []
         zones.push(zone)
 
         localStorage.setItem("zones", JSON.stringify(zones))
@@ -31,9 +94,7 @@ class ZonesStorage {
         let zones = localStorage.getItem("zones")
 
         zones = JSON.parse(zones)
-        console.log(zones)
         zones.splice(zoneId, 1)
-        console.log(zones)
 
         localStorage.setItem("zones", JSON.stringify(zones))
 

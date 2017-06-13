@@ -57,7 +57,13 @@ class App extends React.Component {
 
         this.deviceReader.startReading({
             "onMessage": function (message) {
-                this_instance.setState({zonesData: parseData(message)})
+                let data = parseData(message)
+
+                this_instance.setState(
+                    {zonesData: data}
+                )
+
+                this_instance.storage.addZonesData(data)
             },
             "onError": function (error) {
                 console.log(error)
