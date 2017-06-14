@@ -15,8 +15,8 @@ const int digitalOutPin[] = {2, 3}; // Rele-Electrovalve output
 
 const int minSensorValue[] = $soilMoistureMinSensorValues; // Array of minimun values from the potentiometer to trigger watering
 
-const int checkingDelay = 1000; // Delay in ms between checks  (for the analog-to-digital converter to settle after last reading)
-const int numChecksBeforeSending = 3; // Number of checks should be done before sending data to serial
+const int checkingDelay = 2000; // Delay in ms between checks  (for the analog-to-digital converter to settle after last reading)
+const int numChecksBeforeSending = 2; // Number of checks should be done before sending data to serial
 const long int wateringTime[] = $wateringTimes; // Watering time in ms for every plant
 
 
@@ -31,6 +31,8 @@ void setup() {
   OpenGarden.irrigationOFF(2);
 
   OpenGarden.initSensors();
+
+  OpenGarden.sensorPowerON();
 }
 
 int doWatering(int id) {
@@ -50,17 +52,15 @@ int readSoilMoisture(int sensor_id) {
 
   if (sensor_id == 0) {
     OpenGarden.sensorPowerON();
-
-    soilMoisture = OpenGarden.readSoilMoisture();
-    soilMoisture = map(soilMoisture, 0, 1023, 1, 100);
     delay(500);
-
+    soilMoisture = OpenGarden.readSoilMoisture();
+    soilMoisture = map(soilMoisture, 0, 1023, 0, 100);
     OpenGarden.sensorPowerOFF();
   } else {
     soilMoisture = analogRead(analogInPins[sensor_id - 1]);
-    soilMoisture = map(soilMoisture, 1023, 0, 1, 100);
+    soilMoisture = map(soilMoisture, 1023, 0, 0, 100);
   }
-    
+
   return soilMoisture;
 }
 
