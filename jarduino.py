@@ -17,7 +17,6 @@ from optparse import OptionParser
 SENSOR_TYPES = ["soilMoisture", "airTemperature", "airHumidity"]
 
 
-
 class JarduinoParser(object):
 
     def __init__(self, serial_device, fake_serial_input=False, debug=False):
@@ -26,8 +25,6 @@ class JarduinoParser(object):
         sensors_pattern = "^#sensors#([0-9]/.+)#([0-9]/.+)#"
         actuators_pattern = "#actuators#([0-9],\d+)?#?([0-9],\d+)?#?$"
         self.data_pattern = re.compile("{}{}".format(sensors_pattern, actuators_pattern))
-        self.sensors_data = []
-        self.actuators_data = []
         self.debug = debug
 
     def read_serial_data(self):
@@ -37,6 +34,9 @@ class JarduinoParser(object):
 
     def parse(self):
         try:
+            sensors_data = []
+            actuators_data = []
+
             data = self.read_serial_data().strip()
 
             if self.debug:
@@ -48,14 +48,14 @@ class JarduinoParser(object):
                 sensors_matches = matches[0:2]
                 actuators_matches = matches[2:]
 
-                self.sensors_data = self.sensors_parsed_data(sensors_matches)
-                self.actuators_data = self.actuators_parsed_data(actuators_matches)
+                sensors_data = self.sensors_parsed_data(sensors_matches)
+                actuators_data = self.actuators_parsed_data(actuators_matches)
 
-            if self.sensors_data or self.actuators_data:
+            if sensors_data or actuators_data:
                 return {
                     "timestamp": str(time.time()),
-                    "sensorsData": self.sensors_data,
-                    "actuatorsData": self.actuators_data
+                    "sensorsData": sensors_data,
+                    "actuatorsData": actuators_data
                 }
 
         except serial.SerialException:
