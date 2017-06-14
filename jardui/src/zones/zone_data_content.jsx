@@ -241,14 +241,19 @@ export default class ZoneDataContent extends React.Component {
             let soilMoisture = this.getSensorValue("soilMoisture")
             let airTemperature = this.getSensorValue("airTemperature")
             let airHumidity = this.getSensorValue("airHumidity")
-            let irrigatingClassName = this.irrigatingClassName()
+            let isIrrigatingText = ""
+
+            if (this.isIrrigating()) {
+                isIrrigatingText = "REGANDO"
+            }
 
             return (
                 <div id="content">
-                    <div className={irrigatingClassName}></div>
                     <div className="sensor_values">
                         <div><span className="icon-air-temp"/>{airTemperature} ºC</div>
                         <div><span className="icon-air-humidity"/>{airHumidity} %</div>
+                        <p>Última lectura {lastReadTime}</p>
+                        <p>{isIrrigatingText}</p>
                     </div>
                     <SoilMoistureLevel
                         time={lastReadTime}

@@ -278,15 +278,23 @@ div#main section div#data div#header div.soil_moisture_level  {
 div#main section div#data div#header div.sensor_values  {
     float: left;
     color: white;
-    font-size: 150%;
+    margin-top: 2ex;
+    margin-left: 2ex;
 }
 
 div#main section div#data div#header div.sensor_values .icon-air-temp {
 }
 
+div#main section div#data div#header div.sensor_values div { 
+    margin-bottom: .5ex;
+    font-size: 200%;
+}
+
 div#main section div#data div#header div.sensor_values .icon-air-humidity {
+    float: left;
     height: 46px;
     width: 37px;
+    margin-right: 1ex;
     background: url('/jardui/img/drops.png') no-repeat;
 }
 
@@ -388,10 +396,10 @@ div#main section div#data div#header hr.mark6 {
 }
 
 div#main section div#data div#header hr.mark7 {
-    top: 19px;
+    top: 19px;                 
 }
 
-div#main section div#data div#header h2 {
+div#main section div#data div#header h2 { 
     color: white;
     margin: 0;
     padding: 0;
