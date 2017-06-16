@@ -30,7 +30,7 @@ export default class ZoneDataContent extends React.Component {
         super(props)
 
         this.state = {
-            mode: props.mode ? props.mode : "waiting",
+            mode: props.mode,
             zone: props.zone,
             data: props.data,
             seriesData: {
@@ -49,19 +49,11 @@ export default class ZoneDataContent extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        let nextMode = "waiting"
         let seriesData = this.state.seriesData
+        let nextMode = "waiting"
 
-        if (this.state.data) {
-            if (this.state.mode) {
-                if (this.state.mode === "waiting") {
-                    nextMode = "symbolic"
-                } else if (nextProps.mode) {
-                    nextMode = nextProps.mode
-                } else {
-                    nextMode = this.state.mode
-                }
-            }
+        if (this.state.data || nextProps.data) {
+            nextMode = "chart"
         }
 
         if (nextProps.data) {
@@ -79,18 +71,14 @@ export default class ZoneDataContent extends React.Component {
         })
     }
 
-    componentWillUpdate(nextProps, nextState) {
-        if (this.state.seriesData && this.state.mode === "graph") {
+    componentDidUpdate(nextProps, nextState) {
+        if (nextProps.data) {
             let threshold = moistureLevel2MoistureValue(this.state.zone.min_soil_moisture)
 
             if (!this.graph) {
                 this.graph = this.renderGraph(threshold)
             }  else {
-                this.updateGraph()
-            }
-
-            if (nextProps.mode === "symbolic") {
-                this.graph = null
+            this.updateGraph()
             }
         }
     }
@@ -126,19 +114,19 @@ export default class ZoneDataContent extends React.Component {
             height: 170,
             series:  [
                 {
-                    color: 'white',
+                    color: 'brown',
                     data: this.state.seriesData.soilMoisture,
-                    name: "Humedad sustrato",
+                    name: "Humedad sustrato"
                 },
                 {
                     data: this.state.seriesData.airTemperature,
                     name: "Temperatura del aire",
-                    color: 'red'
+                    color: 'yellow'
                 },
                 {
                     data: this.state.seriesData.airHumidity,
                     name: "Humedad del aire",
-                    color: 'blue'
+                    color: 'green'
                 }
             ],
             padding: {top: 1, left: 1, right: 1, bottom: 1}
@@ -192,7 +180,6 @@ export default class ZoneDataContent extends React.Component {
 
     updateGraph() {
         this.graph.update()
-        this.annotateIrrigatingEvent()
     }
 
     isIrrigating() {
@@ -236,33 +223,7 @@ export default class ZoneDataContent extends React.Component {
                     </div>
                 </div>
             )
-        } else if (this.state.mode === "symbolic") {
-            let lastReadTime = this.getLastReadTime()
-            let soilMoisture = this.getSensorValue("soilMoisture")
-            let airTemperature = this.getSensorValue("airTemperature")
-            let airHumidity = this.getSensorValue("airHumidity")
-            let isIrrigatingText = ""
-
-            if (this.isIrrigating()) {
-                isIrrigatingText = "REGANDO"
-            }
-
-            return (
-                <div id="content">
-                    <div className="sensor_values">
-                        <div><span className="icon-air-temp"/>{airTemperature} ºC</div>
-                        <div><span className="icon-air-humidity"/>{airHumidity} %</div>
-                        <p>Última lectura {lastReadTime}</p>
-                        <p>{isIrrigatingText}</p>
-                    </div>
-                    <SoilMoistureLevel
-                        time={lastReadTime}
-                        value={soilMoisture}
-                        zone={this.state.zone}
-                    />
-                </div>
-            )
-        } else if (this.state.mode === "graph") {
+        } else {
             let graphId = "graph" + this.state.zone.id;
 
             return (

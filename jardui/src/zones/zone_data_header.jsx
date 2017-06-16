@@ -8,36 +8,16 @@ export default class ZoneDataHeader extends React.Component {
         super(props)
 
         this.state = {
-            mode: props.mode,
             zone: props.zone,
             data: props.data
         };
 
-        this.handleChangeModeToGraph = this.handleChangeModeToGraph.bind(this)
-        this.handleChangeModeToSymbolic = this.handleChangeModeToSymbolic.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
         this.setState({
-            mode: nextProps.mode,
             zone: nextProps.zone,
             data: nextProps.data
-        })
-    }
-
-    componentWillMount() {
-        // render graph with historic data
-    }
-
-    handleChangeModeToSymbolic() {
-        this.setState({
-            mode: "symbolic"
-        })
-    }
-
-    handleChangeModeToGraph() {
-        this.setState({
-            mode: "graph"
         })
     }
 
@@ -49,13 +29,8 @@ export default class ZoneDataHeader extends React.Component {
                         <h2>{this.state.zone.name}</h2>
                         <h3>{this.state.zone.description}</h3>
                     </div>
-                    <div className="actions">
-                        <button type="button" onClick={this.handleChangeModeToGraph}>Gráfico</button>
-                        <button type="button" onClick={this.handleChangeModeToSymbolic}>Símbolos</button>
-                    </div>
                 </div>
                 <ZoneDataContent
-                    mode={this.state.mode}
                     zone={this.state.zone}
                     data={this.state.data}
                 />

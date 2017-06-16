@@ -12,7 +12,6 @@ class ZoneData extends React.Component {
         super(props)
 
         this.state = {
-            mode: props.mode,
             zone: props.zone,
             data: props.data
         };
@@ -28,7 +27,6 @@ class ZoneData extends React.Component {
             data: data
         })
     }
-
 
     handleButtonClick(event) {
         const target = event.target

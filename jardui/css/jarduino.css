@@ -237,14 +237,13 @@ div#main section div#data  {
 }
 
 div#main section div#data div#header  {
-    background: #b23811;
     border-radius: 4px 4px 0 0;
     height: 36ex;
     width: 100%;
 }
 
 div#main section div#data div#header div#content  {
-    background: linear-gradient(transparent, #8F2D0E);
+    background: white;
     border-radius: 4px 4px 0 0;
     height: 27ex;
     float: left;
@@ -275,136 +274,12 @@ div#main section div#data div#header div.soil_moisture_level  {
     margin-top: 4ex;
 }
 
-div#main section div#data div#header div.sensor_values  {
-    float: left;
-    color: white;
-    margin-top: 2ex;
-    margin-left: 2ex;
-}
-
-div#main section div#data div#header div.sensor_values .icon-air-temp {
-}
-
-div#main section div#data div#header div.sensor_values div { 
-    margin-bottom: .5ex;
-    font-size: 200%;
-}
-
-div#main section div#data div#header div.sensor_values .icon-air-humidity {
-    float: left;
-    height: 46px;
-    width: 37px;
-    margin-right: 1ex;
-    background: url('/jardui/img/drops.png') no-repeat;
-}
-
-div#main section div#data div#header div.soil_moisture_level div.level {
-    background: white;
-    border-radius: 5px;
-    position: relative;
-    left: 15px;
-    height: 0px;
-}
-
-div#main section div#data div#header div.soil_moisture_level div.level1 {
-    width: 10px;
-    height: 13px;
-    top: 78px;
-}
-
-div#main section div#data div#header div.soil_moisture_level div.level2 {
-    width: 10px;
-    height: 24px;
-    top: 67px;
-}
-
-
-div#main section div#data div#header div.soil_moisture_level div.level3 {
-    width: 10px;
-    height: 35px;
-    top: 56px;
-}
-
-div#main section div#data div#header div.soil_moisture_level div.level4 {
-    width: 10px;
-    height: 46px;
-    top: 45px;
-}
-
-
-div#main section div#data div#header div.soil_moisture_level div.level5 {
-    width: 10px;
-    height: 54px;
-    top: 37px;
-}
-
-div#main section div#data div#header div.soil_moisture_level div.level6 {
-    width: 10px;
-    height: 65px;
-    top: 26px;
-}
-
-div#main section div#data div#header div.soil_moisture_level div.level7 {
-    width: 10px;
-    height: 76px;
-    top: 15px;
-}
-
-div#main section div#data div#header div.soil_moisture_level div.level8 {
-    width: 10px;
-    height: 90px;
-    top: 1px;
-}
-
-div#main section div#data div#header div.soil_moisture_level div.level9 {
-    width: 10px;
-    height: 100px;
-    top: -9px;
-}
-
-div#main section div#data div#header div.soil_moisture_level div.level10 {
-    width: 10px;
-    height: 112px;
-    top: -21px;
-}
-
-
-
-div#main section div#data div#header hr.mark {
-    position: relative;
-    border: none;
-    border-top: 1px dotted white;
-    background-color: transparent;
-    height: 1px;
-    width: 70%;
-}   
-
-div#main section div#data div#header hr.mark1 {
-    top: 84px;
-}
-
-div#main section div#data div#header hr.mark3 {
-    top: 68px;
-}
-
-div#main section div#data div#header hr.mark4 {
-    top: 52px;
-}
-
-div#main section div#data div#header hr.mark6 {
-    top: 36px;
-}
-
-div#main section div#data div#header hr.mark7 {
-    top: 19px;                 
-}
-
 div#main section div#data div#header h2 { 
-    color: white;
     margin: 0;
     padding: 0;
     padding-top: 20px;
     padding-left: 20px;
+    font-weight: normal;
 }
 
 div#main section div#data div#header h3 {
@@ -521,14 +396,6 @@ div#main section form div.buttons button {
     height: 200px;
 }
 
-.y-axis text {
-    fill: white;
-}
-
-.rickshaw_graph .y_grid .tick {
-    stroke: white;
-}
-
 .rickshaw_graph .y_grid .tick[data-y-value=''] {
     stroke-dasharray: 1000;
 }
@@ -540,10 +407,6 @@ div#main section form div.buttons button {
     padding-bottom: 12px;
 }
 
-.rickshaw_graph .y_ticks path {
-    stroke: white;
-}
-
 .timeline {
     position: relative;
     top: -220px;
@@ -553,19 +416,19 @@ div#main section form div.buttons button {
 
 .loader-area {
     padding: 6ex;
-    color: white;
     text-align: center;
 }
 
 .loader-area p {
     margin-top: 1ex;
+    color: grey;
 }
 
 
 .loader {
     margin: 0 auto;
-    border: 4px solid rgba(255, 255, 255, .1);
-    border-top: 4px solid white; 
+    border: 4px solid rgba(0, 0, 0, .1);
+    border-top: 4px solid black; 
     border-radius: 50%;
     width: 30px;
     height: 30px;
