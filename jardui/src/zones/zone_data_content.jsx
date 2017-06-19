@@ -140,23 +140,23 @@ export default class ZoneDataContent extends React.Component {
                 y: parseInt(data.sensorsData.airHumidity)
             })
 
-        /* if (data.actuatorsData.length) {
-         *     let eventDuration = parseInt(data.actuatorsData[0].value)
-         *     let startTimestamp = parseInt(data.timestamp)
-         *     let endTimestamp = startTimestamp + eventDuration
+        if (data.actuatorsData.length) {
+            let eventDuration = parseInt(data.actuatorsData[0].value) / 1000
+            let startTimestamp = parseInt(data.timestamp)
+            let endTimestamp = startTimestamp + eventDuration
 
-         *     seriesData['actuatorsEvents'].push(
-         *         {
-         *             x: startTimestamp,
-         *             y: 100
-         *         })
-         *     seriesData['actuatorsEvents'].push(
-         *         {
-         *             x: endTimestamp,
-         *             y: 0
-         *         })
-         * }
-         */
+            seriesData['actuatorsEvents'].push(
+                {
+                    x: startTimestamp,
+                    y: 100
+                },
+                {
+                    x: endTimestamp,
+                    y: 0
+                },
+
+            )
+        }
     }
 
     renderGraph(threshold) {
@@ -190,7 +190,9 @@ export default class ZoneDataContent extends React.Component {
                 },
                 {
                      data: this.state.seriesData.actuatorsEvents,
-                     name: "Riego",
+
+
+                    name: "Riego",
                      color: 'blue',
                      renderer: 'bar'
                  }
@@ -202,6 +204,12 @@ export default class ZoneDataContent extends React.Component {
 	          graph: graph,
 	          xFormatter: function(x) {
 		            return timeConverter(x)
+	          },
+            yFormatter: function(y) {
+                if (y<100) {
+                    return y
+                }
+                return null
 	          }
         } );
 

@@ -66,11 +66,6 @@ class ArduinoDevice {
             console.log(message);
         });
 
-        // FIXME this is probably redundant
-        this.pyshell.on('error', function (message) {
-            console.log(message);
-        });
-
         this.pyshell.end(function (err) {
             if (!err.toString().includes("never used")) {
                  console.log(err);
