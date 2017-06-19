@@ -25,6 +25,7 @@ function timeConverter(UNIX_timestamp) {
     return time;
 }
 
+
 export default class ZoneDataContent extends React.Component {
 
     constructor(props) {
@@ -34,13 +35,17 @@ export default class ZoneDataContent extends React.Component {
             mode: props.mode,
             zone: props.zone,
             data: props.data,
-            seriesData: null
+            seriesData: {
+                "empty": true,
+                "soilMoisture": [],
+                "airTemperature": [],
+                "airHumidity": [],
+                "actuatorsEvents": []
+            }
         }
 
         this.storage = new ZonesStorage
 
-        this.getLastReadTime = this.getLastReadTime.bind(this)
-        this.getSensorValue = this.getSensorValue.bind(this)
         this.isIrrigating = this.isIrrigating.bind(this)
         this.renderGraph = this.renderGraph.bind(this)
         this.updateGraph = this.updateGraph.bind(this)
@@ -72,16 +77,16 @@ export default class ZoneDataContent extends React.Component {
     componentDidMount(nextProps, nextState) {
         let seriesData = this.getSeriesData()
 
-        if (seriesData) {
+        if (!seriesData.empty) {
             this.setState({
                 mode: "chart",
-                seriesData: this.getSeriesData()
+                seriesData: seriesData
             })
         }
     }
 
     componentDidUpdate(nextProps, nextState) {
-        if (nextProps.data || this.state.seriesData) {
+        if (nextProps.data || !this.state.seriesData.empty) {
             let threshold = moistureLevel2MoistureValue(this.state.zone.min_soil_moisture)
 
             if (!this.graph) {
@@ -93,24 +98,25 @@ export default class ZoneDataContent extends React.Component {
     }
 
     seriesDataAvaliable() {
-        return (this.state.seriesData.soilMoisture.length)
+        return (!this.state.seriesData.empty && this.state.seriesData.soilMoisture.length)
     }
 
     getSeriesData() {
         let data = this.storage.getZoneData(this.state.zone.id)
-        let seriesData = null
+        let seriesData = {
+            "empty": true,
+            "soilMoisture": [],
+            "airTemperature": [],
+            "airHumidity": [],
+            "actuatorsEvents": []
+        }
         let this_instance = this
 
         if (data.length) {
-            seriesData = {
-                "soilMoisture": [],
-                "airTemperature": [],
-                "airHumidity": []
-            }
-
             data.forEach(function (datum) {
                 this_instance.pushToSeriesData(datum, seriesData)
             })
+            seriesData.empty = false
         }
 
         return seriesData
@@ -134,22 +140,31 @@ export default class ZoneDataContent extends React.Component {
                 y: parseInt(data.sensorsData.airHumidity)
             })
 
-        if (data.actuatorsData.length) {
-            seriesData['airHumidity'].push(
-                {
-                    x: parseInt(data.timestamp),
-                    y: 100
-                })
-        }
+        /* if (data.actuatorsData.length) {
+         *     let eventDuration = parseInt(data.actuatorsData[0].value)
+         *     let startTimestamp = parseInt(data.timestamp)
+         *     let endTimestamp = startTimestamp + eventDuration
 
+         *     seriesData['actuatorsEvents'].push(
+         *         {
+         *             x: startTimestamp,
+         *             y: 100
+         *         })
+         *     seriesData['actuatorsEvents'].push(
+         *         {
+         *             x: endTimestamp,
+         *             y: 0
+         *         })
+         * }
+         */
     }
 
     renderGraph(threshold) {
         let graph = new Rickshaw.Graph( {
             element: this.refs.graph,
-            renderer: 'line',
             min: 0,
             max: 100,
+            renderer: 'multi',
             stroke: true,
             preserve: true,
             width: 350,
@@ -158,24 +173,27 @@ export default class ZoneDataContent extends React.Component {
                 {
                     color: 'brown',
                     data: this.state.seriesData.soilMoisture,
-                    name: "Humedad sustrato"
+                    name: "Humedad sustrato",
+                    renderer: 'line'
                 },
                 {
                     data: this.state.seriesData.airTemperature,
                     name: "Temperatura del aire",
-                    color: 'yellow'
+                    color: 'yellow',
+                    renderer: 'line'
                 },
                 {
                     data: this.state.seriesData.airHumidity,
                     name: "Humedad del aire",
-                    color: 'green'
+                    color: 'green',
+                    renderer: 'line'
                 },
                 {
-                    data: this.state.seriesData.actuatorsEvents || [],
-                    name: "Riego",
-                    color: 'blue'
-                },
-
+                     data: this.state.seriesData.actuatorsEvents,
+                     name: "Riego",
+                     color: 'blue',
+                     renderer: 'bar'
+                 }
             ],
             padding: {top: 1, left: 1, right: 1, bottom: 1}
         });
@@ -239,22 +257,6 @@ export default class ZoneDataContent extends React.Component {
             return "irrigating"
         }
         return ""
-    }
-
-    getLastReadTime() {
-        if (this.state.data) {
-            return timeConverter(this.state.data.timestamp)
-        }
-        return null
-    }
-
-    getSensorValue(type) {
-        let sensorData
-
-        if (this.state.data) {
-            return this.state.data.sensorsData[type]
-        }
-        return null
     }
 
     render() {

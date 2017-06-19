@@ -37,7 +37,10 @@ class ZoneData extends React.Component {
             data: props.data
         };
 
+        this.storage = new ZonesStorage
+
         this.handleButtonClick = this.handleButtonClick.bind(this)
+        this.getLastTimestamp = this.getLastTimestamp.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -58,13 +61,46 @@ class ZoneData extends React.Component {
         }
     }
 
-    render() {
-        let zone = this.state.zone
-        let zoneId = {'data-zoneId': zone.id}
+    getLastTimestamp() {
         let timestamp = null
 
         if (this.state.data) {
-            timestamp = timeConverter(this.state.data.timestamp)
+            timestamp = this.state.data.timestamp
+        } else {
+            let zoneData = this.storage.getZoneData(this.state.zone.id)
+
+            if (zoneData) {
+                timestamp = zoneData[zoneData.length-1].timestamp
+            }
+        }
+
+        return timeConverter(timestamp)
+    }
+
+    getLastSensorValue(sensorType) {
+        let value = null
+
+        if (this.state.data) {
+            value = this.state.data.sensorsData[sensorType]
+        } else {
+            let zoneData = this.storage.getZoneData(this.state.zone.id)
+
+            if (zoneData) {
+                value = zoneData[zoneData.length-1].sensorsData[sensorType]
+            }
+        }
+
+        return value
+    }
+
+    render() {
+        let zone = this.state.zone
+        let zoneId = {'data-zoneId': zone.id}
+        let timestamp = this.getLastTimestamp()
+        let sensorsValues = {
+            soilMoisture: this.getLastSensorValue("soilMoisture"),
+            airHumidity: this.getLastSensorValue("airHumidity"),
+            airTemperature: this.getLastSensorValue("airTemperature")
         }
 
         return (
@@ -76,21 +112,21 @@ class ZoneData extends React.Component {
                 <div className="items">
                     Ultima lectura: {timestamp}
                     <div className="item">
-                        <span className="label">Umbral del sustrato</span>
+                        <span className="label">Humedad del sustrato</span>
                         <span className="value">
-                            XX %
+                            {sensorsValues.soilMoisture} %
                         </span>
                     </div>
                     <div className="item">
                         <span className="label">Humedad relativa</span>
                         <span className="value">
-                            XX %
+                            {sensorsValues.airHumidity} %
                         </span>
                     </div>
                     <div className="item">
                         <span className="label">Temperatura ambiente</span>
                         <span className="value">
-                            XX ºC
+                            {sensorsValues.airTemperature} ºC
                         </span>
                     </div>
                 </div>
