@@ -32,11 +32,12 @@ class ArduinoDevice {
     }
 
     upload(zones, handlers) {
-        this.update_code_config(zones)
-        this.upload_code(handlers)
+        let upload_code = this.upload_code
+
+        this.update_code_config(zones, function () { upload_code(handlers) })
     }
 
-    update_code_config(zones) {
+    update_code_config(zones, callback) {
         let moistureValues = []
         let wateringTimes = []
 
@@ -52,7 +53,7 @@ class ArduinoDevice {
             "wateringTimes": wateringTimes
         }
         var json = JSON.stringify(codeConfig)
-        fs.writeFile(SKETCH_DIR + '/jarduino.json', json, 'utf8')
+        fs.writeFile(SKETCH_DIR + '/jarduino.json', json, callback)
     }
 
     upload_code(handlers) {
