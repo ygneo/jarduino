@@ -398,6 +398,7 @@ div#main section form div.buttons button {
 
 .rickshaw_graph .y_grid .tick[data-y-value=''] {
     stroke-dasharray: 1000;
+    stroke: blue;
 }
 
 
