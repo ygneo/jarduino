@@ -87,7 +87,7 @@ export default class ZoneDataContent extends React.Component {
 
     componentDidUpdate(nextProps, nextState) {
         if (nextProps.data || !this.state.seriesData.empty) {
-            let threshold = moistureLevel2MoistureValue(this.state.zone.min_soil_moisture)
+            let threshold = this.state.zone.min_soil_moisture
 
             if (!this.graph) {
                 this.graph = this.renderGraph(threshold)
