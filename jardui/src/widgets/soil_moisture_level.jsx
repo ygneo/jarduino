@@ -6,7 +6,7 @@ import moistureLevel2MoistureValue from '../sensors/soil_moisture_sensor.js'
 const MAXLEVEL = 10
 const MAXVALUE = 100
 
-
+// TODO we can drop this
 
 function convertMinSoilMoisture2Level(value) {
     let moisture_value = moistureLevel2MoistureValue(value)

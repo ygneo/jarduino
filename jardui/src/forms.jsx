@@ -46,9 +46,10 @@ class IrrigationZoneForm extends React.Component {
                 name: '',
                 description: '',
                 watering_frequence: 0,
-                watering_frequence_interval: '',
+                watering_frequence_interval: 'h',
                 watering_time: 0,
-                watering_time_interval: ''
+                watering_time_interval: 'm',
+                irrigatingStart: ''
             }
         }
 
