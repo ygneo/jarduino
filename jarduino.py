@@ -21,10 +21,15 @@ class JarduinoParser(object):
 
     def __init__(self, serial_device, fake_serial_input=False, debug=False):
         self.fake_serial_input = fake_serial_input
+
         self.serial = serial_device
-        sensors_pattern = "^#sensors#([0-9]/.+)#([0-9]/.+)#"
+
+        timestamp_pattern = "^#time#([0-9]+)#"
+        sensors_pattern = "#sensors#([0-9]/.+)#([0-9]/.+)#"
         actuators_pattern = "#actuators#([0-9],\d+)?#?([0-9],\d+)?#?$"
-        self.data_pattern = re.compile("{}{}".format(sensors_pattern, actuators_pattern))
+        self.data_pattern = re.compile("{}{}{}".format(
+            timestamp_pattern, sensors_pattern, actuators_pattern))
+
         self.debug = debug
 
     def read_serial_data(self):
@@ -45,15 +50,16 @@ class JarduinoParser(object):
 
             if data_match:
                 matches = data_match.groups()
-                sensors_matches = matches[0:2]
-                actuators_matches = matches[2:]
+                timestamp = matches[0]
+                sensors_matches = matches[1:3]
+                actuators_matches = matches[3:]
 
                 sensors_data = self.sensors_parsed_data(sensors_matches)
                 actuators_data = self.actuators_parsed_data(actuators_matches)
 
             if sensors_data or actuators_data:
                 return {
-                    "timestamp": str(time.time()),
+                    "timestamp": str(timestamp),
                     "sensorsData": sensors_data,
                     "actuatorsData": actuators_data
                 }

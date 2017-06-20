@@ -189,13 +189,11 @@ export default class ZoneDataContent extends React.Component {
                     renderer: 'line'
                 },
                 {
-                     data: this.state.seriesData.actuatorsEvents,
-
-
+                    data: this.state.seriesData.actuatorsEvents,
                     name: "Riego",
-                     color: 'blue',
-                     renderer: 'bar'
-                 }
+                    color: 'blue',
+                    renderer: 'bar'
+                }
             ],
             padding: {top: 1, left: 1, right: 1, bottom: 1}
         });

@@ -15,14 +15,16 @@ const int digitalOutPin[] = {2, 3}; // Rele-Electrovalve output
 
 const int minSensorValue[] = $soilMoistureMinSensorValues; // Array of minimun values from the potentiometer to trigger watering
 
-const int checkingDelay = 2000; // Delay in ms between checks  (for the analog-to-digital converter to settle after last reading)
-const int numChecksBeforeSending = 2; // Number of checks should be done before sending data to serial
+const int checkingDelay = 1000; // Delay in ms between checks  (for the analog-to-digital converter to settle after last reading)
+const int numChecksBeforeSending = 1; // Number of checks should be done before sending data to serial
 const long int wateringTime[] = $wateringTimes; // Watering time in ms for every plant
 
 
 void setup() {
   // initialize serial communications at 9600 bps:
   Serial.begin(9600);
+
+  OpenGarden.initRTC();
 
   OpenGarden.initIrrigation(1);
   OpenGarden.initIrrigation(2);
@@ -32,7 +34,6 @@ void setup() {
 
   OpenGarden.initSensors();
 
-  OpenGarden.sensorPowerON();
 }
 
 int doWatering(int id) {
@@ -125,6 +126,11 @@ void sendWateringEventsToSerial (int wateringDelays[])
 }
 
 void sendToSerial (int values[][numSensorTypes], int wateringDelays[]) {
+  DateTime now = OpenGarden.getTime();
+
+  Serial.print("#time#");
+  Serial.print(now.unixtime());
+  Serial.print("#");
   sendValuesToSerial(values);
   sendWateringEventsToSerial(wateringDelays);
 }
@@ -132,6 +138,7 @@ void sendToSerial (int values[][numSensorTypes], int wateringDelays[]) {
 boolean mustWater(int id, int value) {
   return (value <= minSensorValue[id]);
 }
+
 
 void loop() {
   static int checksDone = 0;
