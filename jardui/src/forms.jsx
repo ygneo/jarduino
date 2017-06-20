@@ -135,8 +135,17 @@ class IrrigationZoneForm extends React.Component {
                     value={zone.description}
                     onChange={this.handleInputChange}
                 />
+                <h4>Riego programado</h4>
+                <TextInputFieldSet
+                    label="Inicio"
+                    name="irrigatingStart"
+                    id="irrigatingStart"
+                    type="text"
+                    value={zone.irrigatingStart}
+                    onChange={this.handleInputChange}
+                />
                 <TimeIntervalFieldSet
-                    frequenceLabel="Frecuencia de riego"
+                    frequenceLabel="Frecuencia"
                     intervalLabel="Intervalo"
                     id="watering_frequence"
                     name="watering_frequence"
@@ -145,7 +154,7 @@ class IrrigationZoneForm extends React.Component {
                     onChange={this.handleInputChange}
                 />
                 <TimeIntervalFieldSet
-                    frequenceLabel="Tiempo de riego"
+                    frequenceLabel="Duración"
                     intervalLabel="Intervalo"
                     id="watering_time"
                     name="watering_time"
@@ -153,19 +162,14 @@ class IrrigationZoneForm extends React.Component {
                     intervalValue={zone.watering_time_interval}
                     onChange={this.handleInputChange}
                 />
-                <fieldset>
-                    <label for="min_soil_moisture">Umbral de humedad</label>
-                    <select name="min_soil_moisture" id="min_soil_moisture"
-                            value={zone.min_soil_moisture}
-                            onChange={this.handleInputChange}
-                    >
-                        <option value="very_low">Muy baja</option>
-                        <option value="low">Baja</option>
-                        <option value="medium">Media</option>
-                        <option value="high">Alta</option>
-                        <option value="very_high">Muy alta</option>
-                    </select>
-                </fieldset>
+                <TextInputFieldSet
+                    label="Umbral de humedad"
+                    name="min_soil_moisture"
+                    id="min_soil_moisture"
+                    type="text"
+                    value={zone.min_soil_moisture}
+                    onChange={this.handleInputChange}
+                />
                 <div className="buttons">
                     <DeleteButton mode={deleteButtonMode}
                                   zoneId={zoneId}

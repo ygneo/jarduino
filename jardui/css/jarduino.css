@@ -314,7 +314,7 @@ div#main section div#data {
 
 div#main section div#data div.items {
     float: left;
-    margin: 3ex;
+    margin: 0 3ex 3ex 3ex;
     width: 80%;
     padding-bottom: 4ex;
     border-bottom: 2px solid #f2f2f2;
@@ -336,6 +336,21 @@ div#main section div#data div.items div.item span.value {
     float: right;
     font-weight: bold;
 }
+
+div#main section div#data div.settings {
+    float: left;
+    margin: 0 3ex 3ex 3ex;     
+    width: 80%;
+    padding-bottom: 4ex;
+    border-bottom: 2px solid #f2f2f2;
+}
+
+div#main section div#data div.settings h4 {
+    margin: 0;
+    padding: 0;
+}
+
+
 
 
 div#main section div#data div.buttons {

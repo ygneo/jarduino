@@ -62,19 +62,19 @@ class ZoneData extends React.Component {
     }
 
     getLastTimestamp() {
-        let timestamp = null
+        let timestamp = "N/A"
 
-        if (this.state.data) {
-            timestamp = this.state.data.timestamp
+        if (this.state.data && this.state.data.timestamp) {
+            timestamp = timeConverter(this.state.data.timestamp)
         } else {
             let zoneData = this.storage.getZoneData(this.state.zone.id)
 
-            if (zoneData) {
-                timestamp = zoneData[zoneData.length-1].timestamp
+            if (zoneData && zoneData.length) {
+                timestamp = timeConverter(zoneData[zoneData.length-1].timestamp)
             }
         }
 
-        return timeConverter(timestamp)
+        return timestamp
     }
 
     getLastSensorValue(sensorType) {
@@ -85,7 +85,7 @@ class ZoneData extends React.Component {
         } else {
             let zoneData = this.storage.getZoneData(this.state.zone.id)
 
-            if (zoneData) {
+            if (zoneData && zoneData.length) {
                 value = zoneData[zoneData.length-1].sensorsData[sensorType]
             }
         }
@@ -131,7 +131,10 @@ class ZoneData extends React.Component {
                     </div>
                 </div>
                 <div className="settings">
-                    Tiempo de riego {this.state.zone.watering_time} {this.state.zone.watering_time_interval}
+                    <h4>Riego programado</h4>
+                    <p>Inicio  {this.state.zone.irrigatingStart}</p>
+                    <p>Frecuencia {this.state.zone.watering_frequence} {this.state.zone.watering_frequence_interval}</p>
+                    <p>Duración {this.state.zone.watering_time} {this.state.zone.watering_time_interval}</p>
                 </div>
                 <div className="buttons">
                     <span className="edit_button"
