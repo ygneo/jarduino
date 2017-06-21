@@ -212,6 +212,7 @@ class IrrigationZoneForm extends React.Component {
                     onChange={this.handleInputChange}
                 />
                 <h4>Riego programado</h4>
+                <label>Inicio</label>
                 <DateTimePicker
                     defaultValue={irrigatingStart}
                     onChange={this.handleIrrigatingStartChange}
