@@ -156,40 +156,64 @@ export default class ZoneDataContent extends React.Component {
                     color: 'brown',
                     data: this.state.seriesData.soilMoisture,
                     name: "Humedad sustrato",
-                    renderer: 'line'
+                    renderer: 'line',
+                    units: "%"
                 },
                 {
                     data: this.state.seriesData.airTemperature,
                     name: "Temperatura del aire",
                     color: 'yellow',
-                    renderer: 'line'
+                    renderer: 'line',
+                    units: "ºC"
                 },
                 {
                     data: this.state.seriesData.airHumidity,
                     name: "Humedad del aire",
                     color: 'green',
-                    renderer: 'line'
+                    renderer: 'line',
+                    units: "%"
                 },
                 {
                     data: this.state.seriesData.actuatorsEvents,
                     name: "Riego",
                     color: 'blue',
-                    renderer: 'bar'
+                    renderer: 'bar',
+                    noHoverDetail: true
                 }
             ],
             padding: {top: 1, left: 1, right: 1, bottom: 1}
         });
 
-        let hoverDetail = new Rickshaw.Graph.HoverDetail( {
+        let Hover = Rickshaw.Class.create(Rickshaw.Graph.HoverDetail, {
+            render: function($super, args) {
+                // get the current point we are dealing with
+                var point = args.points.filter( function(p) {
+                    return p.active }
+                ).shift();
+
+                if (point.value.y === null) return;
+
+                // check if the series we are dealing with has the "noHoverDetail"
+                // attribute set to true. If so, we don't want to render this
+                // hover detail item, if not call the original render method as
+                // normal
+                if (point.series.noHoverDetail !== true) {
+                    $super(args);
+                }
+
+                if (point.series.units) {
+                    let units = point.series.units
+                    this.yFormatter =  function(y) {
+                            return y + units
+	                  }
+                }
+            }
+        });
+
+        let hoverDetail = new Hover( {
 	          graph: graph,
 	          xFormatter: function(x) {
 		            return timeConverter(x)
-	          },
-            yFormatter: function(y) {
-                if (y<100) {
-                    return y
-                }
-                return null
 	          }
         } );
 
