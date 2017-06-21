@@ -252,7 +252,7 @@ export default class ZoneDataContent extends React.Component {
         this.graph.update()
 
         if (this.isIrrigating()) {
-            let time = this.state.data.localDateTime
+            let time = timeConverter(this.state.data.timestamp)
             this.graphAnnotator.add(this.state.data.timestamp, "Riego ("+ time +")");
             this.graphAnnotator.update();
         }

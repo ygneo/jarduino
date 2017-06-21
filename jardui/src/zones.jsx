@@ -45,12 +45,12 @@ class ZoneData extends React.Component {
         let lastDateTime
 
         if (this.state.data && this.state.data.timestamp) {
-            lastDateTime = this.state.data.localDateTime
+            lastDateTime = timeConverter(this.state.data.timestamp)
         } else {
             let zoneData = this.storage.getZoneData(this.state.zone.id)
 
             if (zoneData && zoneData.length) {
-                lastDateTime = zoneData[zoneData.length-1].localDateTime
+                lastDateTime = timeConverter(zoneData[zoneData.length-1].timestamp)
             }
         }
 
@@ -343,7 +343,6 @@ class Zones extends React.Component {
 
             data = {
                 timestamp: this.state.data.timestamp,
-                localDateTime: this.state.data.localDateTime,
                 sensorsData: sensorsDataPerType,
                 actuatorsData: actuatorsData
             }
