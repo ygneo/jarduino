@@ -3,16 +3,31 @@ function zeroPadding(n, digits=2) {
 }
 
 
-export default function timeConverter(UNIX_timestamp) {
-    var a = new Date(UNIX_timestamp * 1000);
-    var months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-    var year = a.getUTCFullYear();
-    var month = months[a.getUTCMonth()];
-    var date = a.getUTCDate();
-    var hour = a.getUTCHours();
-    var min = zeroPadding(a.getUTCMinutes());
-    var sec = zeroPadding(a.getUTCSeconds());
-    var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+export default function timeConverter(UNIX_timestamp, utc=true, secs=true) {
+    let a = new Date(UNIX_timestamp * 1000)
+    let months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
 
-    return time;
+    let year = a.getFullYear()
+    let month = months[a.getMonth()]
+    let date = a.getDate()
+    let hour = a.getHours()
+    let min = zeroPadding(a.getMinutes())
+    let sec = zeroPadding(a.getSeconds())
+
+    if (utc) {
+        year = a.getUTCFullYear()
+        month = months[a.getUTCMonth()]
+        date = a.getUTCDate()
+        hour = a.getUTCHours()
+        min = zeroPadding(a.getUTCMinutes())
+        sec = zeroPadding(a.getUTCSeconds())
+    }
+
+
+    let time = date + ' ' + month + ' ' + year + '  ' + hour + ':' + min
+    if (secs) {
+        time +=  ':' + sec 
+    }
+
+    return time
 }

@@ -22,6 +22,7 @@ class ZoneData extends React.Component {
 
         this.handleButtonClick = this.handleButtonClick.bind(this)
         this.getLastReadingDateTime = this.getLastReadingDateTime.bind(this)
+        this.getIrrigatingStart = this.getIrrigatingStart.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -37,9 +38,7 @@ class ZoneData extends React.Component {
         const target = event.target
         const className = target.className
 
-        if (className == "edit_button") {
-            this.props.onEditButtonClick(event.target.getAttribute('data-zoneId'));
-        }
+        this.props.onEditButtonClick(event.target.getAttribute('data-zoneId'));
     }
 
     getLastReadingDateTime() {
@@ -78,6 +77,11 @@ class ZoneData extends React.Component {
         return value
     }
 
+    getIrrigatingStart() {
+        let irrigatingStart = Date.parse(this.state.zone.irrigatingStart) / 1000
+        return timeConverter(irrigatingStart, false, false)
+    }
+
     render() {
         let zone = this.state.zone
         let zoneId = {'data-zoneId': zone.id}
@@ -87,6 +91,7 @@ class ZoneData extends React.Component {
             airHumidity: this.getLastSensorValue("airHumidity"),
             airTemperature: this.getLastSensorValue("airTemperature")
         }
+        let irrigatingStart = this.getIrrigatingStart()
 
         return (
             <div id="data">
@@ -99,33 +104,33 @@ class ZoneData extends React.Component {
                     <div className="item">
                         <span className="label">Humedad del sustrato</span>
                         <span className="value">
-                            {sensorsValues.soilMoisture} % ({this.state.zone.min_soil_moisture} %)
+                            {sensorsValues.soilMoisture}% (&lt; {this.state.zone.min_soil_moisture}%)
                         </span>
                     </div>
                     <div className="item">
                         <span className="label">Humedad relativa</span>
                         <span className="value">
-                            {sensorsValues.airHumidity} %
+                            {sensorsValues.airHumidity}%
                         </span>
                     </div>
                     <div className="item">
                         <span className="label">Temperatura ambiente</span>
                         <span className="value">
-                            {sensorsValues.airTemperature} ºC
+                            {sensorsValues.airTemperature}ºC
                         </span>
                     </div>
                 </div>
                 <div className="settings">
                     <h4>Riego programado</h4>
-                    <p>Inicio  {this.state.zone.irrigatingStart}</p>
+                    <p>Inicio {irrigatingStart}</p>
                     <p>Frecuencia {this.state.zone.watering_frequence} {this.state.zone.watering_frequence_interval}</p>
                     <p>Duración {this.state.zone.watering_time} {this.state.zone.watering_time_interval}</p>
                 </div>
                 <div className="buttons">
-                    <span className="edit_button"
+                    <span className="configure"
                           {...zoneId}
                           onClick={this.handleButtonClick}
-                    />
+                    >CONFIGURAR</span>
                 </div>
             </div>
         )

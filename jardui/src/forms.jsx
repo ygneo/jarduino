@@ -2,10 +2,73 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import fieldsets from './inputs.js'
 import ZonesStorage from './storage.js'
+import ReactWidgets from 'react-widgets'
+import timeConverter from './timeConverter.js'
+import dateFormat from 'dateformat'
 
 
 const TextInputFieldSet = fieldsets.TextInputFieldSet
 const TimeIntervalFieldSet = fieldsets.TimeIntervalFieldSet
+
+const DateTimePicker = ReactWidgets.DateTimePicker;
+
+
+function zeroPadding(n, digits=2) {
+    return ('00'+n).slice(-digits);
+}
+
+
+var localizer = {
+
+    formats: {
+        default: "DEFAULT",
+        date: 'd',
+        time: 'HH:MM',
+        header:  'mmm yyyy',
+        footer: "FOOTER",
+        day: 'd',
+        dayOfMonth: 'd',
+        month: 'm',
+        year: 'y',
+        decade: "y - y",
+        century: "y - y"
+    },
+
+    firstOfWeek() {
+        return 0
+    },
+
+    parse(value, format, cultureStr){
+        return new Date(value)
+    },
+
+    format(value, format, cultureStr){
+        let dayOfWeek = ['Lun','Mar','Mie','Jue','Vie', 'Sáb', 'Dom']
+        let months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+        let year = value.getFullYear();
+        let month = months[value.getMonth()];
+        let day = dayOfWeek[value.getDay()]
+        let date = value.getDate();
+        let hour = value.getHours();
+        let min = zeroPadding(value.getMinutes());
+        let time
+
+
+        if (!format) {
+            return day
+        } else {
+            if (format === "DEFAULT" || format === "FOOTER") {
+                let day = dayOfWeek[value.getDay() - 1]
+                return date + ' ' + month + ' ' + year + ' ' + hour + ':' + min;
+            } else {
+                return dateFormat(value, format)
+            }
+        }
+    }
+}
+
+ReactWidgets.setDateLocalizer(localizer)
 
 
 class DeleteButton extends React.Component {
@@ -49,17 +112,19 @@ class IrrigationZoneForm extends React.Component {
                 watering_frequence_interval: 'h',
                 watering_time: 0,
                 watering_time_interval: 'm',
-                irrigatingStart: ''
+                irrigatingStart: new Date()
             }
         }
 
         if (props.zone) {
-            this.state.zone = props.zone
+            Object.assign(this.state.zone, props.zone);
         }
 
         this.storage = new ZonesStorage()
 
         this.handleInputChange = this.handleInputChange.bind(this)
+        this.handleIrrigatingStartChange = this.handleIrrigatingStartChange.bind(this)
+
         this.handleSubmit = this.handleSubmit.bind(this)
         this.handleDelete = this.handleDelete.bind(this)
         this.handleCancel = this.handleCancel.bind(this)
@@ -77,6 +142,16 @@ class IrrigationZoneForm extends React.Component {
 
         zone = this.state.zone
         zone[name] = value
+
+        this.setState({
+            'zone': zone
+        })
+    }
+
+    handleIrrigatingStartChange(date) {
+        let zone = this.state.zone
+
+        zone["irrigatingStart"] = date
 
         this.setState({
             'zone': zone
@@ -111,6 +186,7 @@ class IrrigationZoneForm extends React.Component {
         let zone = this.state.zone
         let deleteButtonMode = "off"
         let zoneId
+        let irrigatingStart = new Date(this.state.zone.irrigatingStart)
 
         if (zone.id !== undefined) {
             deleteButtonMode = "on"
@@ -136,13 +212,10 @@ class IrrigationZoneForm extends React.Component {
                     onChange={this.handleInputChange}
                 />
                 <h4>Riego programado</h4>
-                <TextInputFieldSet
-                    label="Inicio"
-                    name="irrigatingStart"
-                    id="irrigatingStart"
-                    type="text"
-                    value={zone.irrigatingStart}
-                    onChange={this.handleInputChange}
+                <DateTimePicker
+                    defaultValue={irrigatingStart}
+                    onChange={this.handleIrrigatingStartChange}
+                    step={5}
                 />
                 <TimeIntervalFieldSet
                     frequenceLabel="Frecuencia"
