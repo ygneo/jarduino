@@ -42,7 +42,7 @@ class ArduinoDevice {
         let wateringTimes = []
 
         zones.map((zone,i) => {
-            moistureValues.push(moistureLevel2MoistureValue(zone.min_soil_moisture))
+            moistureValues.push(parseInt(zone.min_soil_moisture))
             wateringTimes.push(wateringTimeToMs(zone.watering_time, zone.watering_time_interval))
         })
 
