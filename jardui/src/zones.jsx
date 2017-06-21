@@ -100,7 +100,7 @@ class ZoneData extends React.Component {
                     data={this.state.data}
                 />
                 <div className="items">
-                    Ultima lectura: {lastReadingDateTime}
+                    <h4>Ultima lectura: <em>{lastReadingDateTime}</em></h4>
                     <div className="item">
                         <span className="label">Humedad del sustrato</span>
                         <span className="value">
@@ -120,11 +120,25 @@ class ZoneData extends React.Component {
                         </span>
                     </div>
                 </div>
-                <div className="settings">
+                <div className="items">
                     <h4>Riego programado</h4>
-                    <p>Inicio {irrigatingStart}</p>
-                    <p>Frecuencia {this.state.zone.watering_frequence} {this.state.zone.watering_frequence_interval}</p>
-                    <p>Duración {this.state.zone.watering_time} {this.state.zone.watering_time_interval}</p>
+                    <div className="item">
+                        <span className="label">Inicio</span>
+                        <span className="value">
+                            {irrigatingStart}
+                        </span>
+                    </div>
+                    <div className="item">
+                        <span className="label">Frecuencia</span>
+                        <span className="value">
+                            cada {this.state.zone.watering_frequence} {this.state.zone.watering_frequence_interval}</span>
+                    </div>
+                    <div className="item">
+                        <span className="label">Duración</span>
+                        <span className="value">
+                            {this.state.zone.watering_time} {this.state.zone.watering_time_interval}
+                        </span>
+                    </div>
                 </div>
                 <div className="buttons">
                     <span className="configure"

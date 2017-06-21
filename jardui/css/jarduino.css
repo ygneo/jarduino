@@ -138,15 +138,28 @@ div#main section {
 }
 
 
-div#main section.form {
+div#main section.form  {
     box-shadow: 0px 0px 5px 5px #e0e0e0;
 }
 
-div#main section h4 {
-    text-align: left;
-    color: grey;
+div#main section.form h4 {
+    margin-top: 1.5ex;
+    margin-bottom: 1ex;
 }
 
+
+div#main section h4 {
+    margin: 0;
+    text-align: left;
+    color: grey;
+    font-size: 100%;
+    font-weight: normal;
+}
+
+div#main section h4 em {
+    font-weight: bold;
+    font-style: normal;
+}
 
 div#main section .card {
     border-bottom: 2px solid #f2f2f2;
