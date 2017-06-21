@@ -6,26 +6,7 @@ import ZonesStorage from './storage.js'
 import SoilMoistureLevel from './widgets/soil_moisture_level.js'
 import ZoneDataHeader from './zones/zone_data_header.js'
 import getForZoneId from './zones/getForZoneId.js'
-
-
-function zeroPadding(n, digits=2) {
-    return ('00'+n).slice(-digits);
-}
-
-
-function timeConverter(UNIX_timestamp) {
-    var a = new Date(UNIX_timestamp * 1000);
-    var months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-    var year = a.getUTCFullYear();
-    var month = months[a.getUTCMonth()];
-    var date = a.getUTCDate();
-    var hour = a.getUTCHours();
-    var min = zeroPadding(a.getUTCMinutes());
-    var sec = zeroPadding(a.getUTCSeconds());
-    var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
-
-    return time;
-}
+import timeConverter from './timeConverter.js'
 
 
 class ZoneData extends React.Component {
@@ -40,7 +21,7 @@ class ZoneData extends React.Component {
         this.storage = new ZonesStorage
 
         this.handleButtonClick = this.handleButtonClick.bind(this)
-        this.getLastTimestamp = this.getLastTimestamp.bind(this)
+        this.getLastReadingDateTime = this.getLastReadingDateTime.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -61,20 +42,24 @@ class ZoneData extends React.Component {
         }
     }
 
-    getLastTimestamp() {
-        let timestamp = "N/A"
+    getLastReadingDateTime() {
+        let lastDateTime
 
         if (this.state.data && this.state.data.timestamp) {
-            timestamp = timeConverter(this.state.data.timestamp)
+            lastDateTime = this.state.data.localDateTime
         } else {
             let zoneData = this.storage.getZoneData(this.state.zone.id)
 
             if (zoneData && zoneData.length) {
-                timestamp = timeConverter(zoneData[zoneData.length-1].timestamp)
+                lastDateTime = zoneData[zoneData.length-1].localDateTime
             }
         }
 
-        return timestamp
+        if (!lastDateTime) {
+            lastDateTime = "N/A"
+        }
+
+        return lastDateTime
     }
 
     getLastSensorValue(sensorType) {
@@ -96,7 +81,7 @@ class ZoneData extends React.Component {
     render() {
         let zone = this.state.zone
         let zoneId = {'data-zoneId': zone.id}
-        let timestamp = this.getLastTimestamp()
+        let lastReadingDateTime = this.getLastReadingDateTime()
         let sensorsValues = {
             soilMoisture: this.getLastSensorValue("soilMoisture"),
             airHumidity: this.getLastSensorValue("airHumidity"),
@@ -110,7 +95,7 @@ class ZoneData extends React.Component {
                     data={this.state.data}
                 />
                 <div className="items">
-                    Ultima lectura: {timestamp}
+                    Ultima lectura: {lastReadingDateTime}
                     <div className="item">
                         <span className="label">Humedad del sustrato</span>
                         <span className="value">
@@ -353,6 +338,7 @@ class Zones extends React.Component {
 
             data = {
                 timestamp: this.state.data.timestamp,
+                localDateTime: this.state.data.localDateTime,
                 sensorsData: sensorsDataPerType,
                 actuatorsData: actuatorsData
             }

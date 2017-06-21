@@ -4,26 +4,8 @@ import SoilMoistureLevel from '../widgets/soil_moisture_level.js'
 import Rickshaw from 'rickshaw'
 import moistureLevel2MoistureValue from '../sensors/soil_moisture_sensor.js'
 import ZonesStorage from '../storage.js'
+import timeConverter from '../timeConverter.js'
 
-
-function zeroPadding(n, digits=2) {
-    return ('00'+n).slice(-digits);
-}
-
-
-function timeConverter(UNIX_timestamp) {
-    var a = new Date(UNIX_timestamp * 1000);
-    var months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-    var year = a.getFullYear();
-    var month = months[a.getMonth()];
-    var date = a.getDate();
-    var hour = a.getHours();
-    var min = zeroPadding(a.getMinutes());
-    var sec = zeroPadding(a.getSeconds());
-    var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
-
-    return time;
-}
 
 
 export default class ZoneDataContent extends React.Component {
@@ -246,7 +228,7 @@ export default class ZoneDataContent extends React.Component {
         this.graph.update()
 
         if (this.isIrrigating()) {
-            let time = timeConverter(this.state.data.timestamp)
+            let time = this.state.data.localDateTime
             this.graphAnnotator.add(this.state.data.timestamp, "Riego ("+ time +")");
             this.graphAnnotator.update();
         }
