@@ -100,7 +100,7 @@ class ZoneData extends React.Component {
                     data={this.state.data}
                 />
                 <div className="items">
-                    <h4>Ultima lectura: <em>{lastReadingDateTime}</em></h4>
+                    <h4>Última lectura: <em>{lastReadingDateTime}</em></h4>
                     <div className="item">
                         <span className="label">Humedad del sustrato</span>
                         <span className="value">

@@ -3,7 +3,7 @@ function zeroPadding(n, digits=2) {
 }
 
 
-export default function timeConverter(UNIX_timestamp, utc=true, secs=true) {
+export default function timeConverter(UNIX_timestamp, utc=true, secs=true, only_time=false) {
     let a = new Date(UNIX_timestamp * 1000)
     let months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
 
@@ -23,10 +23,14 @@ export default function timeConverter(UNIX_timestamp, utc=true, secs=true) {
         sec = zeroPadding(a.getUTCSeconds())
     }
 
-
+    
     let time = date + ' ' + month + ' ' + year + '  ' + hour + ':' + min
     if (secs) {
         time +=  ':' + sec 
+    }
+
+    if (only_time) {
+        time = hour + ':' + min + ":" + sec
     }
 
     return time

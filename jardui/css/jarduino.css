@@ -38,7 +38,7 @@ header {
     background: white;
     border-bottom: 4px solid #ededed; 
     position: fixed;
-}
+ }
 
 header h1 {
     margin: 0;
@@ -258,6 +258,7 @@ div#main section div#data div#header  {
     border-radius: 4px 4px 0 0;
     height: 36ex;
     width: 100%;
+    margin-bottom: 3ex;
 }
 
 div#main section div#data div#header div#content  {
@@ -431,6 +432,11 @@ div#main section form div.buttons button {
     stroke: blue;
 }
 
+.x-axis {
+    position: relative;
+    top: -200px;
+    left: 8px;
+}
 
 .y-axis .rickshaw_graph {
     padding-top: 10px;
@@ -470,4 +476,8 @@ div#main section form div.buttons button {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+rect {
+    fill-opacity: 0.2;
 }

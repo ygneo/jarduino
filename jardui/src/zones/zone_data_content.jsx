@@ -7,6 +7,11 @@ import ZonesStorage from '../storage.js'
 import timeConverter from '../timeConverter.js'
 
 
+function zeroPadding(n, digits=2) {
+    return ('00'+n).slice(-digits);
+}
+
+
 
 export default class ZoneDataContent extends React.Component {
 
@@ -135,8 +140,7 @@ export default class ZoneDataContent extends React.Component {
                 {
                     x: endTimestamp,
                     y: 0
-                },
-
+                }
             )
         }
     }
@@ -238,13 +242,26 @@ export default class ZoneDataContent extends React.Component {
 
         yAxis.render();
 
-        this.graphAnnotator = new Rickshaw.Graph.Annotate({
+        var xAxis = new Rickshaw.Graph.Axis.X({
             graph: graph,
-            element: this.refs.timeline
+            element: this.refs.xAxis,
+            tickFormat: function (x) {
+                let d = new Date(x * 1000)
+                return zeroPadding(d.getUTCHours()) + ":" + zeroPadding(d.getUTCMinutes()) + ":" + zeroPadding(d.getUTCSeconds())
+            },
+            orientation: 'bottom',
+            pixelsPerTick: 75
         });
 
-        graph.render()
+        xAxis.render();
 
+        /* this.graphAnnotator = new Rickshaw.Graph.Annotate({
+         *     graph: graph,
+         *     element: this.refs.timeline
+         * });
+
+         * graph.render()
+         */
         return graph
     }
 
@@ -253,8 +270,8 @@ export default class ZoneDataContent extends React.Component {
 
         if (this.isIrrigating()) {
             let time = timeConverter(this.state.data.timestamp)
-            this.graphAnnotator.add(this.state.data.timestamp, "Riego ("+ time +")");
-            this.graphAnnotator.update();
+//            this.graphAnnotator.add(this.state.data.timestamp, "Riego ("+ time +")");
+  //          this.graphAnnotator.update();
         }
     }
 
@@ -291,6 +308,7 @@ export default class ZoneDataContent extends React.Component {
                     <div className="graph-content">
                         <div className="y-axis" ref="yAxis"></div>
                         <div className="graph" ref="graph"></div>
+                        <div className="x-axis" ref="xAxis"></div>
                         <div className="timeline" ref="timeline"></div>
                     </div>
                 </div>
