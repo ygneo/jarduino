@@ -40,17 +40,29 @@ class ArduinoDevice {
     update_code_config(zones, callback) {
         let moistureValues = []
         let wateringTimes = []
+        let irrigatingStartDateTimes = []
 
         zones.map((zone,i) => {
             moistureValues.push(parseInt(zone.min_soil_moisture))
+
             wateringTimes.push(wateringTimeToMs(zone.watering_time, zone.watering_time_interval))
+
+            let datetime = new Date(zone.irrigatingStart)
+            irrigatingStartDateTimes.push({
+                year: datetime.getFullYear(),
+                month: datetime.getMonth(),
+                day: datetime.getDate(),
+                hour: datetime.getHours(),
+                min: datetime.getMinutes()
+            })
         })
 
         var codeConfig = {
             "soilMoistureMinSensorValues": moistureValues,
             "checkingDelay": 1000,
             "numchecksBeforeWatering": 3,
-            "wateringTimes": wateringTimes
+            "wateringTimes": wateringTimes,
+            "irrigatingStartDateTimes": irrigatingStartDateTimes
         }
         var json = JSON.stringify(codeConfig)
         fs.writeFile(SKETCH_DIR + '/jarduino.json', json, callback)

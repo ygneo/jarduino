@@ -51,7 +51,7 @@ class JarduinoParser(object):
             if data_match:
                 matches = data_match.groups()
                 timestamp = matches[0]
-                sensors_matches = matches[1:3]
+                sensors_matches = matches[1:3] 
                 actuators_matches = matches[3:]
 
                 sensors_data = self.sensors_parsed_data(sensors_matches)
@@ -171,18 +171,33 @@ def upload(sketch_dir):
     call("cd {}; MONITOR_PORT={} make upload".format(sketch_dir, device_name), shell=True)
 
 
-def read_code_configuration(sketch_dir):
+def _read_date_times(date_times):
+    date_times_string = "{"
+
+    for i, date_time in enumerate(date_times):
+        date_times_string += "DateTime({year},{month},{day},{hour},{min})".format(**date_time)
+        if i != (len(date_times) - 1):
+            date_times_string += ", "
+
+    date_times_string += "}"
+
+    return date_times_string
+
+def parse_code_configuration(sketch_dir):
     with open("{}jarduino.json".format(sketch_dir), "r") as f:
         code_configuration = json.loads(f.read())
 
     for key, value in code_configuration.iteritems():
-        code_configuration[key] = str(code_configuration[key]).replace("[", "{").replace("]", "}")
+        if key == "irrigatingStartDateTimes":
+            code_configuration[key] = _read_date_times(value)
+        else:
+            code_configuration[key] = str(code_configuration[key]).replace("[", "{").replace("]", "}")
 
     return code_configuration
 
 
 def generate(sketch_dir):
-    code_configuration = read_code_configuration(sketch_dir)
+    code_configuration = parse_code_configuration(sketch_dir)
 
     with open("{}jarduino.tpl".format(sketch_dir), "r") as f:
         template = Template(f.read())

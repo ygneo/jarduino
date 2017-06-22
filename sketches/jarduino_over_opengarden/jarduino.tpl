@@ -1,5 +1,7 @@
 #include <OpenGarden.h>
+#include <TimeAlarms.h>
 #include "Wire.h" 
+
 
 #define SOIL_MOISTURE     0
 #define AIR_TEMPERATURE   1
@@ -17,7 +19,10 @@ const int minSensorValue[] = $soilMoistureMinSensorValues; // Array of minimun v
 
 const int checkingDelay = 1000; // Delay in ms between checks  (for the analog-to-digital converter to settle after last reading)
 const int numChecksBeforeSending = 1; // Number of checks should be done before sending data to serial
+
+DateTime irrigatingStartDateTime[] = $irrigatingStartDateTimes; //{DateTime(2017, 6, 22, 13, 10, 0), DateTime(2017, 6, 22, 13, 35, 0)};
 const long int wateringTime[] = $wateringTimes; // Watering time in ms for every plant
+boolean irrigatingTimeStarted = false;
 
 
 void setup() {
@@ -33,8 +38,8 @@ void setup() {
   OpenGarden.irrigationOFF(2);
 
   OpenGarden.initSensors();
-
 }
+
 
 int doWatering(int id) {
   int valve_number = id + 1;
@@ -135,10 +140,28 @@ void sendToSerial (int values[][numSensorTypes], int wateringDelays[]) {
   sendWateringEventsToSerial(wateringDelays);
 }
 
-boolean mustWater(int id, int value) {
-  return (value <= minSensorValue[id]);
+boolean isIrrigatingTime(int id) {
+  DateTime now = OpenGarden.getTime();
+
+  if (now.unixtime() >= irrigatingStartDateTime[id].unixtime()) {
+    if (irrigatingTimeStarted) {
+      // use freq
+      return true;
+    } else { 
+      irrigatingTimeStarted = true;
+      return true;
+    }
+  }
+
+  return false;
 }
 
+boolean mustIrrigate(int id, int value) {
+  return (isIrrigatingTime(id) && value <= minSensorValue[id]);
+}
+
+
+int alarmCreated = false;
 
 void loop() {
   static int checksDone = 0;
@@ -172,7 +195,7 @@ void loop() {
     }
 
     for (int i=0; i<numZones; i++) {
-      if (mustWater(i, means[i])) {
+      if (mustIrrigate(i, means[i])) {
         wateringDelays[i] = doWatering(i);
       }
     }
