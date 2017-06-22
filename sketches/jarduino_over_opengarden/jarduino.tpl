@@ -20,8 +20,9 @@ const int minSensorValue[] = $soilMoistureMinSensorValues; // Array of minimun v
 const int checkingDelay = 1000; // Delay in ms between checks  (for the analog-to-digital converter to settle after last reading)
 const int numChecksBeforeSending = 1; // Number of checks should be done before sending data to serial
 
-DateTime irrigatingStartDateTime[] = $irrigatingStartDateTimes; //{DateTime(2017, 6, 22, 13, 10, 0), DateTime(2017, 6, 22, 13, 35, 0)};
+DateTime irrigatingStartDateTime[] = $irrigatingStartDateTimes; // For instance {DateTime(2017, 6, 22, 13, 10, 0), DateTime(2017, 6, 22, 13, 35, 0)}
 const long int wateringTime[] = $wateringTimes; // Watering time in ms for every plant
+const long int irrigatingFrequence[] = $irrigatingFrequences; // Irrigating frequence in seconds for every plant
 boolean irrigatingTimeStarted = false;
 
 

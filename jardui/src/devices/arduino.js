@@ -41,11 +41,16 @@ class ArduinoDevice {
         let moistureValues = []
         let wateringTimes = []
         let irrigatingStartDateTimes = []
+        let irrigatingFrequences = []
 
         zones.map((zone,i) => {
-            moistureValues.push(parseInt(zone.min_soil_moisture))
+            moistureValues.push(
+                parseInt(zone.min_soil_moisture)
+            )
 
-            wateringTimes.push(wateringTimeToMs(zone.watering_time, zone.watering_time_interval))
+            wateringTimes.push(
+                timeIntervalToMs(zone.watering_time, zone.watering_time_interval)
+            )
 
             let datetime = new Date(zone.irrigatingStart)
             irrigatingStartDateTimes.push({
@@ -55,16 +60,24 @@ class ArduinoDevice {
                 hour: datetime.getHours(),
                 min: datetime.getMinutes()
             })
+
+            irrigatingFrequences.push(
+                timeIntervalToMs(zone.watering_frequence, zone.watering_frequence_interval)
+            )
+
         })
 
-        var codeConfig = {
+        let codeConfig = {
             "soilMoistureMinSensorValues": moistureValues,
             "checkingDelay": 1000,
             "numchecksBeforeWatering": 3,
             "wateringTimes": wateringTimes,
-            "irrigatingStartDateTimes": irrigatingStartDateTimes
+            "irrigatingStartDateTimes": irrigatingStartDateTimes,
+            "irrigatingFrequences": irrigatingFrequences
         }
-        var json = JSON.stringify(codeConfig)
+
+        let json = JSON.stringify(codeConfig)
+
         fs.writeFile(SKETCH_DIR + '/jarduino.json', json, callback)
     }
 
@@ -92,7 +105,7 @@ class ArduinoDevice {
 }
 
 
-function wateringTimeToMs(time, interval) {
+function timeIntervalToMs(time, interval) {
     let multiplier = {
         "s": 1000,
         "m": 60000,
