@@ -64,13 +64,17 @@ class ZonesStorage {
     addZone(zone) {
         let zones = localStorage.getItem("zones")
 
-        if (zones !== null) {
+        if (zones !== "null") {
             zones = JSON.parse(zones)
         } else {
             zones = []
         }
 
-        zone.id = zones.length
+        if (zones && zones.length) {
+            zone.id = zones.length
+        } else {
+            zone.id = 0
+        }
         zone.data = []
         zones.push(zone)
 
@@ -114,7 +118,10 @@ class ZonesStorage {
 
         zones = JSON.parse(zones)
 
-        return Object.keys(zones).map(x => zones[x])
+        if (zones && zones.length) {
+            return Object.keys(zones).map(x => zones[x])
+        } 
+        return null
     }
 }
 
