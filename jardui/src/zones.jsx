@@ -92,6 +92,17 @@ class ZoneData extends React.Component {
             airTemperature: this.getLastSensorValue("airTemperature")
         }
         let irrigatingStart = this.getIrrigatingStart()
+        let barStyles = {
+            soilMoisture: {
+                width: sensorsValues.soilMoisture + "%"
+            },
+            airHumidity: {
+                width: sensorsValues.airHumidity + "%"
+            },
+            airTemperature: {
+                width: sensorsValues.airTemperature + "%"
+            }
+        };
 
         return (
             <div id="data">
@@ -102,22 +113,37 @@ class ZoneData extends React.Component {
                 <div className="items">
                     <h4>Última lectura: <em>{lastReadingDateTime}</em></h4>
                     <div className="item">
-                        <span className="label">Humedad del sustrato</span>
-                        <span className="value">
-                            {sensorsValues.soilMoisture}% (&lt; {this.state.zone.min_soil_moisture}%)
-                        </span>
+                        <div className="item-value">
+                            <span className="label">Humedad del sustrato</span>
+                            <span className="value">
+                                {sensorsValues.soilMoisture}% (&lt; {this.state.zone.min_soil_moisture}%)
+                            </span>
+                        </div>
+                        <div className="w3-light-grey w3-round value-bar">
+                            <div className="w3-container w3-round w3-soilMoisture" style={barStyles.soilMoisture}></div>
+                        </div>
                     </div>
                     <div className="item">
-                        <span className="label">Humedad relativa</span>
-                        <span className="value">
-                            {sensorsValues.airHumidity}%
-                        </span>
+                        <div className="item-value">
+                            <span className="label">Humedad relativa</span>
+                            <span className="value">
+                                {sensorsValues.airHumidity}%
+                            </span>
+                        </div>
+                        <div className="w3-light-grey w3-round value-bar">
+                            <div className="w3-container w3-round w3-airHumidity" style={barStyles.airHumidity}></div>
+                        </div>
                     </div>
                     <div className="item">
-                        <span className="label">Temperatura ambiente</span>
-                        <span className="value">
-                            {sensorsValues.airTemperature}ºC
-                        </span>
+                        <div className="item-value">
+                            <span className="label">Temperatura ambiente</span>
+                            <span className="value">
+                                {sensorsValues.airTemperature}ºC
+                            </span>
+                        </div>
+                        <div className="w3-light-grey w3-round value-bar">
+                            <div className="w3-container w3-round w3-airTemperature" style={barStyles.airTemperature}></div>
+                        </div>
                     </div>
                 </div>
                 <div className="items">
@@ -144,7 +170,7 @@ class ZoneData extends React.Component {
                     <span className="configure"
                           {...zoneId}
                           onClick={this.handleButtonClick}
-                    >CONFIGURAR</span>
+                    >MODIFICAR</span>
                 </div>
             </div>
         )

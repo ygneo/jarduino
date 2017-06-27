@@ -153,34 +153,34 @@ export default class ZoneDataContent extends React.Component {
             renderer: 'multi',
             stroke: true,
             preserve: true,
-            width: 350,
+            width: 320,
             height: 170,
             series:  [
                 {
-                    color: 'brown',
+                    color: '#99754D',
                     data: this.state.seriesData.soilMoisture,
                     name: "Humedad sustrato",
                     renderer: 'line',
                     units: "%"
                 },
                 {
+                    color: '#FFC300',
                     data: this.state.seriesData.airTemperature,
                     name: "Temperatura del aire",
-                    color: 'yellow',
                     renderer: 'line',
                     units: "ºC"
                 },
                 {
+                    color: '#17A1E6',
                     data: this.state.seriesData.airHumidity,
                     name: "Humedad del aire",
-                    color: 'green',
                     renderer: 'line',
                     units: "%"
                 },
                 {
+                    color: 'blue',
                     data: this.state.seriesData.actuatorsEvents,
                     name: "Riego",
-                    color: 'blue',
                     renderer: 'bar',
                     noHoverDetail: true
                 }
@@ -208,7 +208,7 @@ export default class ZoneDataContent extends React.Component {
                 if (point.series.units) {
                     let units = point.series.units
                     this.yFormatter =  function(y) {
-                            return y + units
+                        return y + units
 	                  }
                 }
             }
@@ -270,8 +270,8 @@ export default class ZoneDataContent extends React.Component {
 
         if (this.isIrrigating()) {
             let time = timeConverter(this.state.data.timestamp)
-//            this.graphAnnotator.add(this.state.data.timestamp, "Riego ("+ time +")");
-  //          this.graphAnnotator.update();
+            //            this.graphAnnotator.add(this.state.data.timestamp, "Riego ("+ time +")");
+            //          this.graphAnnotator.update();
         }
     }
 

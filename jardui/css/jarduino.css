@@ -42,7 +42,7 @@ header {
 
 header h1 {
     margin: 0;
-    margin-top: 1.5ex;
+    margin-top: 1ex;
     margin-left: 3ex;
     float: left;
     background: url('/jardui/img/logo.png') no-repeat;
@@ -285,7 +285,7 @@ div#main section div#data div#header  {
     border-radius: 4px 4px 0 0;
     height: 36ex;
     width: 100%;
-    margin-bottom: 3ex;
+    margin-bottom: 8ex;
 }
 
 div#main section div#data div#header div#content  {
@@ -323,7 +323,7 @@ div#main section div#data div#header div.soil_moisture_level  {
 div#main section div#data div#header h2 { 
     margin: 0;
     padding: 0;
-    padding-top: 20px;
+    padding-top: 10px;
     padding-left: 20px;
     font-weight: normal;
 }
@@ -338,6 +338,7 @@ div#main section div#data div#header h3 {
 div#main section div#data div#header div.header-container {
     float: left;
     width: 100%;
+    margin-bottom: .8ex;
 }
 
 
@@ -444,7 +445,7 @@ div#main section form div.buttons button {
     display: block;
     width: 100%;
     height: 180px;
-    top: -210px;
+    top: -190px;
     left: 9px;
 }
 .graph-content {
@@ -461,7 +462,7 @@ div#main section form div.buttons button {
 
 .x-axis {
     position: relative;
-    top: -200px;
+    top: -190px;
     left: 8px;
 }
 
@@ -549,5 +550,29 @@ rect {
     text-align: left;
     color: black;
     font-size: 90%;
+}
 
+.item-value {
+    width: 100%;
+    height: 2ex;
+    margin-bottom: 2ex;
+}
+
+.value-bar .w3-container {
+    height: 2ex;
+}
+
+.w3-soilMoisture {
+    color: #fff!important;
+    background-color: #99754D!important;
+}
+
+.w3-airHumidity {
+    color: #fff!important;
+    background-color: #FFC300!important;
+}
+
+.w3-airTemperature {
+    color: #fff!important;
+    background-color: #17A1E6!important;
 }

@@ -121,6 +121,7 @@ class App extends React.Component {
 
     isUploadButtonEnabled() {
         return (this.state.deviceFound && this.state.status !== "uploading")
+    }
 
     handleOpenSettingsModal () {
         this.setState({
