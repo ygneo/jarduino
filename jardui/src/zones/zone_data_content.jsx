@@ -146,47 +146,112 @@ export default class ZoneDataContent extends React.Component {
     }
 
     renderGraph(threshold) {
-        let graph = new Rickshaw.Graph( {
-            element: this.refs.graph,
+        let series = [
+            {
+                color: '#99754D',
+                name: "a ver",
+                renderer: 'line',
+                units: "%"
+            },
+            {
+                color: '#FFC300',
+                name: "b",
+                renderer: 'line',
+                units: "ºC"
+            },
+            {
+                color: '#17A1E6',
+                name: "c",
+                renderer: 'line',
+                units: "%"
+            }
+        ]
+        /* let graph = new Rickshaw.Graph( {
+         *     element: this.refs.graph,
+         *     min: 0,
+         *     max: 100,
+         *     renderer: 'multi',
+         *     stroke: true,
+         *     preserve: true,
+         *     width: 320,
+         *     height: 170,
+         *     series:  [
+         *         {
+         *             color: '#99754D',
+         *             data: this.state.seriesData.soilMoisture,
+         *             name: "Humedad sustrato",
+         *             renderer: 'line',
+         *             units: "%"
+         *         },
+         *         {
+         *             color: '#FFC300',
+         *             data: this.state.seriesData.airTemperature,
+         *             name: "Temperatura del aire",
+         *             renderer: 'line',
+         *             units: "ºC"
+         *         },
+         *         {
+         *             color: '#17A1E6',
+         *             data: this.state.seriesData.airHumidity,
+         *             name: "Humedad del aire",
+         *             renderer: 'line',
+         *             units: "%"
+         *         },
+         *         {
+         *             color: 'blue',
+         *             data: this.state.seriesData.actuatorsEvents,
+         *             name: "Riego",
+         *             renderer: 'bar',
+         *             noHoverDetail: true
+         *         }
+         *     ],
+         *     padding: {top: 1, left: 1, right: 1, bottom: 1}
+         * });
+         */
+
+
+        var tv = 1500;
+
+        // instantiate our graph!
+        var graph = new Rickshaw.Graph( {
+	          element: this.refs.graph,
             min: 0,
             max: 100,
-            renderer: 'multi',
-            stroke: true,
-            preserve: true,
-            width: 320,
-            height: 170,
-            series:  [
-                {
-                    color: '#99754D',
-                    data: this.state.seriesData.soilMoisture,
-                    name: "Humedad sustrato",
-                    renderer: 'line',
-                    units: "%"
-                },
-                {
-                    color: '#FFC300',
-                    data: this.state.seriesData.airTemperature,
-                    name: "Temperatura del aire",
-                    renderer: 'line',
-                    units: "ºC"
-                },
-                {
-                    color: '#17A1E6',
-                    data: this.state.seriesData.airHumidity,
-                    name: "Humedad del aire",
-                    renderer: 'line',
-                    units: "%"
-                },
-                {
-                    color: 'blue',
-                    data: this.state.seriesData.actuatorsEvents,
-                    name: "Riego",
-                    renderer: 'bar',
-                    noHoverDetail: true
-                }
-            ],
-            padding: {top: 1, left: 1, right: 1, bottom: 1}
-        });
+	          width: 320,
+	          height: 170,
+	          renderer: 'multi',
+	          series: new Rickshaw.Series.FixedDuration(series, undefined, {
+		            timeInterval: tv,
+		            maxDataPoints: 100,
+		            timeBase: new Date().getTime() / 1000
+	          }) 
+        } );
+
+        graph.render();
+
+        // add some data every so often
+
+        var i = 0;
+        var this_instance = this;
+
+        var iv = setInterval( function() {
+            var seriesData = this_instance.state.seriesData
+            var l = this_instance.state.seriesData.soilMoisture.length - 1;
+
+            var lastSoilMoistureValue = seriesData.soilMoisture[l].y;
+            var lastAirTempValue = seriesData.airTemperature[l].y;
+            var lastAirHumidityValue = seriesData.airHumidity[l].y;
+
+	          var data = { "a ver": lastSoilMoistureValue };
+
+	          var randInt = Math.floor(Math.random()*100);
+	          data.b = lastAirTempValue
+	          data.c = lastAirHumidityValue
+
+	          graph.series.addData(data);
+	          graph.render();
+
+        }, tv );
 
         let Hover = Rickshaw.Class.create(Rickshaw.Graph.HoverDetail, {
             render: function($super, args) {
