@@ -240,7 +240,7 @@ div#main section form button {
 }
 
 div#main section form label {
-    font-size: 80%;
+    font-size: 100%;
 }
 
 div#main section form input, select {
@@ -575,4 +575,40 @@ rect {
 .w3-airTemperature {
     color: #fff!important;
     background-color: #17A1E6!important;
+}
+
+.threshold input[type=checkbox] {
+    float: left;
+    width: 1em!important;
+    padding-right: 1ex;
+    margin-top: .5ex;
+
+}
+
+.threshold label {
+    float: left;
+}
+
+.rangeValue {
+    float: right;
+}
+
+.thrLine {
+    width: 3em;
+    height: 1px;
+    border-top: 1px dashed blue;
+    margin-top: 10.5px;
+    margin-right: 1em;
+    float: left;
+}
+
+.thr {
+    font-size: 90%;
+    color: grey;
+}
+
+.thrContainer {
+    float: left;
+    width: 100%;
+    margin-top: 1ex;
 }

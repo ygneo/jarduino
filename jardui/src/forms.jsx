@@ -9,6 +9,7 @@ import dateFormat from 'dateformat'
 
 const TextInputFieldSet = fieldsets.TextInputFieldSet
 const TimeIntervalFieldSet = fieldsets.TimeIntervalFieldSet
+const ThresholdFieldSet = fieldsets.ThresholdFieldSet
 
 const DateTimePicker = ReactWidgets.DateTimePicker;
 
@@ -91,7 +92,7 @@ class DeleteButton extends React.Component {
         if (this.state.mode == "on") {
             return (
                 <span className="delete"
-                  data-zoneId={this.state.zoneId}
+                      data-zoneId={this.state.zoneId}
                       onClick={this.handleClick}/>
             )
         }
@@ -99,6 +100,12 @@ class DeleteButton extends React.Component {
     }
 }
 
+
+const defaultThresholdValues = {
+    "soilMoisture": 50,
+    "airHumidity": 50,
+    "airTemperature": 30
+}
 
 class IrrigationZoneForm extends React.Component {
     constructor(props) {
@@ -112,7 +119,8 @@ class IrrigationZoneForm extends React.Component {
                 watering_frequence_interval: 'h',
                 watering_time: 0,
                 watering_time_interval: 'm',
-                irrigatingStart: new Date()
+                irrigatingStart: new Date(),
+                min_soil_moisture: defaultThresholdValues.soilMoisture
             }
         }
 
@@ -236,12 +244,44 @@ class IrrigationZoneForm extends React.Component {
                     intervalValue={zone.watering_time_interval}
                     onChange={this.handleInputChange}
                 />
-                <TextInputFieldSet
-                    label="Umbral de humedad"
+                <h4>Umbrales de riego</h4>
+                <ThresholdFieldSet
+                    label="Humedad del sustrato"
                     name="min_soil_moisture"
                     id="min_soil_moisture"
-                    type="text"
                     value={zone.min_soil_moisture}
+                    rangeMin={1}
+                    rangeMin={100}
+                    step={1}
+                    defaultValue={defaultThresholdValues.soilMoisture}
+                    units="%"
+                    enabled={true}
+                    onChange={this.handleInputChange}
+                />
+                <ThresholdFieldSet
+                    label="Humedad del aire"
+                    name="airHumidityThreshold"
+                    id="airHumidityThreshold"
+                    value={zone.bla}
+                    rangeMin={1}
+                    rangeMin={100}
+                    step={1}
+                    defaultValue={defaultThresholdValues.airHumidity}
+                    units="%"
+                    enabled={false}
+                    onChange={this.handleInputChange}
+                />
+                <ThresholdFieldSet
+                    label="Temperatura del aire"
+                    name="airTemperatureThreshold"
+                    id="airTemperatureThreshold"
+                    value={zone.bla}
+                    rangeMin={1}
+                    rangeMin={50}
+                    step={1}
+                    defaultValue={defaultThresholdValues.airTemperature}
+                    units="ºC"
+                    enabled={false}
                     onChange={this.handleInputChange}
                 />
                 <div className="buttons">

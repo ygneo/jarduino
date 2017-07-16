@@ -1,5 +1,71 @@
- import React from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom'
+
+
+class ThresholdFieldSet extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            "value": props.value ? props.value : props.defaultValue,
+            "enabled": props.enabled
+        }
+
+        this.handleRangeChange = this.handleRangeChange.bind(this);
+        this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
+    }
+
+    handleRangeChange(event) {
+        this.setState({
+            "value": event.target.value
+        })
+        this.props.onChange(event);
+    }
+
+    handleCheckboxChange(event) {
+        this.setState({
+            "enabled": !this.state.enabled
+        })
+    }
+
+    render () {
+        let checkBoxId = this.props.id + "cb"
+        let checkBoxOpts = {}
+        let rangeInputOpts = {}
+
+        if (this.state.enabled) {
+            checkBoxOpts = {'checked': 'checked'}
+        }
+
+        if (!this.state.enabled) {
+            rangeInputOpts['disabled'] = 'disabled'
+        }
+
+        return (
+            <fieldset className="threshold">
+                <input
+                    id={checkBoxId}
+                    type="checkbox"
+                    onChange={this.handleCheckboxChange}
+                    {...checkBoxOpts}
+                />
+                <label htmlFor={checkBoxId}>{this.props.label}</label>
+                <span className="rangeValue">{this.state.value} {this.props.units}</span>
+                <input
+                    id={this.props.id}
+                    name={this.props.name}
+                    type="range"
+                    min="{props.rangeMin}"
+                    max="{props.rangeMax}"
+                    step="{props.rangeStep}"
+                    onChange={this.handleRangeChange}
+                    value={this.state.value}
+                    {...rangeInputOpts}
+                />
+            </fieldset>
+        )
+    }
+}
 
 
 class TextInputFieldSet extends React.Component {
@@ -73,7 +139,9 @@ class TimeIntervalFieldSet extends React.Component {
 
 const fieldsets = {
     "TextInputFieldSet": TextInputFieldSet,
-    "TimeIntervalFieldSet": TimeIntervalFieldSet
+    "TimeIntervalFieldSet": TimeIntervalFieldSet,
+    "ThresholdFieldSet": ThresholdFieldSet
+
 }
 
 export default fieldsets

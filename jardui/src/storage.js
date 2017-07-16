@@ -64,7 +64,7 @@ class ZonesStorage {
     addZone(zone) {
         let zones = localStorage.getItem("zones")
 
-        if (zones !== "null") {
+        if (zones) {
             zones = JSON.parse(zones)
         } else {
             zones = []

@@ -122,6 +122,9 @@ class ZoneData extends React.Component {
                         <div className="w3-light-grey w3-round value-bar">
                             <div className="w3-container w3-round w3-soilMoisture" style={barStyles.soilMoisture}></div>
                         </div>
+                        <div className="thrContainer">
+                            <div className="thrLine"></div><div className="thr">Umbral de riego: &lt; {this.state.zone.min_soil_moisture}%</div>
+                        </div>
                     </div>
                     <div className="item">
                         <div className="item-value">
@@ -415,22 +418,27 @@ class Zones extends React.Component {
     }
 
     render() {
-        let numZones = this.state.zones.length
+        let numZones = 0
+        if (this.state.zones) {
+            numZones = this.state.zones.length
+        }
         let emptyIrrigationZone = <EmptyIrrigationZone onCreateZone={this.handleZoneCreation}/>
         let zoneElements = []
 
 
-        this.state.zones.map((zone,i) => {
-            let data = this.getZoneData(i)
+        if (this.state.zones) {
+            this.state.zones.map((zone,i) => {
+                let data = this.getZoneData(i)
 
-            zoneElements.push(<IrrigationZone
-                                  mode="show"
-                                  zone={zone}
-                                  data={data}
-                                  onZoneDeletion={this.handleZoneDeletion}
-                                  onZoneUpdated={this.handleZoneUpdated}
-                              />)
-        })
+                zoneElements.push(<IrrigationZone
+                                      mode="show"
+                                      zone={zone}
+                                      data={data}
+                                      onZoneDeletion={this.handleZoneDeletion}
+                                      onZoneUpdated={this.handleZoneUpdated}
+                                  />)
+            })
+        }
 
         if (this.state.mode =="creating") {
             zoneElements.push(<IrrigationZone
