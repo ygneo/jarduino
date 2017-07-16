@@ -167,10 +167,9 @@ export default class ZoneDataContent extends React.Component {
             }
         ]
 
-        var tv = 1500;
+        let tv = 1500
 
-        // instantiate our graph!
-        var graph = new Rickshaw.Graph( {
+        let graph = new Rickshaw.Graph( {
 	          element: this.refs.graph,
             min: 0,
             max: 100,
@@ -181,13 +180,12 @@ export default class ZoneDataContent extends React.Component {
 		            timeInterval: tv,
 		            maxDataPoints: 100,
 		            timeBase: new Date().getTime() / 1000
-	          }) 
-        } );
+	          })
+        } )
 
-        graph.render();
+        graph.render()
 
-        let i = 0;
-        let this_instance = this;
+        let this_instance = this
 
         let iv = setInterval( function() {
             let seriesData = this_instance.state.seriesData
@@ -266,7 +264,7 @@ export default class ZoneDataContent extends React.Component {
             element: this.refs.xAxis,
             tickFormat: function (x) {
                 let d = new Date(x * 1000)
-                return zeroPadding(d.getUTCHours()) + ":" + zeroPadding(d.getUTCMinutes()) + ":" + zeroPadding(d.getUTCSeconds())
+                return zeroPadding(d.getHours()) + ":" + zeroPadding(d.getMinutes()) + ":" + zeroPadding(d.getSeconds())
             },
             orientation: 'bottom',
             pixelsPerTick: 75
