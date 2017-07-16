@@ -149,66 +149,23 @@ export default class ZoneDataContent extends React.Component {
         let series = [
             {
                 color: '#99754D',
-                name: "a ver",
+                name: "Humedad sustrato",
                 renderer: 'line',
                 units: "%"
             },
             {
                 color: '#FFC300',
-                name: "b",
+                name: "Temperatura aire",
                 renderer: 'line',
                 units: "ºC"
             },
             {
                 color: '#17A1E6',
-                name: "c",
+                name: "Humedad aire",
                 renderer: 'line',
                 units: "%"
             }
         ]
-        /* let graph = new Rickshaw.Graph( {
-         *     element: this.refs.graph,
-         *     min: 0,
-         *     max: 100,
-         *     renderer: 'multi',
-         *     stroke: true,
-         *     preserve: true,
-         *     width: 320,
-         *     height: 170,
-         *     series:  [
-         *         {
-         *             color: '#99754D',
-         *             data: this.state.seriesData.soilMoisture,
-         *             name: "Humedad sustrato",
-         *             renderer: 'line',
-         *             units: "%"
-         *         },
-         *         {
-         *             color: '#FFC300',
-         *             data: this.state.seriesData.airTemperature,
-         *             name: "Temperatura del aire",
-         *             renderer: 'line',
-         *             units: "ºC"
-         *         },
-         *         {
-         *             color: '#17A1E6',
-         *             data: this.state.seriesData.airHumidity,
-         *             name: "Humedad del aire",
-         *             renderer: 'line',
-         *             units: "%"
-         *         },
-         *         {
-         *             color: 'blue',
-         *             data: this.state.seriesData.actuatorsEvents,
-         *             name: "Riego",
-         *             renderer: 'bar',
-         *             noHoverDetail: true
-         *         }
-         *     ],
-         *     padding: {top: 1, left: 1, right: 1, bottom: 1}
-         * });
-         */
-
 
         var tv = 1500;
 
@@ -229,28 +186,25 @@ export default class ZoneDataContent extends React.Component {
 
         graph.render();
 
-        // add some data every so often
+        let i = 0;
+        let this_instance = this;
 
-        var i = 0;
-        var this_instance = this;
+        let iv = setInterval( function() {
+            let seriesData = this_instance.state.seriesData
+            let l = this_instance.state.seriesData.soilMoisture.length - 1
 
-        var iv = setInterval( function() {
-            var seriesData = this_instance.state.seriesData
-            var l = this_instance.state.seriesData.soilMoisture.length - 1;
+            let lastSoilMoistureValue = seriesData.soilMoisture[l].y
+            let lastAirTempValue = seriesData.airTemperature[l].y
+            let lastAirHumidityValue = seriesData.airHumidity[l].y
 
-            var lastSoilMoistureValue = seriesData.soilMoisture[l].y;
-            var lastAirTempValue = seriesData.airTemperature[l].y;
-            var lastAirHumidityValue = seriesData.airHumidity[l].y;
+	          let data = {
+                "Humedad sustrato": lastSoilMoistureValue,
+                "Humedad aire": lastAirHumidityValue,
+                "Temperatura aire": lastAirTempValue
+            }
 
-	          var data = { "a ver": lastSoilMoistureValue };
-
-	          var randInt = Math.floor(Math.random()*100);
-	          data.b = lastAirTempValue
-	          data.c = lastAirHumidityValue
-
-	          graph.series.addData(data);
-	          graph.render();
-
+	          graph.series.addData(data)
+	          graph.render()
         }, tv );
 
         let Hover = Rickshaw.Class.create(Rickshaw.Graph.HoverDetail, {
