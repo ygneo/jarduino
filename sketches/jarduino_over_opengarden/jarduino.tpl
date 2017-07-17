@@ -77,22 +77,6 @@ int readSoilMoisture(int sensor_id) {
 
 /* ---- */
 
-int readAirHumidity() {
-  OpenGarden.sensorPowerON();
-  delay(1000);
-  float airHumidity = OpenGarden.readAirHumidity();
-  OpenGarden.sensorPowerOFF();
-  return airHumidity;
-}
-
-int readAirTemperature() {
-  OpenGarden.sensorPowerON();
-  delay(1000);
-  float airTemperature = OpenGarden.readAirTemperature();
-  OpenGarden.sensorPowerOFF();
-  return airTemperature;
-}
-
 void sendValuesToSerial (int values[][numSensorTypes])
 {
   Serial.print("#sensors#");
@@ -173,6 +157,18 @@ void initIrrigatingEvents (uint32_t lastIrrigatingEvents[][3], int numZones) {
     }
 }
 
+void readSensorValues(int id, int sensorValues[][numSensorTypes]) {
+  OpenGarden.sensorPowerON();
+  delay(1000);
+  float airHumidity = OpenGarden.readAirHumidity();
+  float airTemperature = OpenGarden.readAirTemperature();
+  OpenGarden.sensorPowerOFF();
+
+  sensorValues[id][SOIL_MOISTURE] = readSoilMoisture(id);
+  sensorValues[id][AIR_TEMPERATURE] = airHumidity;
+  sensorValues[id][AIR_HUMIDITY] =  airTemperature;
+}
+
 void loop() {
   static int checksDone = 0;
   static int sum[] = {0, 0};
@@ -186,9 +182,7 @@ void loop() {
   initIrrigatingEvents(lastIrrigatingEvents, numZones);
   
   for (int i=0; i<numZones; i++) {
-    sensorValues[i][SOIL_MOISTURE] = readSoilMoisture(i);
-    sensorValues[i][AIR_TEMPERATURE] = readAirTemperature();
-    sensorValues[i][AIR_HUMIDITY] =  readAirHumidity();
+    readSensorValues(i, sensorValues);
   }
   checksDone++;
 
@@ -229,7 +223,7 @@ void loop() {
   for (int i=0; i<numZones; i++) {
      totalWateringDelay += wateringDelays[i];
    }
- 
+
    delayTime = checkingDelay - totalWateringDelay;
    if (delayTime > 0) {
      delay(delayTime);

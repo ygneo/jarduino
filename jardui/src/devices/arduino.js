@@ -70,7 +70,7 @@ class ArduinoDevice {
         let codeConfig = {
             "soilMoistureMinSensorValues": moistureValues,
             "checkingDelay": 1000,
-            "numchecksBeforeWatering": 1,
+            "numchecksBeforeWatering": 5,
             "wateringTimes": wateringTimes,
             "irrigatingStartDateTimes": irrigatingStartDateTimes,
             "irrigatingFrequences": irrigatingFrequences
