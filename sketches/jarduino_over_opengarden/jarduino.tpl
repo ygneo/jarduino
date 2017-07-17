@@ -118,7 +118,7 @@ void sendValuesToSerial (int values[][numSensorTypes])
 }
 
 
-void sendIrrigatingEventsToSerial (int irrigatingEvents[][3]) 
+void sendIrrigatingEventsToSerial (uint32_t irrigatingEvents[][3]) 
 {
   String valuesString;
 
@@ -135,7 +135,7 @@ void sendIrrigatingEventsToSerial (int irrigatingEvents[][3])
 
 }
 
-void sendToSerial (int values[][numSensorTypes], int lastIrrigatingEvents[][3]) {
+void sendToSerial (int values[][numSensorTypes], uint32_t lastIrrigatingEvents[][3]) {
   DateTime now = OpenGarden.getTime();
 
   Serial.print("#time#");
@@ -165,7 +165,7 @@ boolean mustIrrigate(int id, int value) {
   return (isIrrigatingTime(id) && value < minSensorValue[id]);
 }
 
-void initIrrigatingEvents (int lastIrrigatingEvents[][3], int numZones) {
+void initIrrigatingEvents (uint32_t lastIrrigatingEvents[][3], int numZones) {
     for (int i=0; i<numZones; i++) {
         lastIrrigatingEvents[i][ZONEID] = i;
         lastIrrigatingEvents[i][TIMESTAMP] = 0;
@@ -178,7 +178,7 @@ void loop() {
   static int sum[] = {0, 0};
   int means[] = {0, 0};
   int wateringDelays[] = {0, 0};
-  int lastIrrigatingEvents[numZones][3];
+  uint32_t lastIrrigatingEvents[numZones][3];
   int delayTime = 0;
   int totalWateringDelay = 0;
   int sensorValues[numZones][numSensorTypes];
