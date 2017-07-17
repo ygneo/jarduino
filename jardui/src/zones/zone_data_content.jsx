@@ -164,10 +164,16 @@ export default class ZoneDataContent extends React.Component {
                 name: "Humedad aire",
                 renderer: 'line',
                 units: "%"
+            },
+            {
+                color: 'blue',
+                name: "irrEvent",
+                renderer: 'bar',
+                noHoverDetail: true
             }
         ]
 
-        let tv = 1500
+        let tv = 1000
 
         let graph = new Rickshaw.Graph( {
 	          element: this.refs.graph,
@@ -184,26 +190,6 @@ export default class ZoneDataContent extends React.Component {
         } )
 
         graph.render()
-
-        let this_instance = this
-
-        let iv = setInterval( function() {
-            let seriesData = this_instance.state.seriesData
-            let l = this_instance.state.seriesData.soilMoisture.length - 1
-
-            let lastSoilMoistureValue = seriesData.soilMoisture[l].y
-            let lastAirTempValue = seriesData.airTemperature[l].y
-            let lastAirHumidityValue = seriesData.airHumidity[l].y
-
-	          let data = {
-                "Humedad sustrato": lastSoilMoistureValue,
-                "Humedad aire": lastAirHumidityValue,
-                "Temperatura aire": lastAirTempValue
-            }
-
-	          graph.series.addData(data)
-	          graph.render()
-        }, tv );
 
         let Hover = Rickshaw.Class.create(Rickshaw.Graph.HoverDetail, {
             render: function($super, args) {
@@ -272,24 +258,44 @@ export default class ZoneDataContent extends React.Component {
 
         xAxis.render();
 
-        /* this.graphAnnotator = new Rickshaw.Graph.Annotate({
-         *     graph: graph,
-         *     element: this.refs.timeline
-         * });
 
-         * graph.render()
-         */
+/*        this.graphAnnotator = new Rickshaw.Graph.Annotate({
+              graph: graph,
+              element: this.refs.timeline
+        });
+        this.graphAnnotator.add(new Date() / 1000, "Riego")
+
+        if (this.isIrrigating()) {
+            console.log("RIEGO")
+            this.graphAnnotator.add(new Date() / 1000, "Riego");
+            this.graphAnnotator.update();
+        }
+*/
         return graph
     }
 
     updateGraph() {
-        this.graph.update()
+        let seriesData = this.state.seriesData
+        let l = this.state.seriesData.soilMoisture.length - 1
+
+        let lastSoilMoistureValue = seriesData.soilMoisture[l].y
+        let lastAirTempValue = seriesData.airTemperature[l].y
+        let lastAirHumidityValue = seriesData.airHumidity[l].y
+        let irrEvent = 0
 
         if (this.isIrrigating()) {
-            let time = timeConverter(this.state.data.timestamp)
-            //            this.graphAnnotator.add(this.state.data.timestamp, "Riego ("+ time +")");
-            //          this.graphAnnotator.update();
+            irrEvent = 100
         }
+
+	      let data = {
+            "Humedad sustrato": lastSoilMoistureValue,
+            "Humedad aire": lastAirHumidityValue,
+            "Temperatura aire": lastAirTempValue,
+            "irrEvent": irrEvent
+        }
+
+	      this.graph.series.addData(data)
+	      this.graph.render()
     }
 
     isIrrigating() {
