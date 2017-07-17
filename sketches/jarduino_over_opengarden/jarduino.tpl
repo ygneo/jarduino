@@ -27,8 +27,15 @@ const int numChecksBeforeSending = 1; // Number of checks should be done before 
 DateTime irrigatingStartDateTime[] = $irrigatingStartDateTimes; // For instance {DateTime(2017, 6, 22, 13, 10, 0), DateTime(2017, 6, 22, 13, 35, 0)}
 const long int wateringTime[] = $wateringTimes; // Watering time in ms for every plant
 const long int irrigatingFrequence[] = $irrigatingFrequences; // Irrigating frequence in seconds for every plant
-boolean irrigatingTimeStarted = false;
 
+static uint32_t lastIrrigatingTimestamp[numZones];
+
+
+void emptyLastIrrigatingTimestamp() {
+  for (int i=0; i<numZones; i++) {
+    lastIrrigatingTimestamp[i] = 0;
+  }
+}
 
 void setup() {
   // initialize serial communications at 9600 bps:
@@ -43,8 +50,9 @@ void setup() {
   OpenGarden.irrigationOFF(2);
 
   OpenGarden.initSensors();
-}
 
+  emptyLastIrrigatingTimestamp();
+}
 
 int doWatering(int id) {
   int valve_number = id + 1;
@@ -131,14 +139,19 @@ void sendToSerial (int values[][numSensorTypes], uint32_t lastIrrigatingEvents[]
 
 boolean isIrrigatingTime(int id) {
   DateTime now = OpenGarden.getTime();
-
+  uint32_t currentTimestamp = now.unixtime();
+  uint32_t diff;
+  
   if (now.unixtime() >= irrigatingStartDateTime[id].unixtime()) {
-    if (irrigatingTimeStarted) {
-      // use freq
+    if (lastIrrigatingTimestamp[id] == 0) {
+      lastIrrigatingTimestamp[id] = currentTimestamp;
       return true;
-    } else { 
-      irrigatingTimeStarted = true;
-      return true;
+    } else {
+      diff = currentTimestamp - lastIrrigatingTimestamp[id];
+      if (diff >= irrigatingFrequence[id]) {
+        lastIrrigatingTimestamp[id] = currentTimestamp;
+        return true;
+      }
     }
   }
 

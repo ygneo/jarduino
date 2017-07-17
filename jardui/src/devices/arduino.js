@@ -62,7 +62,7 @@ class ArduinoDevice {
             })
 
             irrigatingFrequences.push(
-                timeIntervalToMs(zone.watering_frequence, zone.watering_frequence_interval)
+                timeIntervalToSecs(zone.watering_frequence, zone.watering_frequence_interval)
             )
 
         })
@@ -110,6 +110,15 @@ function timeIntervalToMs(time, interval) {
         "s": 1000,
         "m": 60000,
         "h": 360000
+    }
+    return time * multiplier[interval];
+}
+
+function timeIntervalToSecs(time, interval) {
+    let multiplier = {
+        "s": 1,
+        "m": 60,
+        "h": 3600
     }
     return time * multiplier[interval];
 }
