@@ -64,13 +64,18 @@ class ArduinoDevice {
             irrigatingFrequences.push(
                 timeIntervalToSecs(zone.watering_frequence, zone.watering_frequence_interval)
             )
-
         })
+
+        let settings = JSON.parse(localStorage.getItem("settings"))
+
+        let checkingDelay = timeIntervalToMs(
+            settings.sendingFrequence,
+            settings.sendingInterval)
 
         let codeConfig = {
             "soilMoistureMinSensorValues": moistureValues,
-            "checkingDelay": 1000,
-            "numchecksBeforeWatering": 1,
+            "checkingDelay": checkingDelay,
+            "numChecksBeforeSending": settings.readingsCount,
             "wateringTimes": wateringTimes,
             "irrigatingStartDateTimes": irrigatingStartDateTimes,
             "irrigatingFrequences": irrigatingFrequences

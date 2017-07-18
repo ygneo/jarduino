@@ -41,7 +41,6 @@ function buildScheme(zones) {
             })
         })
     }
-
     return scheme;
 }
 
@@ -168,15 +167,23 @@ class SettingsModal extends React.Component {
             zones: props.zones
         }
 
+        localStorage.setItem("settings", JSON.stringify(settings))
+
         this.handleCloseModal = this.handleCloseModal.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this)
         this.handleCancel = this.handleCancel.bind(this)
+        this.handleInputChange = this.handleInputChange.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
+        let settings = this.state.settings
+
+        settings.scheme = buildScheme(nextProps.zones)
+
         this.setState({
             isOpen: nextProps.isOpen,
-            zones: nextProps.zones
+            zones: nextProps.zones,
+            settings: settings
         })
     }
 
@@ -200,6 +207,7 @@ class SettingsModal extends React.Component {
         event.preventDefault()
 
         localStorage.setItem("settings", JSON.stringify(this.state.settings))
+
 
         this.props.onClose()
     }
@@ -258,6 +266,7 @@ class SettingsModal extends React.Component {
                             value={this.state.settings.readingsCount}
                             onChange={this.handleInputChange}
                         />
+                        <p className="small">Ten en cuenta que cada lectura puede añadir un retraso de varios segundos, necesario para estabilizar o iniciar los sensores.</p>
                         <fieldset>
                             <h4>Plantilla de código fuente</h4>
                             <fieldset>

@@ -21,8 +21,8 @@ const int digitalOutPin[] = {2, 3}; // Rele-Electrovalve output
 
 const int minSensorValue[] = $soilMoistureMinSensorValues; // Array of minimun values from the potentiometer to trigger watering
 
-const int checkingDelay = 1000; // Delay in ms between checks  (for the analog-to-digital converter to settle after last reading)
-const int numChecksBeforeSending = 1; // Number of checks should be done before sending data to serial
+const int checkingDelay = $checkingDelay;
+const int numChecksBeforeSending = $numChecksBeforeSending; // Number of checks should be done before sending data to serial
 
 DateTime irrigatingStartDateTime[] = $irrigatingStartDateTimes; // For instance {DateTime(2017, 6, 22, 13, 10, 0), DateTime(2017, 6, 22, 13, 35, 0)}
 const long int wateringTime[] = $wateringTimes; // Watering time in ms for every plant
