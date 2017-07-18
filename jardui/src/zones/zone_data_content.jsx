@@ -39,13 +39,15 @@ export default class ZoneDataContent extends React.Component {
         this.getSeriesData = this.getSeriesData.bind(this)
         this.pushtToSeriesData = this.pushToSeriesData.bind(this)
         this.seriesDataAvaliable = this.seriesDataAvaliable.bind(this)
+        this.hasNewData = this.hasNewData.bind(this)
+
     }
 
     componentWillReceiveProps(nextProps) {
         let seriesData = this.state.seriesData
         let nextMode = "waiting"
 
-        if (this.state.data || nextProps.data || this.seriesDataAvaliable()) {
+        if (this.hasNewData(nextProps)) {
             nextMode = "chart"
         }
 
@@ -61,28 +63,31 @@ export default class ZoneDataContent extends React.Component {
         })
     }
 
-    componentDidMount(nextProps, nextState) {
-        let seriesData = this.getSeriesData()
-
-        if (!seriesData.empty) {
-            this.setState({
-                mode: "chart",
-                seriesData: seriesData
-            })
-        }
-    }
-
     componentDidUpdate(nextProps, nextState) {
-        if (nextProps.data || !this.state.seriesData.empty) {
+        if (this.state.seriesData.soilMoisture.length > 2) {
             let threshold = this.state.zone.min_soil_moisture
 
             if (!this.graph) {
                 this.graph = this.renderGraph(threshold)
-            }  else {
-                this.updateGraph()
             }
+            this.updateGraph()
         }
     }
+
+    hasNewData(nextProps) {
+        let lastTimeStamp;
+
+        if (this.state.data) {
+            if (this.state.seriesData.soilMoisture.length > 2) {
+               if (nextProps.data) {
+                   if (this.state.data.timestamp < nextProps.data.timestamp) {
+                       return true;
+                   }
+               }
+           }
+           return false;
+       }
+   }
 
     seriesDataAvaliable() {
         return (!this.state.seriesData.empty && this.state.seriesData.soilMoisture.length)
@@ -275,28 +280,30 @@ export default class ZoneDataContent extends React.Component {
     }
 
     updateGraph() {
-        let seriesData = this.state.seriesData
-        let l = this.state.seriesData.soilMoisture.length - 1
+        if (this.state.data) {
+            let seriesData = this.state.seriesData
+            let l = this.state.seriesData.soilMoisture.length - 1
 
-        let lastSoilMoistureValue = seriesData.soilMoisture[l].y
-        let lastAirTempValue = seriesData.airTemperature[l].y
-        let lastAirHumidityValue = seriesData.airHumidity[l].y
-        let irrEvent = 0
+            let lastSoilMoistureValue = seriesData.soilMoisture[l].y
+            let lastAirTempValue = seriesData.airTemperature[l].y
+            let lastAirHumidityValue = seriesData.airHumidity[l].y
+            let irrEvent = 0
 
-        if (this.isIrrigating()) {
-            irrEvent = 100
+            if (this.isIrrigating()) {
+                irrEvent = 100
+            }
+
+	          let data = {
+                "Humedad sustrato": lastSoilMoistureValue,
+                "Humedad aire": lastAirHumidityValue,
+                "Temperatura aire": lastAirTempValue,
+                "irrEvent": irrEvent
+            }
+
+	          this.graph.series.addData(data)
+	          this.graph.render()
         }
-
-	      let data = {
-            "Humedad sustrato": lastSoilMoistureValue,
-            "Humedad aire": lastAirHumidityValue,
-            "Temperatura aire": lastAirTempValue,
-            "irrEvent": irrEvent
-        }
-
-	      this.graph.series.addData(data)
-	      this.graph.render()
-    }
+       }
 
     isIrrigating() {
         return (this.state.data &&
@@ -318,7 +325,7 @@ export default class ZoneDataContent extends React.Component {
                     <div className="loader-area">
                         <div className="loader"></div>
                         <p className="loading">
-                            Esperando datos...
+                            Esperando a tener suficientes <br/>datos para graficar...
                         </p>
                     </div>
                 </div>
