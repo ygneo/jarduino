@@ -124,15 +124,13 @@ class App extends React.Component {
     }
 
     handleOpenSettingsModal () {
-        this.setState({
-            showSettingsModal: true
-        })
+        let modal = document.getElementById("settingsModal")
+        modal.style.display = 'block'
     }
 
     handleCloseSettingsModal () {
-        this.setState({
-            showSettingsModal: false
-        })
+        let modal = document.getElementById("settingsModal")
+        modal.style.display = 'none'
     }
 
     render() {
@@ -171,6 +169,7 @@ class App extends React.Component {
                     <SettingsModal
                         isOpen={this.state.showSettingsModal}
                         onClose={this.handleCloseSettingsModal}
+                        ref="modal"
                     />
 
                     <div id="main">

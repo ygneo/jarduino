@@ -35,12 +35,11 @@ class SettingsModal extends React.Component {
     }
 
     render () {
-        if (this.state.isOpen === true) {
-            return (
-                <div id="settingsModal" className="modal">
-                    <div className="modal-header">
-                        <span className="title">Configuración del dispositivo</span>
-                        <span className="close" onClick={this.handleCloseModal}>&times;</span>
+        return (
+            <div id="settingsModal" className="modal">
+                <div className="modal-header">
+                    <span className="title">Configuración del dispositivo</span>
+                    <span className="close" onClick={this.handleCloseModal}>&times;</span>
                     </div>
                     <div className="modal-content">
                         <form>
@@ -93,8 +92,6 @@ class SettingsModal extends React.Component {
                     </div>
                 </div>
             )
-        }
-        return null
     }
 }
 
