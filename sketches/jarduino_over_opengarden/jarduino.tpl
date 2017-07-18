@@ -13,7 +13,7 @@
 
 const int numSensorTypes = 3;
 
-const int numZones = 2;
+const int numZones = $numZones;
 
 const int analogInPins[] = {A0}; // Analog input pins
 

@@ -42,6 +42,7 @@ class ArduinoDevice {
         let wateringTimes = []
         let irrigatingStartDateTimes = []
         let irrigatingFrequences = []
+        let numZones = zones.length
 
         zones.map((zone,i) => {
             moistureValues.push(
@@ -73,6 +74,7 @@ class ArduinoDevice {
             settings.sendingInterval)
 
         let codeConfig = {
+            "numZones": numZones,
             "codeTemplatePath": settings.codeTemplatePath,
             "soilMoistureMinSensorValues": moistureValues,
             "checkingDelay": checkingDelay,
