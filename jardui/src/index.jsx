@@ -135,6 +135,7 @@ class App extends React.Component {
 
     render() {
         let isUploadButtonEnabled = this.isUploadButtonEnabled()
+        let zones = this.storage.getZones()
 
         return (
             <div id="app">
@@ -169,6 +170,7 @@ class App extends React.Component {
                     <SettingsModal
                         isOpen={this.state.showSettingsModal}
                         onClose={this.handleCloseSettingsModal}
+                        zones={zones}
                         ref="modal"
                     />
 

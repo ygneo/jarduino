@@ -627,11 +627,11 @@ rect {
     position: absolute;
     z-index: 9999;
     width: 900px;
-    height: 550px;
+    height: 760px;
     left: 50%;
-    top: 170%;
+    top: 240%;
     margin-left: -450px;
-    margin-top: -275px;
+    margin-top: -410px;
     overflow: auto;
     border: 1px solid black;
     background: white;
@@ -676,4 +676,8 @@ rect {
 
 input#readingsCount {
     width: 4em;
+}
+
+p.small {
+    font-size: 90%;
 }
