@@ -30,13 +30,29 @@ const electroOptions = [
     {value: "D7", name: "D7"},
 ]
 
+function buildScheme(zones) {
+    let scheme = []
+
+    if (zones) {
+        zones.map((zone,i) => {
+            scheme.push({
+                "sensor": sensorOptions[i],
+                "electro": electroOptions[i]
+            })
+        })
+    }
+
+    return scheme;
+}
+
+
 class ConnectionSchemeTable extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
             "zones": props.zones,
-            "scheme": this.buildScheme(props.zones)
+            "scheme": props.scheme
         }
 
         this.handleCloseModal = this.handleCloseModal.bind(this);
@@ -47,28 +63,13 @@ class ConnectionSchemeTable extends React.Component {
     componentWillReceiveProps(nextProps) {
         this.setState({
             isOpen: nextProps.isOpen,
-            scheme: this.buildScheme(nextProps.zones),
+            scheme: nextProps.scheme,
             zones: nextProps.zones
         })
     }
 
-    handleCloseModal () {
+    handleCloseModal() {
         this.props.onClose()
-    }
-
-    buildScheme(zones) {
-        let scheme = []
-
-        if (zones) {
-            zones.map((zone,i) => {
-                scheme.push({
-                    "sensor": sensorOptions[i],
-                    "electro": electroOptions[i]
-                })
-            })
-        }
-
-        return scheme;
     }
 
     buildSelectBox(name, id) {
@@ -149,17 +150,27 @@ class SettingsModal extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            isOpen: props.isOpen,
-            settings: {
-                "sendingFrequence": 5,
-                "sendingInterval": "s",
-                "readingsCount": 3
-            },
-            "zones": props.zones
+        let settings = {
+            "sendingFrequence": 5,
+            "sendingInterval": "s",
+            "readingsCount": 3,
+            "scheme": buildScheme(props.zones)
+        }
+        let savedSettings = localStorage.getItem("settings")
+
+        if (savedSettings) {
+            settings = JSON.parse(savedSettings)
         }
 
-        this.handleCloseModal = this.handleCloseModal.bind(this);
+        this.state = {
+            isOpen: props.isOpen,
+            settings: settings,
+            zones: props.zones
+        }
+
+        this.handleCloseModal = this.handleCloseModal.bind(this)
+        this.handleSubmit = this.handleSubmit.bind(this)
+        this.handleCancel = this.handleCancel.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -169,8 +180,36 @@ class SettingsModal extends React.Component {
         })
     }
 
+    handleInputChange (event) {
+        const target = event.target
+        const value = target.type === 'checkbox' ? target.checked : target.value
+        const name = target.name
+        let settings = this.state.settings
+
+        if (name.includes("connection")) {
+        } else {
+            settings[name] = value
+        }
+
+        this.setState({
+            'settings': settings
+        })
+    }
+
+    handleSubmit(event) {
+        event.preventDefault()
+
+        localStorage.setItem("settings", JSON.stringify(this.state.settings))
+
+        this.props.onClose()
+    }
+
     handleCloseModal () {
         this.props.onClose()
+    }
+
+    handleCancel(e) {
+        this.props.onClose();
     }
 
     render () {
@@ -181,7 +220,7 @@ class SettingsModal extends React.Component {
                     <span className="close" onClick={this.handleCloseModal}>&times;</span>
                 </div>
                 <div className="modal-content">
-                    <form>
+                    <form onSubmit={this.handleSubmit}>
                         <h4>Envío de datos</h4>
                         {/* <fieldset>
                             <legend>Destino</legend>
@@ -209,6 +248,7 @@ class SettingsModal extends React.Component {
                             name="sendingFrequence"
                             frequenceValue={this.state.settings.sendingFrequence}
                             intervalValue={this.state.settings.sendingInterval}
+                            onChange={this.handleInputChange}
                         />
                         <TextInputFieldSet
                             label="Número de lecturas entre envíos"
@@ -216,6 +256,7 @@ class SettingsModal extends React.Component {
                             id="readingsCount"
                             type="text"
                             value={this.state.settings.readingsCount}
+                            onChange={this.handleInputChange}
                         />
                         <fieldset>
                             <h4>Plantilla de código fuente</h4>
@@ -227,12 +268,17 @@ class SettingsModal extends React.Component {
                             <h4>Esquema de conexión</h4>
                             <ConnectionSchemeTable
                                 zones={this.state.zones}
+                                scheme={this.state.settings.scheme}
                             />
                             <p>Notas</p>
                             <p className="small">[OG] Indica una referencia a una entrada del shield OpenGarden.</p>
                             <p className="small">Si se utiliza el sensor DHT22 (humedad y temperatura del aire), se conectará a la entrada DHT22 de OpenGarden.</p>
 
                         </fieldset>
+                        <div className="actions">
+                            <button type="button" onClick={this.handleCancel}>CANCELAR</button>
+                            <button type="submit">GUARDAR</button>
+                        </div>
                     </form>
                 </div>
             </div>
