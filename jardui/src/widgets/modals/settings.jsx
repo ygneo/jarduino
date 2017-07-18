@@ -153,6 +153,7 @@ class SettingsModal extends React.Component {
             "sendingFrequence": 5,
             "sendingInterval": "s",
             "readingsCount": 3,
+            "codeTemplatePath": "/home/ygneo/dev/jarduino/sketches/jarduino_over_opengarden/",
             "scheme": buildScheme(props.zones)
         }
         let savedSettings = localStorage.getItem("settings")
@@ -268,10 +269,15 @@ class SettingsModal extends React.Component {
                         />
                         <p className="small">Ten en cuenta que cada lectura puede añadir un retraso de varios segundos, necesario para estabilizar o iniciar los sensores.</p>
                         <fieldset>
-                            <h4>Plantilla de código fuente</h4>
-                            <fieldset>
-                                <input type="file" id="codeTemplate" name="codeTemplate"/>
-                            </fieldset>
+                            <h4>Ruta de la plantilla de código fuente</h4>
+                            <TextInputFieldSet
+                                label="Número de lecturas entre envíos"
+                                name="codeTemplatePath"
+                                id="codeTemplatePath"
+                                type="text"
+                                value={this.state.settings.codeTemplatePath}
+                                onChange={this.handleInputChange}
+                            />
                         </fieldset>
                         <fieldset>
                             <h4>Esquema de conexión</h4>

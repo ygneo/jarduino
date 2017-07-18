@@ -681,3 +681,7 @@ input#readingsCount {
 p.small {
     font-size: 90%;
 }
+
+input#codeTemplate {
+    width: 30em;
+}

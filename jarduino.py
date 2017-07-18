@@ -244,10 +244,6 @@ parser.add_option("-d", "--debug",
                   help="Activate debug mode",
                   action="store_true",
                   default=False)
-parser.add_option("-s", "--sketch-dir",
-                  dest="sketch_dir",
-                  help="Sketch directory", action="store",
-                  default="./sketches/jarduino_over_opengarden/")
 
 (options, args) = parser.parse_args()
 
@@ -256,6 +252,11 @@ try:
 except IndexError:
     mode = "read"
 
+try:
+    sketch_dir = args[1]
+except IndexError:
+    sketch_dir = "./sketches/jarduino_over_opengarden/"
+
 if mode == "read":
     print_parsed_serial_input(debug=options.debug_mode)
 if mode == "readfake":
@@ -263,5 +264,5 @@ if mode == "readfake":
 if mode == "detect":
     detect_arduino()
 if mode == "upload":
-    generate(options.sketch_dir)
-    upload(options.sketch_dir)
+    generate(sketch_dir)
+    upload(sketch_dir)

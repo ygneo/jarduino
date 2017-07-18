@@ -73,6 +73,7 @@ class ArduinoDevice {
             settings.sendingInterval)
 
         let codeConfig = {
+            "codeTemplatePath": settings.codeTemplatePath,
             "soilMoistureMinSensorValues": moistureValues,
             "checkingDelay": checkingDelay,
             "numChecksBeforeSending": settings.readingsCount,
@@ -91,7 +92,16 @@ class ArduinoDevice {
     }
 
     try_to_upload_code(handlers) {
-        this.pyshell = new pythonShell('jarduino.py', {"args": ["upload"]});
+        let settings = JSON.parse(localStorage.getItem("settings"))
+        let codeTemplatePath = settings.codeTemplatePath.trim()
+
+        let options = {
+            mode: 'text',
+            args: ['upload',
+                  codeTemplatePath]
+        }
+
+        this.pyshell = new pythonShell('jarduino.py', options)
 
         this.pyshell.on('message', function (message) {
             console.log(message);
