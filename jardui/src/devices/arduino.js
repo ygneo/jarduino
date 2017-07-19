@@ -42,7 +42,10 @@ class ArduinoDevice {
         let wateringTimes = []
         let irrigatingStartDateTimes = []
         let irrigatingFrequences = []
+        let sensorIns = []
+        let electroOuts = []
         let numZones = zones.length
+        let settings = JSON.parse(localStorage.getItem("settings"))
 
         zones.map((zone,i) => {
             moistureValues.push(
@@ -65,9 +68,18 @@ class ArduinoDevice {
             irrigatingFrequences.push(
                 timeIntervalToSecs(zone.watering_frequence, zone.watering_frequence_interval)
             )
-        })
 
-        let settings = JSON.parse(localStorage.getItem("settings"))
+            let value = settings.scheme[i].sensor.value;
+            if (value.startsWith("9")) {
+                value = parseInt(value);
+            } 
+            sensorIns.push(settings.scheme[i].sensor.value)
+            value = settings.scheme[i].sensor.value;
+            if (value.startsWith("9")) {
+                value = parseInt(value);
+            } 
+            electroOuts.push(settings.scheme[i].electro.value)
+        })
 
         let checkingDelay = timeIntervalToMs(
             settings.sendingFrequence,
@@ -75,13 +87,14 @@ class ArduinoDevice {
 
         let codeConfig = {
             "numZones": numZones,
-            "codeTemplatePath": settings.codeTemplatePath,
             "soilMoistureMinSensorValues": moistureValues,
             "checkingDelay": checkingDelay,
             "numChecksBeforeSending": settings.readingsCount,
             "wateringTimes": wateringTimes,
             "irrigatingStartDateTimes": irrigatingStartDateTimes,
-            "irrigatingFrequences": irrigatingFrequences
+            "irrigatingFrequences": irrigatingFrequences,
+            "sensorsIns": sensorIns,
+            "electroOuts": electroOuts
         }
 
         let json = JSON.stringify(codeConfig)

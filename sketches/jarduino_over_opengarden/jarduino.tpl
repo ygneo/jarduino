@@ -15,9 +15,8 @@ const int numSensorTypes = 3;
 
 const int numZones = $numZones;
 
-const int analogInPins[] = {A0}; // Analog input pins
-
-const int digitalOutPin[] = {2, 3}; // Rele-Electrovalve output
+const int sensorsIn[] = $sensorsIns; // For instance {99, A0} (open garden MOIST, A0)
+const int electroValvesOut[] = $electroOuts; // For instance {991, 992} (open garden electro 1 & 2)
 
 const int minSensorValue[] = $soilMoistureMinSensorValues; // Array of minimun values from the potentiometer to trigger watering
 
@@ -54,29 +53,34 @@ void setup() {
   emptyLastIrrigatingTimestamp();
 }
 
-int doWatering(int id) {
-  int valve_number = id + 1;
+int doWatering(int zoneId) {
+  int outId = electroValvesOut[zoneId];
 
-  OpenGarden.irrigationON(valve_number);
+  if (outId > 990) {
+    outId = outId - 990;
+  }
 
-  delay(wateringTime[id]);
+  OpenGarden.irrigationON(outId);
 
-  OpenGarden.irrigationOFF(valve_number);
+  delay(wateringTime[zoneId]);
 
-  return wateringTime[id];
+  OpenGarden.irrigationOFF(outId);
+
+  return wateringTime[zoneId];
 }
 
-int readSoilMoisture(int sensor_id) {
+int readSoilMoisture(int zoneId) {
   int soilMoisture = 0;
+  int inId = sensorsIn[zoneId];
 
-  if (sensor_id == 0) {
+  if (inId == 99) {
     OpenGarden.sensorPowerON();
     delay(500);
     soilMoisture = OpenGarden.readSoilMoisture();
     soilMoisture = map(soilMoisture, 0, 1023, 0, 100);
     OpenGarden.sensorPowerOFF();
   } else {
-    soilMoisture = analogRead(analogInPins[sensor_id - 1]);
+    soilMoisture = analogRead(inId);
     soilMoisture = map(soilMoisture, 1023, 0, 0, 100);
   }
 

@@ -44,6 +44,27 @@ function buildScheme(zones) {
     return scheme;
 }
 
+function getOption(value, type, zoneId) {
+    let option = {}
+
+    if (type == "sensor") {
+        sensorOptions.map((opt,i) => {
+            if (opt.value === value) {
+                option = opt
+            }
+        })
+    } else if (type === "electro") {
+        electroOptions.map((opt,i) => {
+            if (opt.value === value) {
+                option = opt
+            }
+        })
+    }
+
+    return option;
+}
+
+
 
 class ConnectionSchemeTable extends React.Component {
     constructor(props) {
@@ -54,7 +75,7 @@ class ConnectionSchemeTable extends React.Component {
             "scheme": props.scheme
         }
 
-        this.handleCloseModal = this.handleCloseModal.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
         this.buildTable = this.buildTable.bind(this);
         this.buildSelectBox = this.buildSelectBox.bind(this)
     }
@@ -62,28 +83,45 @@ class ConnectionSchemeTable extends React.Component {
     componentWillReceiveProps(nextProps) {
         this.setState({
             isOpen: nextProps.isOpen,
-            scheme: nextProps.scheme,
             zones: nextProps.zones
         })
     }
 
-    handleCloseModal() {
-        this.props.onClose()
+    handleInputChange(event) {
+        const target = event.target
+        const value = target.type === 'checkbox' ? target.checked : target.value
+        const name = target.name
+        let scheme = this.state.scheme
+        let zoneId
+
+        if (name.startsWith("sensorconnection")) {
+            zoneId = name.split("_")[1]
+            scheme[zoneId]["sensor"] = getOption(value, "sensor", zoneId)
+        } else if (name.startsWith("electroconnection")) {
+            zoneId = name.split("_")[1]
+            scheme[zoneId]["electro"] = getOption(value, "electro", zoneId)
+        }
+
+        this.setState({
+            'scheme': scheme
+        })
+
+        this.props.onChange(event)
     }
 
     buildSelectBox(name, id) {
-        let selName = name + "connection" + id
+        let selName = name + "connection_" + id
         let sensorSelOptions = []
         let electroSelOptions = []
 
         sensorOptions.map((opt,i) => {
-                let sel = {}
+            let sel = {}
 
-                if (this.state.scheme[id].sensor.value === opt.value) {
-                    sel = {"selected": "selected"}
-                }
+            if (this.state.scheme[id].sensor.value === opt.value) {
+                sel = {"selected": "selected"}
+            }
 
-                sensorSelOptions.push(<option value={opt.value} {...sel}>{opt.name}</option>)
+            sensorSelOptions.push(<option value={opt.value} {...sel}>{opt.name}</option>)
         })
 
         electroOptions.map((opt,i) => {
@@ -98,7 +136,9 @@ class ConnectionSchemeTable extends React.Component {
 
         if (name === "sensor") {
             return (
-                <select name={selName}>
+                <select name={selName}
+                        onChange={this.handleInputChange}
+                >
                     {sensorSelOptions}
                 </select>
             )
@@ -179,8 +219,6 @@ class SettingsModal extends React.Component {
     componentWillReceiveProps(nextProps) {
         let settings = this.state.settings
 
-        settings.scheme = buildScheme(nextProps.zones)
-
         this.setState({
             isOpen: nextProps.isOpen,
             zones: nextProps.zones,
@@ -193,8 +231,14 @@ class SettingsModal extends React.Component {
         const value = target.type === 'checkbox' ? target.checked : target.value
         const name = target.name
         let settings = this.state.settings
+        let zoneId
 
-        if (name.includes("connection")) {
+        if (name.startsWith("sensorconnection")) {
+            zoneId = name.split("_")[1]
+            settings.scheme[zoneId]["sensor"] = getOption(value, "sensor", zoneId)
+        } else if (name.startsWith("electroconnection")) {
+            zoneId = name.split("_")[1]
+            settings.scheme[zoneId]["electro"] = getOption(value, "electro", zoneId)
         } else {
             settings[name] = value
         }
@@ -207,8 +251,10 @@ class SettingsModal extends React.Component {
     handleSubmit(event) {
         event.preventDefault()
 
-        localStorage.setItem("settings", JSON.stringify(this.state.settings))
+        console.log("SUBMIT")
+        console.log(this.state.settings)
 
+        localStorage.setItem("settings", JSON.stringify(this.state.settings))
 
         this.props.onClose()
     }
@@ -284,6 +330,7 @@ class SettingsModal extends React.Component {
                             <ConnectionSchemeTable
                                 zones={this.state.zones}
                                 scheme={this.state.settings.scheme}
+                                onChange={this.handleInputChange}
                             />
                             <p>Notas</p>
                             <p className="small">[OG] Indica una referencia a una entrada del shield OpenGarden.</p>

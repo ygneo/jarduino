@@ -183,6 +183,18 @@ def _read_date_times(date_times):
 
     return date_times_string
 
+
+def _read_in_outs(values):
+    parsed_values = []
+    for value in values:
+        value = str(value)
+        if value[0] == "9":
+            value = int(value)
+        parsed_values.append(value)
+    parsed_values = str(parsed_values).replace("[", "{").replace("]", "}")
+    parsed_values = str(parsed_values).replace("'", "")
+    return parsed_values
+
 def parse_code_configuration(sketch_dir):
     with open("{}jarduino.json".format(sketch_dir), "r") as f:
         code_configuration = json.loads(f.read())
@@ -190,6 +202,8 @@ def parse_code_configuration(sketch_dir):
     for key, value in code_configuration.iteritems():
         if key == "irrigatingStartDateTimes":
             code_configuration[key] = _read_date_times(value)
+        elif key in ("sensorsIns", "electroOuts"):
+            code_configuration[key] = _read_in_outs(value)
         else:
             code_configuration[key] = str(code_configuration[key]).replace("[", "{").replace("]", "}")
 
