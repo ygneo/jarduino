@@ -19,7 +19,7 @@ export default class ZoneDataContent extends React.Component {
         super(props)
 
         this.state = {
-            mode: props.mode,
+            mode: props.mode || "waiting",
             zone: props.zone,
             data: props.data,
             seriesData: {
@@ -36,19 +36,20 @@ export default class ZoneDataContent extends React.Component {
         this.isIrrigating = this.isIrrigating.bind(this)
         this.renderGraph = this.renderGraph.bind(this)
         this.updateGraph = this.updateGraph.bind(this)
+        this.updateGraphData = this.updateGraphData.bind(this)
         this.getSeriesData = this.getSeriesData.bind(this)
         this.pushtToSeriesData = this.pushToSeriesData.bind(this)
         this.seriesDataAvaliable = this.seriesDataAvaliable.bind(this)
         this.hasNewData = this.hasNewData.bind(this)
-
+        this.renderSeriesData = this.renderSeriesData.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
-        let seriesData = this.state.seriesData
+        let seriesData = this.getSeriesData()
         let nextMode = "waiting"
 
-        if (this.hasNewData(nextProps)) {
-            nextMode = "chart"
+        if (seriesData.empty === false) {
+            nextMode = "chart" // maybe use timeout to change to waiting
         }
 
         if (nextProps.data) {
@@ -69,23 +70,41 @@ export default class ZoneDataContent extends React.Component {
 
             if (!this.graph) {
                 this.graph = this.renderGraph(threshold)
+                this.renderSeriesData()
+            } else {
+                if (this.hasNewData(nextState)) {
+                    this.updateGraph()
+                }
             }
-            this.updateGraph()
         }
     }
 
-    hasNewData(nextProps) {
+    renderSeriesData() {
+        let seriesData = this.state.seriesData
+        let l = seriesData.soilMoisture.length;
+
+
+        for (let i=0; i<4; i++) {
+            let values = {
+                soilMoisture: seriesData.soilMoisture[i].y,
+                airTemperature: seriesData.airTemperature[i].y,
+                airHumidity: seriesData.airHumidity[i].y
+            }
+            this.updateGraphData(values)
+        }
+    }
+
+
+    hasNewData(nextState) {
         let lastTimeStamp;
 
         if (this.state.data) {
-            if (this.state.seriesData.soilMoisture.length > 2) {
-               if (nextProps.data) {
-                   if (this.state.data.timestamp < nextProps.data.timestamp) {
-                       return true;
-                   }
-               }
+            if (nextState.data) {
+                if (this.state.data.timestamp <= nextState.data.timestamp) {
+                    return true
+                }
            }
-           return false;
+           return false
        }
    }
 
@@ -279,31 +298,39 @@ export default class ZoneDataContent extends React.Component {
         return graph
     }
 
-    updateGraph() {
-        if (this.state.data) {
-            let seriesData = this.state.seriesData
-            let l = this.state.seriesData.soilMoisture.length - 1
+    updateGraphData(values) {
+        let lastSoilMoistureValue = values.soilMoisture
+        let lastAirTempValue = values.airTemperature
+        let lastAirHumidityValue = values.airHumidity
+        let irrEvent = 0
 
-            let lastSoilMoistureValue = seriesData.soilMoisture[l].y
-            let lastAirTempValue = seriesData.airTemperature[l].y
-            let lastAirHumidityValue = seriesData.airHumidity[l].y
-            let irrEvent = 0
-
-            if (this.isIrrigating()) {
-                irrEvent = 100
-            }
-
-	          let data = {
-                "Humedad sustrato": lastSoilMoistureValue,
-                "Humedad aire": lastAirHumidityValue,
-                "Temperatura aire": lastAirTempValue,
-                "irrEvent": irrEvent
-            }
-
-	          this.graph.series.addData(data)
-	          this.graph.render()
+        if (this.isIrrigating()) {
+            irrEvent = 100
         }
-       }
+
+	      let data = {
+            "Humedad sustrato": lastSoilMoistureValue,
+            "Humedad aire": lastAirHumidityValue,
+            "Temperatura aire": lastAirTempValue,
+            "irrEvent": irrEvent
+        }
+
+	      this.graph.series.addData(data)
+	      this.graph.render()
+    }
+
+    updateGraph() {
+        let seriesData = this.state.seriesData
+        let l = this.state.seriesData.soilMoisture.length - 1
+
+        let values = {
+            soilMoisture: seriesData.soilMoisture[l].y,
+            airTemperature: seriesData.airTemperature[l].y,
+            airHumidity: seriesData.airHumidity[l].y
+        }
+
+        this.updateGraphData(values)
+    }
 
     isIrrigating() {
         return (this.state.data &&
@@ -325,7 +352,7 @@ export default class ZoneDataContent extends React.Component {
                     <div className="loader-area">
                         <div className="loader"></div>
                         <p className="loading">
-                            Esperando a tener suficientes <br/>datos para graficar...
+                            Graficando datos...
                         </p>
                     </div>
                 </div>

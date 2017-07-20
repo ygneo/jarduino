@@ -58,7 +58,10 @@ class ZonesStorage {
 
         zones = JSON.parse(zones)
 
-        return zones[id].data
+        if (zones && zones.length) {
+            return zones[id].data
+        }
+        return {}
     }
 
     addZone(zone) {
