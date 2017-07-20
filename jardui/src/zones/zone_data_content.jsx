@@ -19,7 +19,7 @@ export default class ZoneDataContent extends React.Component {
         super(props)
 
         this.state = {
-            mode: props.mode || "waiting",
+            mode: props.mode || "chart",
             zone: props.zone,
             data: props.data,
             seriesData: {
@@ -46,10 +46,10 @@ export default class ZoneDataContent extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         let seriesData = this.getSeriesData()
-        let nextMode = "waiting"
+        let nextMode = "chart"
 
-        if (seriesData.empty === false) {
-            nextMode = "chart" // maybe use timeout to change to waiting
+        if (seriesData.empty) {
+            nextMode = "waiting" // maybe use timeout to change to waiting
         }
 
         if (nextProps.data) {
@@ -84,7 +84,7 @@ export default class ZoneDataContent extends React.Component {
         let l = seriesData.soilMoisture.length;
 
 
-        for (let i=0; i<4; i++) {
+        for (let i=0; i<l; i++) {
             let values = {
                 soilMoisture: seriesData.soilMoisture[i].y,
                 airTemperature: seriesData.airTemperature[i].y,
@@ -100,7 +100,7 @@ export default class ZoneDataContent extends React.Component {
 
         if (this.state.data) {
             if (nextState.data) {
-                if (this.state.data.timestamp <= nextState.data.timestamp) {
+                if (this.state.data.timestamp >= nextState.data.timestamp) {
                     return true
                 }
            }
