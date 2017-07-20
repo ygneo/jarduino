@@ -81,16 +81,17 @@ export default class ZoneDataContent extends React.Component {
 
     renderSeriesData() {
         let seriesData = this.state.seriesData
-        let l = seriesData.soilMoisture.length;
-
+        let l = seriesData.soilMoisture.length
+        let actuatorsEvents = []
 
         for (let i=0; i<l; i++) {
             let values = {
                 soilMoisture: seriesData.soilMoisture[i].y,
                 airTemperature: seriesData.airTemperature[i].y,
-                airHumidity: seriesData.airHumidity[i].y
+                airHumidity: seriesData.airHumidity[i].y,
+                actuatorsEvents: seriesData.actuatorsEvents || []
             }
-            this.updateGraphData(values)
+            this.updateGraphData(seriesData.soilMoisture[i].x, values)
         }
     }
 
@@ -103,10 +104,10 @@ export default class ZoneDataContent extends React.Component {
                 if (this.state.data.timestamp >= nextState.data.timestamp) {
                     return true
                 }
-           }
-           return false
-       }
-   }
+            }
+            return false
+        }
+    }
 
     seriesDataAvaliable() {
         return (!this.state.seriesData.empty && this.state.seriesData.soilMoisture.length)
@@ -283,35 +284,47 @@ export default class ZoneDataContent extends React.Component {
         xAxis.render();
 
 
-/*        this.graphAnnotator = new Rickshaw.Graph.Annotate({
-              graph: graph,
-              element: this.refs.timeline
-        });
-        this.graphAnnotator.add(new Date() / 1000, "Riego")
+        /*        this.graphAnnotator = new Rickshaw.Graph.Annotate({
+           graph: graph,
+           element: this.refs.timeline
+           });
+           this.graphAnnotator.add(new Date() / 1000, "Riego")
 
-        if (this.isIrrigating()) {
-            console.log("RIEGO")
-            this.graphAnnotator.add(new Date() / 1000, "Riego");
-            this.graphAnnotator.update();
-        }
-*/
+           if (this.isIrrigating()) {
+           console.log("RIEGO")
+           this.graphAnnotator.add(new Date() / 1000, "Riego");
+           this.graphAnnotator.update();
+           }
+         */
         return graph
     }
 
-    updateGraphData(values) {
-        let lastSoilMoistureValue = values.soilMoisture
-        let lastAirTempValue = values.airTemperature
-        let lastAirHumidityValue = values.airHumidity
+    updateGraphData(timestamp, values) {
         let irrEvent = 0
+        let actuatorsEvents = values.actuatorsEvents
+        let eventsCount = actuatorsEvents.length
 
+/*        if (actuatorsEvents && eventsCount) {
+            console.log("UP")
+            console.log("actuator TS")
+            console.log(actuatorsEvents[eventsCount - 1].x)
+            console.log("TS")
+            console.log(timestamp)
+
+            if (actuatorsEvents[eventsCount - 1].x <= timestamp) {
+                console.log("IRR EVENT")
+                irrEvent = 100
+            }
+        }
+        */
         if (this.isIrrigating()) {
             irrEvent = 100
         }
 
 	      let data = {
-            "Humedad sustrato": lastSoilMoistureValue,
-            "Humedad aire": lastAirHumidityValue,
-            "Temperatura aire": lastAirTempValue,
+            "Humedad sustrato": values.soilMoisture,
+            "Humedad aire": values.airTemperature,
+            "Temperatura aire": values.airHumidity,
             "irrEvent": irrEvent
         }
 
@@ -326,10 +339,11 @@ export default class ZoneDataContent extends React.Component {
         let values = {
             soilMoisture: seriesData.soilMoisture[l].y,
             airTemperature: seriesData.airTemperature[l].y,
-            airHumidity: seriesData.airHumidity[l].y
+            airHumidity: seriesData.airHumidity[l].y,
+            actuatorsEvents: seriesData.actuatorsEvents || []
         }
 
-        this.updateGraphData(values)
+        this.updateGraphData(seriesData.soilMoisture[l].x, values)
     }
 
     isIrrigating() {
