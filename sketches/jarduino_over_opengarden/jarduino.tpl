@@ -182,8 +182,8 @@ void readSensorValues(int id, int sensorValues[][numSensorTypes]) {
   OpenGarden.sensorPowerOFF();
 
   sensorValues[id][SOIL_MOISTURE] = readSoilMoisture(id);
-  sensorValues[id][AIR_TEMPERATURE] = airHumidity;
-  sensorValues[id][AIR_HUMIDITY] =  airTemperature;
+  sensorValues[id][AIR_TEMPERATURE] = airTemperature;
+  sensorValues[id][AIR_HUMIDITY] =  airHumidity;
 }
 
 void loop() {
