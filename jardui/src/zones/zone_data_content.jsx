@@ -244,7 +244,7 @@ export default class ZoneDataContent extends React.Component {
         let hoverDetail = new Hover( {
 	          graph: graph,
 	          xFormatter: function(x) {
-		            return timeConverter(x)
+		            return timeConverter(x, false)
 	          }
         } );
 
