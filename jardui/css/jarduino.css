@@ -589,6 +589,32 @@ rect {
     display: none;
 }
 
+#settingsModal form .actions {
+    padding: 0;
+    padding-top: .5ex;
+    padding-bottom: .5ex;
+    float: right;
+    margin-bottom: 1ex;
+    margin-right: 4ex;
+}
+
+#settingsModal form p {
+    width: 80%;
+}
+
+#settingsModal form .actions button {
+    border: 0;
+    padding: 0;
+    background: none;
+    display: block;
+    float: left;
+    color: #17A1E6;
+    cursor: pointer;
+    font-size: 100%;
+    font-weight: bold;
+    margin-right: 5ex;
+}
+
 #settingsModal form {
     padding-left: 2%;
     padding-rigth: 2%;
@@ -623,15 +649,26 @@ rect {
     float: left;
 }
 
+#settingsModal table {
+    border: 1px solid lightgray;
+    border-collapse: collapse;
+}
+
+#settingsModal table th, #settingsModal table td {
+    padding: 1ex;
+    text-align: left;
+    border: 1px solid lightgray;
+}
+
 .modal {
     position: absolute;
     z-index: 9999;
     width: 900px;
-    height: 760px;
+    height: 930px;
     left: 50%;
-    top: 240%;
+    top: 270%;
     margin-left: -450px;
-    margin-top: -410px;
+    margin-top: -475px;
     overflow: auto;
     border: 1px solid black;
     background: white;
@@ -685,3 +722,4 @@ p.small {
 input#codeTemplate {
     width: 30em;
 }
+

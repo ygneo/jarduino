@@ -160,9 +160,9 @@ class ConnectionSchemeTable extends React.Component {
 
             elements.push(<h5>{zone.name}</h5>);
             elements.push(<table>
-                <th>
-                    <td>Componente</td><td>Conexión</td>
-                </th>
+                <tr>
+                    <th>Componente</th><th>Conexión</th>
+                </tr>
                 <tr><td>Sensor humedad sustrato</td><td>{sensorSelectBox}</td></tr>
                 <tr><td>Electroválvula</td><td>{electroSelectBox}</td></tr>
             </table>
@@ -332,9 +332,7 @@ class SettingsModal extends React.Component {
                                 scheme={this.state.settings.scheme}
                                 onChange={this.handleInputChange}
                             />
-                            <p>Notas</p>
-                            <p className="small">[OG] Indica una referencia a una entrada del shield OpenGarden.</p>
-                            <p className="small">Si se utiliza el sensor DHT22 (humedad y temperatura del aire), se conectará a la entrada DHT22 de OpenGarden.</p>
+                                         <p className="small">[OG] Indica una referencia a una entrada del shield OpenGarden. Si se utiliza el sensor DHT22 (humedad y temperatura del aire), se conectará a la entrada DHT22 de OpenGarden.</p>
 
                         </fieldset>
                         <div className="actions">
