@@ -12,7 +12,6 @@ function zeroPadding(n, digits=2) {
 }
 
 
-
 export default class ZoneDataContent extends React.Component {
 
     constructor(props) {
@@ -66,10 +65,16 @@ export default class ZoneDataContent extends React.Component {
 
     componentDidUpdate(nextProps, nextState) {
         if (this.state.seriesData.soilMoisture.length > 2) {
-            let threshold = this.state.zone.min_soil_moisture
+            let thresholds = []
+
+            for (let thName in this.state.zone.thresholds) {
+                if (this.state.zone.thresholds[thName].enabled) {
+                    thresholds.push(this.state.zone.thresholds[thName])
+                }
+            }
 
             if (!this.graph) {
-                this.graph = this.renderGraph(threshold)
+                this.graph = this.renderGraph(thresholds)
                 this.renderSeriesData()
             } else {
                 if (this.hasNewData(nextState)) {
@@ -170,7 +175,7 @@ export default class ZoneDataContent extends React.Component {
         }
     }
 
-    renderGraph(threshold) {
+    renderGraph(thresholds) {
         let series = [
             {
                 color: '#99754D',
@@ -179,13 +184,13 @@ export default class ZoneDataContent extends React.Component {
                 units: "%"
             },
             {
-                color: '#FFC300',
+                color: '#17A1E6',
                 name: "Temperatura aire",
                 renderer: 'line',
                 units: "ºC"
             },
             {
-                color: '#17A1E6',
+                color: '#FFC300',
                 name: "Humedad aire",
                 renderer: 'line',
                 units: "%"
@@ -247,24 +252,35 @@ export default class ZoneDataContent extends React.Component {
 	          xFormatter: function(x) {
 		            return timeConverter(x, false)
 	          }
-        } );
+        })
 
-        var formatYAxis = function(n) {
-	          var map = {
-		            0: '0',
-		            50: '50',
-		            100: '100'
-	          };
-            map[threshold] = ''
+        let formatYAxis = function(n) {
+	         var map = {
+		           0: '0',
+		           50: '50',
+		           100: '100'
+	         }
+            for (let th in thresholds) {
+                let threshold = thresholds[th]
+                map[threshold.value] = threshold.abrName
+            }
 
-	          return map[n];
+	          return map[n]
         }
+
+        let tickValues = [0, 50, 100]
+        for (let th in thresholds) {
+            let threshold = thresholds[th]
+            tickValues.push(threshold.value)
+        }
+        tickValues = tickValues.sort()
+
 
         let yAxis = new Rickshaw.Graph.Axis.Y({
             graph: graph,
             ticksTreatment: 'y-axis',
             element: this.refs.yAxis,
-            tickValues: [0, 50, threshold, 100],
+            tickValues: tickValues,
             tickFormat: formatYAxis
         });
 
@@ -304,7 +320,7 @@ export default class ZoneDataContent extends React.Component {
         let actuatorsEvents = values.actuatorsEvents
         let eventsCount = actuatorsEvents.length
 
-/*        if (actuatorsEvents && eventsCount) {
+        /*        if (actuatorsEvents && eventsCount) {
             console.log("UP")
             console.log("actuator TS")
             console.log(actuatorsEvents[eventsCount - 1].x)
@@ -323,8 +339,8 @@ export default class ZoneDataContent extends React.Component {
 
 	      let data = {
             "Humedad sustrato": values.soilMoisture,
-            "Humedad aire": values.airTemperature,
-            "Temperatura aire": values.airHumidity,
+            "Humedad aire": values.airHumidity,
+            "Temperatura aire": values.airTemperature,
             "irrEvent": irrEvent
         }
 

@@ -18,7 +18,9 @@ const int numZones = $numZones;
 const int sensorsIn[] = $sensorsIns; // For instance {99, A0} (open garden MOIST, A0)
 const int electroValvesOut[] = $electroOuts; // For instance {991, 992} (open garden electro 1 & 2)
 
-const int minSensorValue[] = $soilMoistureMinSensorValues; // Array of minimun values from the potentiometer to trigger watering
+const int minSoilMoisture[numZones] = $soilMoistureMinSensorValues;
+const int minAirHumidity[numZones] = $airHumidityMinSensorValues;
+const int maxAirTemperature[numZones] = $airTemperatureMaxSensorValues;
 
 const int checkingDelay = $checkingDelay;
 const int numChecksBeforeSending = $numChecksBeforeSending; // Number of checks should be done before sending data to serial
@@ -162,8 +164,12 @@ boolean isIrrigatingTime(int id) {
   return false;
 }
 
-boolean mustIrrigate(int id, int value) {
-  return (isIrrigatingTime(id) && value < minSensorValue[id]);
+boolean thresholdOvercomed(int sensorValues[], int id) {
+  return (sensorValues[SOIL_MOISTURE] <= minSoilMoisture[id] || sensorValues[AIR_HUMIDITY] <= minAirHumidity[id] || sensorValues[AIR_TEMPERATURE] >= maxAirTemperature[id]);
+}
+
+boolean mustIrrigate(int id, int sensorValues[]) {
+  return (isIrrigatingTime(id) && thresholdOvercomed(sensorValues, id));
 }
 
 void initIrrigatingEvents (uint32_t lastIrrigatingEvents[][3], int numZones) {
@@ -189,7 +195,9 @@ void readSensorValues(int id, int sensorValues[][numSensorTypes]) {
 
 void loop() {
   static int checksDone = 0;
-  static int sum[] = {0, 0};
+  static int sumSoilMoisture[] = {0, 0};
+  static int sumAirHumidity[] = {0, 0};
+  static int sumAirTemperature[] = {0, 0};
   int means[] = {0, 0};
   int wateringDelays[] = {0, 0};
   uint32_t lastIrrigatingEvents[numZones][3];
@@ -205,22 +213,36 @@ void loop() {
   checksDone++;
 
   for (int i=0; i<numZones; i++) {
-      sum[i] += sensorValues[i][SOIL_MOISTURE];
+      sumSoilMoisture[i] += sensorValues[i][SOIL_MOISTURE];
+  }
+  for (int i=0; i<numZones; i++) {
+      sumAirHumidity[i] += sensorValues[i][AIR_HUMIDITY];
+  }
+  for (int i=0; i<numZones; i++) {
+      sumAirTemperature[i] += sensorValues[i][AIR_TEMPERATURE];
   }
 
   if (checksDone >= numChecksBeforeSending) {
     for (int i=0; i<numZones; i++) {
-      means[i] = sum[i] / checksDone;
+      means[i] = sumSoilMoisture[i] / checksDone;
       sensorValues[i][SOIL_MOISTURE] = means[i];
+
+      means[i] = sumAirHumidity[i] / checksDone;
+      sensorValues[i][AIR_HUMIDITY] = means[i];
+
+      means[i] = sumAirTemperature[i] / checksDone;
+      sensorValues[i][AIR_TEMPERATURE] = means[i];
     }
 
     checksDone = 0;
     for (int i=0; i<numZones; i++) {
-      sum[i] = 0;
+      sumSoilMoisture[i] = 0;
+      sumAirHumidity[i] = 0;
+      sumAirTemperature[i] = 0;
     }
 
     for (int i=0; i<numZones; i++) {
-      if (mustIrrigate(i, means[i])) {
+      if (mustIrrigate(i, sensorValues[i])) {
         DateTime now = OpenGarden.getTime();
 
         lastIrrigatingEvents[i][ZONEID] = i;

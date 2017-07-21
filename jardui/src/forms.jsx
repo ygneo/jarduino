@@ -102,9 +102,9 @@ class DeleteButton extends React.Component {
 
 
 const defaultThresholdValues = {
-    "soilMoisture": 50,
-    "airHumidity": 50,
-    "airTemperature": 30
+    "soilMoisture": "50",
+    "airHumidity": "50",
+    "airTemperature": "30"
 }
 
 class IrrigationZoneForm extends React.Component {
@@ -120,7 +120,23 @@ class IrrigationZoneForm extends React.Component {
                 watering_time: 0,
                 watering_time_interval: 'm',
                 irrigatingStart: new Date(),
-                min_soil_moisture: defaultThresholdValues.soilMoisture
+                thresholds: {
+                    soilMoisture: {
+                        enabled: true,
+                        value: defaultThresholdValues.soilMoisture,
+                        abrName: "h"
+                    },
+                    airTemperature: {
+                        enabled: false,
+                        value: defaultThresholdValues.airTemperature,
+                        abrName: "t"
+                    },
+                    airHumidity: {
+                        enabled: false,
+                        value: defaultThresholdValues.airHumidity,
+                        abrName: "hr"
+                    }
+                }
             }
         }
 
@@ -149,7 +165,15 @@ class IrrigationZoneForm extends React.Component {
         let zone
 
         zone = this.state.zone
-        zone[name] = value
+
+        if (name.startsWith("th_")) {
+            zone.thresholds[name.split("_")[1]].value = value
+        } else if (name.startsWith("cb_th_")) {
+            zone.thresholds[name.split("_")[2]].enabled = value
+        }
+        else {
+            zone[name] = value
+        }
 
         this.setState({
             'zone': zone
@@ -247,41 +271,44 @@ class IrrigationZoneForm extends React.Component {
                 <h4>Umbrales de riego</h4>
                 <ThresholdFieldSet
                     label="Humedad del sustrato"
-                    name="min_soil_moisture"
-                    id="min_soil_moisture"
-                    value={zone.min_soil_moisture}
+                    name="th_soilMoisture"
+                    id="thSoilMoisture"
+                    value={zone.thresholds.soilMoisture.value}
                     rangeMin={1}
                     rangeMin={100}
                     step={1}
+                    symbol="<"
                     defaultValue={defaultThresholdValues.soilMoisture}
                     units="%"
-                    enabled={true}
+                    enabled={zone.thresholds.soilMoisture.enabled}
                     onChange={this.handleInputChange}
                 />
                 <ThresholdFieldSet
                     label="Humedad del aire"
-                    name="airHumidityThreshold"
-                    id="airHumidityThreshold"
-                    value={zone.bla}
+                    name="th_airHumidity"
+                    id="thAirHumidity"
+                    symbol="<"
+                    value={zone.thresholds.airHumidity.value}
                     rangeMin={1}
                     rangeMin={100}
                     step={1}
                     defaultValue={defaultThresholdValues.airHumidity}
                     units="%"
-                    enabled={false}
+                    enabled={zone.thresholds.airHumidity.enabled}
                     onChange={this.handleInputChange}
                 />
                 <ThresholdFieldSet
                     label="Temperatura del aire"
-                    name="airTemperatureThreshold"
-                    id="airTemperatureThreshold"
-                    value={zone.bla}
+                    name="th_airTemperature"
+                    id="th_airTemperature"
+                    symbol=">"
+                    value={zone.thresholds.airTemperature.value}
                     rangeMin={1}
                     rangeMin={50}
                     step={1}
                     defaultValue={defaultThresholdValues.airTemperature}
                     units="ºC"
-                    enabled={false}
+                    enabled={zone.thresholds.airTemperature.enabled}
                     onChange={this.handleInputChange}
                 />
                 <div className="buttons">

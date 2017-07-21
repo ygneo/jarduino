@@ -82,6 +82,7 @@ class ZoneData extends React.Component {
         return timeConverter(irrigatingStart, false, false)
     }
 
+
     render() {
         let zone = this.state.zone
         let zoneId = {'data-zoneId': zone.id}
@@ -102,7 +103,13 @@ class ZoneData extends React.Component {
             airTemperature: {
                 width: sensorsValues.airTemperature + "%"
             }
-        };
+        }
+        let thClassName = {
+            soilMoisture: zone.thresholds.soilMoisture.enabled ? "show" : "hide",
+            airHumidity: zone.thresholds.airHumidity.enabled ? "show" : "hide",
+            airTemperature: zone.thresholds.airTemperature.enabled ? "show" : "hide"
+        }
+
 
         return (
             <div id="data">
@@ -116,19 +123,19 @@ class ZoneData extends React.Component {
                         <div className="item-value">
                             <span className="label">Humedad del sustrato</span>
                             <span className="value">
-                                {sensorsValues.soilMoisture}% (&lt; {this.state.zone.min_soil_moisture}%)
+                                {sensorsValues.soilMoisture}%
                             </span>
                         </div>
                         <div className="w3-light-grey w3-round value-bar">
                             <div className="w3-container w3-round w3-soilMoisture" style={barStyles.soilMoisture}></div>
                         </div>
-                        <div className="thrContainer">
-                            <div className="thrLine"></div><div className="thr">Umbral de riego: &lt; {this.state.zone.min_soil_moisture}%</div>
+                        <div className={`thrContainer ${thClassName.soilMoisture}`}>
+                            <div className="thrLine w3-border-blue"></div><div className="thr">Umbral de riego (h) <span>&lt; {this.state.zone.thresholds.soilMoisture.value}%</span></div>
                         </div>
                     </div>
                     <div className="item">
                         <div className="item-value">
-                            <span className="label">Humedad relativa</span>
+                            <span className="label">Humedad del aire</span>
                             <span className="value">
                                 {sensorsValues.airHumidity}%
                             </span>
@@ -136,16 +143,22 @@ class ZoneData extends React.Component {
                         <div className="w3-light-grey w3-round value-bar">
                             <div className="w3-container w3-round w3-airHumidity" style={barStyles.airHumidity}></div>
                         </div>
+                        <div className={`thrContainer ${thClassName.airHumidity}`}>
+                            <div className="thrLine w3-border-red"></div><div className="thr">Umbral de riego (hr) <span>&lt; {this.state.zone.thresholds.airHumidity.value}%</span></div>
+                        </div>
                     </div>
                     <div className="item">
                         <div className="item-value">
-                            <span className="label">Temperatura ambiente</span>
+                            <span className="label">Temperatura del aire</span>
                             <span className="value">
                                 {sensorsValues.airTemperature}ºC
                             </span>
                         </div>
                         <div className="w3-light-grey w3-round value-bar">
                             <div className="w3-container w3-round w3-airTemperature" style={barStyles.airTemperature}></div>
+                        </div>
+                        <div className={`thrContainer ${thClassName.airTemperature}`}>
+                            <div className="thrLine w3-border-black"></div><div className="thr">Umbral de riego (t) &gt; {this.state.zone.thresholds.airTemperature.value}ºC</div>
                         </div>
                     </div>
                 </div>

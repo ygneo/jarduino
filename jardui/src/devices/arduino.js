@@ -38,7 +38,9 @@ class ArduinoDevice {
     }
 
     update_code_config(zones, callback) {
-        let moistureValues = []
+        let minMoistureValues = []
+        let minAirHumidityValues = []
+        let maxAirTemperatureValues = []
         let wateringTimes = []
         let irrigatingStartDateTimes = []
         let irrigatingFrequences = []
@@ -48,9 +50,24 @@ class ArduinoDevice {
         let settings = JSON.parse(localStorage.getItem("settings"))
 
         zones.map((zone,i) => {
-            moistureValues.push(
-                parseInt(zone.min_soil_moisture)
-            )
+            let minSoilMoisture = 0
+            let minAirHumidity = 0
+            let maxAirTemperature = 100
+
+            if (zone.thresholds.soilMoisture.enabled) {
+                minSoilMoisture = parseInt(zone.thresholds.soilMoisture.value)
+            }
+            minMoistureValues.push(minSoilMoisture)
+
+            if (zone.thresholds.airHumidity.enabled) {
+                minAirHumidity =  parseInt(zone.thresholds.airHumidity.value)
+            }
+            minAirHumidityValues.push(minAirHumidity)
+
+            if (zone.thresholds.airTemperature.enabled) {
+                maxAirTemperature = parseInt(zone.thresholds.airTemperature.value)
+            }
+            maxAirTemperatureValues.push(maxAirTemperature)
 
             wateringTimes.push(
                 timeIntervalToMs(zone.watering_time, zone.watering_time_interval)
@@ -87,7 +104,11 @@ class ArduinoDevice {
 
         let codeConfig = {
             "numZones": numZones,
-            "soilMoistureMinSensorValues": moistureValues,
+            "soilMoistureMinSensorValues": minMoistureValues,
+            "airHumidityMinSensorValues": minAirHumidityValues,
+            "airTemperatureMaxSensorValues": maxAirTemperatureValues,
+            "minAirHumidityValues": minAirHumidityValues,
+            "minAirTemperatureValues": minAirHumidityValues,
             "checkingDelay": checkingDelay,
             "numChecksBeforeSending": settings.readingsCount,
             "wateringTimes": wateringTimes,
