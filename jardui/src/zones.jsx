@@ -113,72 +113,72 @@ class ZoneData extends React.Component {
 
         return (
             <div id="data">
-            <ZoneDataHeader
-            zone={zone}
-            data={this.state.data}
-            />
-            <div className="items">
-            <h4>Última lectura: <em>{lastReadingDateTime}</em></h4>
-            <div className="item">
-            <div className="item-value">
-            <span className="label">Humedad del sustrato</span>
-            <span className="value">
-            {sensorsValues.soilMoisture}%
-            </span>
-            </div>
-            <div className="w3-light-grey w3-round value-bar">
-            <div className="w3-container w3-round w3-soilMoisture" style={barStyles.soilMoisture}></div>
-            </div>
-            <div className={`thrContainer ${thClassName.soilMoisture}`}>
-            <div className="thrLine w3-border-blue"></div><div className="thr">Umbral de riego (h) &lt; {this.state.zone.thresholds.soilMoisture.value}%</div>
-            </div>
-            </div>
-            <div className="item">
-            <div className="item-value">
-            <span className="label">Humedad relativa</span>
-            <span className="value">
-            {sensorsValues.airHumidity}%
-            </span>
-            </div>
-            <div className="w3-light-grey w3-round value-bar">
-            <div className="w3-container w3-round w3-airHumidity" style={barStyles.airHumidity}></div>
-            </div>
-            <div className={`thrContainer ${thClassName.airHumidity}`}>
-            <div className="thrLine w3-border-red"></div><div className="thr">Umbral de riego (hr) &lt; {this.state.zone.thresholds.airHumidity.value}%</div>
-            </div>
-            </div>
-            <div className="item">
-            <div className="item-value">
-            <span className="label">Temperatura ambiente</span>
-            <span className="value">
-            {sensorsValues.airTemperature}ºC
-            </span>
-            </div>
-            <div className="w3-light-grey w3-round value-bar">
-            <div className="w3-container w3-round w3-airTemperature" style={barStyles.airTemperature}></div>
-            </div>
-            <div className={`thrContainer ${thClassName.airTemperature}`}>
-            <div className="thrLine w3-border-black"></div><div className="thr">Umbral de riego (t) &gt; {this.state.zone.thresholds.airTemperature.value}ºC</div>
-            </div>
-            </div>
-            </div>
-            <div className="items">
-            <h4>Riego programado</h4>
-            <div className="item">
-            <span className="label">Inicio</span>
-            <span className="value">
-            {irrigatingStart}
-            </span>
-            </div>
-            <div className="item">
-            <span className="label">Frecuencia</span>
-            <span className="value">
-            cada {this.state.zone.watering_frequence} {this.state.zone.watering_frequence_interval}</span>
-            </div>
-            <div className="item">
-            <span className="label">Duración</span>
-            <span className="value">
-            {this.state.zone.watering_time} {this.state.zone.watering_time_interval}
+                <ZoneDataHeader
+                    zone={zone}
+                    data={this.state.data}
+                />
+                <div className="items">
+                    <h4>Última lectura: <em>{lastReadingDateTime}</em></h4>
+                    <div className="item">
+                        <div className="item-value">
+                            <span className="label">Humedad del sustrato</span>
+                            <span className="value">
+                                {sensorsValues.soilMoisture}%
+                            </span>
+                        </div>
+                        <div className="w3-light-grey w3-round value-bar">
+                            <div className="w3-container w3-round w3-soilMoisture" style={barStyles.soilMoisture}></div>
+                        </div>
+                        <div className={`thrContainer ${thClassName.soilMoisture}`}>
+                            <div className="thrLine w3-border-blue"></div><div className="thr">Umbral de riego (h) <span>&lt; {this.state.zone.thresholds.soilMoisture.value}%</span></div>
+                        </div>
+                    </div>
+                    <div className="item">
+                        <div className="item-value">
+                            <span className="label">Humedad del aire</span>
+                            <span className="value">
+                                {sensorsValues.airHumidity}%
+                            </span>
+                        </div>
+                        <div className="w3-light-grey w3-round value-bar">
+                            <div className="w3-container w3-round w3-airHumidity" style={barStyles.airHumidity}></div>
+                        </div>
+                        <div className={`thrContainer ${thClassName.airHumidity}`}>
+                            <div className="thrLine w3-border-red"></div><div className="thr">Umbral de riego (hr) <span>&lt; {this.state.zone.thresholds.airHumidity.value}%</span></div>
+                        </div>
+                    </div>
+                    <div className="item">
+                        <div className="item-value">
+                            <span className="label">Temperatura del aire</span>
+                            <span className="value">
+                                {sensorsValues.airTemperature}ºC
+                            </span>
+                        </div>
+                        <div className="w3-light-grey w3-round value-bar">
+                            <div className="w3-container w3-round w3-airTemperature" style={barStyles.airTemperature}></div>
+                        </div>
+                        <div className={`thrContainer ${thClassName.airTemperature}`}>
+                            <div className="thrLine w3-border-black"></div><div className="thr">Umbral de riego (t) &gt; {this.state.zone.thresholds.airTemperature.value}ºC</div>
+                        </div>
+                    </div>
+                </div>
+                <div className="items">
+                    <h4>Riego programado</h4>
+                    <div className="item">
+                        <span className="label">Inicio</span>
+                        <span className="value">
+                            {irrigatingStart}
+                        </span>
+                    </div>
+                    <div className="item">
+                        <span className="label">Frecuencia</span>
+                        <span className="value">
+                            cada {this.state.zone.watering_frequence} {this.state.zone.watering_frequence_interval}</span>
+                    </div>
+                    <div className="item">
+                        <span className="label">Duración</span>
+                        <span className="value">
+                            {this.state.zone.watering_time} {this.state.zone.watering_time_interval}
                         </span>
                     </div>
                 </div>

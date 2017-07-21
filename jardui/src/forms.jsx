@@ -277,6 +277,7 @@ class IrrigationZoneForm extends React.Component {
                     rangeMin={1}
                     rangeMin={100}
                     step={1}
+                    symbol="<"
                     defaultValue={defaultThresholdValues.soilMoisture}
                     units="%"
                     enabled={zone.thresholds.soilMoisture.enabled}
@@ -286,6 +287,7 @@ class IrrigationZoneForm extends React.Component {
                     label="Humedad del aire"
                     name="th_airHumidity"
                     id="thAirHumidity"
+                    symbol="<"
                     value={zone.thresholds.airHumidity.value}
                     rangeMin={1}
                     rangeMin={100}
@@ -299,6 +301,7 @@ class IrrigationZoneForm extends React.Component {
                     label="Temperatura del aire"
                     name="th_airTemperature"
                     id="th_airTemperature"
+                    symbol=">"
                     value={zone.thresholds.airTemperature.value}
                     rangeMin={1}
                     rangeMin={50}

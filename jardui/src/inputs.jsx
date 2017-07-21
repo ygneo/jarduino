@@ -8,7 +8,8 @@ class ThresholdFieldSet extends React.Component {
 
         this.state = {
             "value": props.value ? props.value : props.defaultValue,
-            "enabled": props.enabled
+            "enabled": props.enabled,
+            "symbol": props.symbol
         }
 
         this.handleRangeChange = this.handleRangeChange.bind(this);
@@ -54,7 +55,7 @@ class ThresholdFieldSet extends React.Component {
                     {...checkBoxOpts}
                 />
                 <label htmlFor={checkBoxId}>{this.props.label}</label>
-                <span className="rangeValue">{this.state.value} {this.props.units}</span>
+                <span className="rangeValue">{this.state.symbol} {this.state.value} {this.props.units}</span>
                 <input
                     id={this.props.id}
                     name={this.props.name}
