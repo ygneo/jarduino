@@ -184,13 +184,13 @@ export default class ZoneDataContent extends React.Component {
                 units: "%"
             },
             {
-                color: '#FFC300',
+                color: '#17A1E6',
                 name: "Temperatura aire",
                 renderer: 'line',
                 units: "ºC"
             },
             {
-                color: '#17A1E6',
+                color: '#FFC300',
                 name: "Humedad aire",
                 renderer: 'line',
                 units: "%"
