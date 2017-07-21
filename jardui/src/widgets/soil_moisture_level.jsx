@@ -28,13 +28,13 @@ class SoilMoistureLevel extends React.Component {
             time: props.time,
             value: props.value,
             level: convertMoistureValue2Level(props.value),
-            mark: convertMinSoilMoisture2Level(props.zone.min_soil_moisture)
+            mark: convertMinSoilMoisture2Level(props.zone.threshold.soilMoisture)
         }
     }
 
     componentWillReceiveProps(nextProps) {
         let level = convertMoistureValue2Level(nextProps.value)
-        let mark = convertMinSoilMoisture2Level(nextProps.zone.min_soil_moisture)
+        let mark = convertMinSoilMoisture2Level(nextProps.zone.soilMoisture)
 
         this.setState({
             value: nextProps.value,

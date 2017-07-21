@@ -458,9 +458,20 @@ div#main section form div.buttons button {
     height: 200px;
 }
 
-.rickshaw_graph .y_grid .tick[data-y-value=''] {
-    stroke-dasharray: 4 4;
+.rickshaw_graph .y_grid .tick[data-y-value='h'] {
     stroke: blue;
+}
+
+.rickshaw_graph .y_grid .tick[data-y-value='h'] text {
+    opacity: 0;
+}
+
+.rickshaw_graph .y_grid .tick[data-y-value='hr'] {
+    stroke: red;
+}
+
+.rickshaw_graph .y_grid .tick[data-y-value='t'] {
+    stroke: black;
 }
 
 .x-axis {
@@ -564,9 +575,8 @@ rect {
 
 .thrLine {
     width: 3em;
-    height: 1px;
-    border-top: 1px dashed blue;
-    margin-top: 10.5px;
+    border-top: 2px dashed blue;
+    margin-top: 9.5px;
     margin-right: 1em;
     float: left;
 }
@@ -580,6 +590,14 @@ rect {
     float: left;
     width: 100%;
     margin-top: 1ex;
+}
+
+.show {
+    display: block;
+}
+
+.hide {
+    display: none;
 }
 
 #settingsModal {
@@ -722,4 +740,5 @@ p.small {
 input#codeTemplate {
     width: 30em;
 }
+
 

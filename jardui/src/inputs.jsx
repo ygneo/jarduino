@@ -26,10 +26,13 @@ class ThresholdFieldSet extends React.Component {
         this.setState({
             "enabled": !this.state.enabled
         })
+        this.props.onChange(event);
     }
 
     render () {
         let checkBoxId = this.props.id + "cb"
+        let checkBoxName = "cb_" + this.props.name
+
         let checkBoxOpts = {}
         let rangeInputOpts = {}
 
@@ -45,6 +48,7 @@ class ThresholdFieldSet extends React.Component {
             <fieldset className="threshold">
                 <input
                     id={checkBoxId}
+                    name={checkBoxName}
                     type="checkbox"
                     onChange={this.handleCheckboxChange}
                     {...checkBoxOpts}
