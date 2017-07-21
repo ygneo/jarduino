@@ -320,7 +320,7 @@ export default class ZoneDataContent extends React.Component {
         let actuatorsEvents = values.actuatorsEvents
         let eventsCount = actuatorsEvents.length
 
-/*        if (actuatorsEvents && eventsCount) {
+        /*        if (actuatorsEvents && eventsCount) {
             console.log("UP")
             console.log("actuator TS")
             console.log(actuatorsEvents[eventsCount - 1].x)
@@ -339,8 +339,8 @@ export default class ZoneDataContent extends React.Component {
 
 	      let data = {
             "Humedad sustrato": values.soilMoisture,
-            "Humedad aire": values.airTemperature,
-            "Temperatura aire": values.airHumidity,
+            "Humedad aire": values.airHumidity,
+            "Temperatura aire": values.airTemperature,
             "irrEvent": irrEvent
         }
 
