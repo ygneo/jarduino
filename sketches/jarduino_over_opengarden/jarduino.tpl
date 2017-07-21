@@ -178,6 +178,7 @@ void readSensorValues(int id, int sensorValues[][numSensorTypes]) {
   OpenGarden.sensorPowerON();
   delay(1000);
   float airHumidity = OpenGarden.readAirHumidity();
+  delay(1000);
   float airTemperature = OpenGarden.readAirTemperature();
   OpenGarden.sensorPowerOFF();
 
