@@ -26,7 +26,7 @@ class JarduinoParser(object):
 
         timestamp_pattern = "^#time#([0-9]+)#"
         sensors_pattern = "#sensors#([0-9]/.+)#([0-9]/.+)#"
-        actuators_pattern = "#actuators#([0-9],\d+,\d+)?#?([0-9],\d+,\d+)#?$"
+        actuators_pattern = "#actuators#([0-9],\d+,\d+)?#?([0-9],\d+,\d+)?#?$"
         self.data_pattern = re.compile("{}{}{}".format(
             timestamp_pattern, sensors_pattern, actuators_pattern))
 

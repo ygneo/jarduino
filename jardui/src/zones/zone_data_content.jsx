@@ -18,7 +18,7 @@ export default class ZoneDataContent extends React.Component {
         super(props)
 
         this.state = {
-            mode: props.mode || "chart",
+            mode: props.mode || "waiting",
             zone: props.zone,
             data: props.data,
             seriesData: {
@@ -45,10 +45,10 @@ export default class ZoneDataContent extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         let seriesData = this.getSeriesData()
-        let nextMode = "chart"
+        let nextMode = "waiting"
 
-        if (seriesData.empty) {
-            nextMode = "waiting" // maybe use timeout to change to waiting
+        if (this.hasNewData(nextProps)) {
+            nextMode = "chart" // maybe use timeout to change to waiting
         }
 
         if (nextProps.data) {
@@ -64,7 +64,7 @@ export default class ZoneDataContent extends React.Component {
     }
 
     componentDidUpdate(nextProps, nextState) {
-        if (this.state.seriesData.soilMoisture.length > 2) {
+        if (this.state.mode == "chart") {
             let thresholds = []
 
             for (let thName in this.state.zone.thresholds) {
@@ -75,12 +75,9 @@ export default class ZoneDataContent extends React.Component {
 
             if (!this.graph) {
                 this.graph = this.renderGraph(thresholds)
-                this.renderSeriesData()
-            } else {
-                if (this.hasNewData(nextState)) {
-                    this.updateGraph()
-                }
             }
+
+            this.updateGraph()
         }
     }
 
@@ -102,11 +99,9 @@ export default class ZoneDataContent extends React.Component {
 
 
     hasNewData(nextState) {
-        let lastTimeStamp;
-
         if (this.state.data) {
             if (nextState.data) {
-                if (this.state.data.timestamp >= nextState.data.timestamp) {
+                if (nextState.data.timestamp >= this.state.data.timestamp) {
                     return true
                 }
             }
@@ -382,7 +377,6 @@ export default class ZoneDataContent extends React.Component {
                     <div className="loader-area">
                         <div className="loader"></div>
                         <p className="loading">
-                            Graficando datos...
                         </p>
                     </div>
                 </div>
