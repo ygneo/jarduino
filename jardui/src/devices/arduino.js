@@ -76,7 +76,7 @@ class ArduinoDevice {
             let datetime = new Date(zone.irrigatingStart)
             irrigatingStartDateTimes.push({
                 year: datetime.getFullYear(),
-                month: datetime.getMonth(),
+                month: datetime.getMonth() + 1,
                 day: datetime.getDate(),
                 hour: datetime.getHours(),
                 min: datetime.getMinutes()
