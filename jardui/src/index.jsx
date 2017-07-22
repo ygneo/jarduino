@@ -6,6 +6,7 @@ import ZonesStorage from './jardui/lib/storage.js'
 import UploadCodeToDeviceButton from './jardui/lib/widgets/buttons/upload_code.js'
 import SettingsButton from './jardui/lib/widgets/buttons/settings.js'
 import SettingsModal from './jardui/lib/widgets/modals/settings.js'
+import HistoricModal from './jardui/lib/widgets/modals/historic.js'
 import DeviceReader from './jardui/lib/devices/reader.js'
 import parseData from './jardui/lib/parser.js'
 

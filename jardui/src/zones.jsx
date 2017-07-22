@@ -7,6 +7,7 @@ import SoilMoistureLevel from './widgets/soil_moisture_level.js'
 import ZoneDataHeader from './zones/zone_data_header.js'
 import getForZoneId from './zones/getForZoneId.js'
 import timeConverter from './timeConverter.js'
+import HistoricModal from './widgets/modals/historic.js'
 
 
 class ZoneData extends React.Component {
@@ -23,6 +24,7 @@ class ZoneData extends React.Component {
         this.handleButtonClick = this.handleButtonClick.bind(this)
         this.getLastReadingDateTime = this.getLastReadingDateTime.bind(this)
         this.getIrrigatingStart = this.getIrrigatingStart.bind(this)
+        this.handleHistoricClick = this.handleHistoricClick.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -32,6 +34,10 @@ class ZoneData extends React.Component {
             zone: nextProps.zone,
             data: data
         })
+    }
+
+    handleHistoricClick(event) {
+        this.props.onHistoricClick(event)
     }
 
     handleButtonClick(event) {
@@ -183,7 +189,10 @@ class ZoneData extends React.Component {
                     </div>
                 </div>
                 <div className="buttons">
-                    <span className="configure"
+                    <span className="left"
+                          onClick={this.handleHistoricClick}
+                    >HISTÓRICO</span>
+                    <span className="right"
                           {...zoneId}
                           onClick={this.handleButtonClick}
                     >MODIFICAR</span>
@@ -238,7 +247,8 @@ class IrrigationZone extends React.Component {
         this.state = {
             mode: props.mode,
             zone: props.zone,
-            data: props.data
+            data: props.data,
+            modalOpened: false
         }
 
         this.storage = new ZonesStorage()
@@ -246,14 +256,28 @@ class IrrigationZone extends React.Component {
         this.handleZoneCreation = this.handleZoneCreation.bind(this)
         this.handleZoneDeletion = this.handleZoneDeletion.bind(this)
         this.handleZoneUpdate = this.handleZoneUpdate.bind(this)
+        this.handleCloseHistoricModal = this.handleCloseHistoricModal.bind(this)
 
         this.renderEditForm = this.renderEditForm.bind(this)
+        this.renderHistoric = this.renderHistoric.bind(this)
         this.cancelForm = this.cancelForm.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
         this.setState({
             "data": nextProps.data
+        })
+    }
+
+    renderHistoric() {
+        this.setState({
+            modalOpened: true
+        })
+    }
+
+    handleCloseHistoricModal() {
+        this.setState({
+            modalOpened: false
         })
     }
 
@@ -275,14 +299,25 @@ class IrrigationZone extends React.Component {
         } else if (this.state.mode == "show") {
             className = "irrigation_zone"
 
+            console.log(this.state)
+
             element = (
                 <section className={className}>
                     <ZoneData zone={this.state.zone}
                               onCancel={this.cancelForm}
                               onEditButtonClick={this.renderEditForm}
+                              onHistoricClick={this.renderHistoric}
                               data={this.state.data}
                     />
+                    <HistoricModal
+                        opened={this.state.modalOpened}
+                        onClose={this.handleCloseHistoricModal}
+                        zone={this.state.zone}
+                        ref="historicModal"
+                    />
                 </section>
+
+
             )
         } else if (this.state.mode == "edition") {
             className = "form"

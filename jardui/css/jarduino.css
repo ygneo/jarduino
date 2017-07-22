@@ -402,19 +402,29 @@ div#main section div#data div.settings h4 {
 
 div#main section div#data div.buttons {
     clear: both;
-    width: 90%;
     margin-top: 4ex;
+    margin-right: 2ex;
     margin-left: 2ex;
+    float: left;
+    width: 90%;
 
 }
 
-div#main section div#data div.buttons span.configure {
+div#main section div#data div.buttons span {
     display: block;
-    float: right;
+    margin-right: 2ex;
     color: #17A1E6;
     cursor: pointer;
     font-size: 100%;
     font-weight: bold;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
 }
 
 div#main section div#data div.buttons span.edit_button:hover {
@@ -682,7 +692,7 @@ rect {
     border: 1px solid lightgray;
 }
 
-.modal {
+#settingsModal {
     position: absolute;
     z-index: 9999;
     width: 900px;
@@ -695,13 +705,28 @@ rect {
     border: 1px solid black;
     background: white;
 }
+
+#historicModal {
+    position: absolute;
+    z-index: 9999;
+    width: 1300px;
+    height: 930px;
+    left: 40%;
+    top: 270%;
+    margin-left: -450px;
+    margin-top: -475px;
+    overflow: auto;
+    border: 1px solid black;
+    background: white;
 }
+
+#historicModal .modal-content {
+    padding: 4ex;
+}
+
 
 .modal-content {
     background-color: #fefefe;
-    margin: 15% auto; /* 15% from the top and centered */
-    padding: 20px;
-    width: 80%; /* Could be more or less, depending on screen size */
 }
 
 .close {
@@ -743,6 +768,15 @@ p.small {
 
 input#codeTemplate {
     width: 30em;
+}
+
+#chart_container {
+    float: left;
+}
+
+#panel {
+    margin-left: 2ex;
+    float: left;
 }
 
 
