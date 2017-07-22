@@ -118,12 +118,15 @@ void sendValuesToSerial (int values[][numSensorTypes])
 
 void sendIrrigatingEventsToSerial (uint32_t irrigatingEvents[][3]) 
 {
+  DateTime now = OpenGarden.getTime();
   String valuesString;
 
   Serial.print("#actuators#");
   for (int i=0; i < numZones; i++) {
     if (irrigatingEvents[i][TIMESTAMP] > 0) {
       valuesString += i;
+      valuesString += ",";
+      valuesString += now.unixtime(),
       valuesString += ",";
       valuesString += irrigatingEvents[i][DURATION];
       valuesString += "#";   
@@ -147,7 +150,20 @@ boolean isIrrigatingTime(int id) {
   DateTime now = OpenGarden.getTime();
   uint32_t currentTimestamp = now.unixtime();
   uint32_t diff;
-  
+
+  /* Serial.println("id"); */
+  /* Serial.println(id); */
+  /* Serial.println("now"); */
+  /* OpenGarden.printTime(now); */
+  /* Serial.println(); */
+  /* Serial.println("now unixtime"); */
+  /* Serial.println(now.unixtime()); */
+  /* Serial.println("start"); */
+  /* OpenGarden.printTime(irrigatingStartDateTime[id]); */
+  /* Serial.println(); */
+  /* Serial.println("start unixtime"); */
+  /* Serial.println(irrigatingStartDateTime[id].unixtime()); */
+
   if (now.unixtime() >= irrigatingStartDateTime[id].unixtime()) {
     if (lastIrrigatingTimestamp[id] == 0) {
       lastIrrigatingTimestamp[id] = currentTimestamp;

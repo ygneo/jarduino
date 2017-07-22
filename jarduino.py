@@ -26,7 +26,7 @@ class JarduinoParser(object):
 
         timestamp_pattern = "^#time#([0-9]+)#"
         sensors_pattern = "#sensors#([0-9]/.+)#([0-9]/.+)#"
-        actuators_pattern = "#actuators#([0-9],\d+)?#?([0-9],\d+)?#?$"
+        actuators_pattern = "#actuators#([0-9],\d+,\d+)?#?([0-9],\d+,\d+)#?$"
         self.data_pattern = re.compile("{}{}{}".format(
             timestamp_pattern, sensors_pattern, actuators_pattern))
 
@@ -95,13 +95,14 @@ class JarduinoParser(object):
 
         for actuator_data in actuators_data:
             try:
-                zone_id, value = actuator_data.split(",")
+                zone_id, timestamp, value = actuator_data.split(",")
             except AttributeError:
                 continue
             data.append({
                 "zoneId": zone_id,
                 "data": [{
                     "type": "irrigation",
+                    "timestamp": timestamp,
                     "value": value,
                 }]
             })
