@@ -280,18 +280,18 @@ form fieldset.time_interval input {
 }
 
 
-div#main section div.data  {
+div#main section div#data  {
     text-align: left;
 }
 
-div#main section div.data div#header  {
+div#main section div#data div#header  {
     border-radius: 4px 4px 0 0;
     height: 36ex;
     width: 100%;
     margin-bottom: 8ex;
 }
 
-div#main section div.data div#header div#content  {
+div#main section div#data div#header div#content  {
     background: white;
     border-radius: 4px 4px 0 0;
     height: 27ex;
@@ -299,12 +299,12 @@ div#main section div.data div#header div#content  {
     width: 100%;
 }
 
-div#main section div.data div#header div#content div.attributes  {
+div#main section div#data div#header div#content div.attributes  {
     float: left;
     margin-bottom: 1.5ex;
 }
 
-div#main section div.data div#header div#content div.irrigating {
+div#main section div#data div#header div#content div.irrigating {
     float: left;
     height: 46px;
     width: 37px;
@@ -314,7 +314,7 @@ div#main section div.data div#header div#content div.irrigating {
 }
 
 
-div#main section div.data div#header div.soil_moisture_level  {
+div#main section div#data div#header div.soil_moisture_level  {
     float: right;
     background: url('/jardui/img/cube.png') no-repeat;
     width: 40px;
@@ -323,7 +323,7 @@ div#main section div.data div#header div.soil_moisture_level  {
     margin-top: 4ex;
 }
 
-div#main section div.data div#header h2 { 
+div#main section div#data div#header h2 { 
     margin: 0;
     padding: 0;
     padding-top: 10px;
@@ -331,38 +331,38 @@ div#main section div.data div#header h2 {
     font-weight: normal;
 }
 
-div#main section div.data div#header h3 {
+div#main section div#data div#header h3 {
     color: grey;
     margin: 0;
     padding: 0;
     padding-left: 20px;
 }
 
-div#main section div.data div#header div.header-container {
+div#main section div#data div#header div.header-container {
     float: left;
     width: 100%;
     margin-bottom: .8ex;
 }
 
 
-div#main section div.data div#header div.header-container .attributes {
+div#main section div#data div#header div.header-container .attributes {
     float: left;
 }
 
-div#main section div.data div#header div.header-container .actions {
+div#main section div#data div#header div.header-container .actions {
     float: right;
     margin-top: 2.5ex;
     margin-right: 2ex;
 }
 
 
-div#main section div.data {
+div#main section div#data {
     float: left;
     width: 100%;
  }
 
 
-div#main section div.data div.items {
+div#main section div#data div.items {
     float: left;
     margin: 0 3ex 3ex 3ex;
     width: 80%;
@@ -370,7 +370,7 @@ div#main section div.data div.items {
     border-bottom: 2px solid #f2f2f2;
 }
 
-div#main section div.data div.items div.item  {
+div#main section div#data div.items div.item  {
     clear: both;
     float: left;
     margin-top: 1ex;
@@ -378,16 +378,16 @@ div#main section div.data div.items div.item  {
 }
 
 
-div#main section div.data div.items div.item span.label {
+div#main section div#data div.items div.item span.label {
     float: left;
 }
 
-div#main section div.data div.items div.item span.value {
+div#main section div#data div.items div.item span.value {
     float: right;
     font-weight: bold;
 }
 
-div#main section div.data div.settings {
+div#main section div#data div.settings {
     float: left;
     margin: 0 3ex 3ex 3ex;     
     width: 80%;
@@ -395,12 +395,12 @@ div#main section div.data div.settings {
     border-bottom: 2px solid #f2f2f2;
 }
 
-div#main section div.data div.settings h4 {
+div#main section div#data div.settings h4 {
     margin: 0;
     padding: 0;
 }
 
-div#main section div.data div.buttons {
+div#main section div#data div.buttons {
     clear: both;
     width: 90%;
     margin-top: 4ex;
@@ -408,7 +408,7 @@ div#main section div.data div.buttons {
 
 }
 
-div#main section div.data div.buttons span.configure {
+div#main section div#data div.buttons span.configure {
     display: block;
     float: right;
     color: #17A1E6;
@@ -417,7 +417,7 @@ div#main section div.data div.buttons span.configure {
     font-weight: bold;
 }
 
-div#main section div.data div.buttons span.edit_button:hover {
+div#main section div#data div.buttons span.edit_button:hover {
     background: url('/jardui/img/configure_hover.png') no-repeat;
 }
 

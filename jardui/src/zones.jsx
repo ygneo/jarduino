@@ -85,7 +85,6 @@ class ZoneData extends React.Component {
 
     render() {
         let zone = this.state.zone
-        let id = "zoneData" + zone.id
         let zoneId = {'data-zoneId': zone.id}
         let lastReadingDateTime = this.getLastReadingDateTime()
         let sensorsValues = {
@@ -111,8 +110,9 @@ class ZoneData extends React.Component {
             airTemperature: zone.thresholds.airTemperature.enabled ? "show" : "hide"
         }
 
+
         return (
-            <div id={id} className="data">
+            <div id="data">
                 <ZoneDataHeader
                     zone={zone}
                     data={this.state.data}
@@ -257,14 +257,14 @@ class IrrigationZone extends React.Component {
         })
     }
 
-     render() {
-         let dataClassName
-         let formClassName
-         let element = null
+    render() {
+        let className
+        let element = null
 
-         if (this.state.mode == "creation") {
+        if (this.state.mode == "creation") {
+            className = "form"
             element = (
-                <section className="form">
+                <section className={className}>
                     <IrrigationZoneForm
                         onCancel={this.cancelForm}
                         onDelete={this.deleteZone}
@@ -272,37 +272,32 @@ class IrrigationZone extends React.Component {
                     />
                 </section>
             )
-         } else {
-             dataClassName = "show"
-             formClassName = "hide"
-
-             if (this.state.mode === "edition") {
-                dataClassName = "hide"
-                formClassName = "show"
-            }
+        } else if (this.state.mode == "show") {
+            className = "irrigation_zone"
 
             element = (
-                <section className="irrigation_zone">
-                <div className={dataClassName}>
-                  <ZoneData zone={this.state.zone}
-                               ref="zonedata"
-                          onCancel={this.cancelForm}
-                          onEditButtonClick={this.renderEditForm}
-                          data={this.state.data}
-                />
-                </div>
-                <div className={formClassName}>
-                  <IrrigationZoneForm
-                        ref="form"
+                <section className={className}>
+                    <ZoneData zone={this.state.zone}
+                              onCancel={this.cancelForm}
+                              onEditButtonClick={this.renderEditForm}
+                              data={this.state.data}
+                    />
+                </section>
+            )
+        } else if (this.state.mode == "edition") {
+            className = "form"
+
+            element = (
+                <section className={className}>
+                    <IrrigationZoneForm
                         onCancel={this.cancelForm}
                         onZoneUpdated={this.handleZoneUpdate}
                         onDelete={this.handleZoneDeletion}
                         zone={this.state.zone}
                     />
-                </div>
                 </section>
             )
-        } 
+        }
 
         return element
     }
@@ -331,7 +326,6 @@ class IrrigationZone extends React.Component {
 
     renderEditForm(zoneId) {
         let zone = this.storage.getZone(zoneId)
-
 
         this.setState({
             "mode": "edition",

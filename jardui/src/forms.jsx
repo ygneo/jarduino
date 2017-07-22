@@ -217,7 +217,6 @@ class IrrigationZoneForm extends React.Component {
     render () {
         let zone = this.state.zone
         let deleteButtonMode = "off"
-        let id = "form" + this.state.zone.id
         let zoneId
         let irrigatingStart = new Date(this.state.zone.irrigatingStart)
 
@@ -227,7 +226,7 @@ class IrrigationZoneForm extends React.Component {
         }
 
         return (
-            <form id={id} onSubmit={this.handleSubmit}>
+            <form onSubmit={this.handleSubmit}>
                 <TextInputFieldSet
                     label="Nombre"
                     name="name"
