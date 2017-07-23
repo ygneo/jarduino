@@ -810,4 +810,9 @@ input#codeTemplate {
     width: 20%;
 }
 
+#filter {
+    width: 20%;
+    margin-bottom: 2ex;
+}
+
 
