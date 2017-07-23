@@ -12,39 +12,11 @@ function zeroPadding(n, digits=2) {
 }
 
 
-let series = [
-    {
-        color: '#99754D',
-        name: "Humedad sustrato",
-        renderer: 'line',
-        units: "%"
-    },
-    {
-        color: '#17A1E6',
-        name: "Temperatura aire",
-        renderer: 'line',
-        units: "ºC"
-    },
-    {
-        color: '#FFC300',
-        name: "Humedad aire",
-        renderer: 'line',
-        units: "%"
-    },
-    {
-        color: 'blue',
-        name: "Eventos de riego",
-        renderer: 'bar',
-        noHoverDetail: true
-    }
-]
-
 export default class HistoricModal extends React.Component {
 
     constructor(props) {
         super(props);
         this.storage = new ZonesStorage
-
         let seriesData = this.getSeriesData(props.zone.id)
 
         this.state = {
@@ -57,242 +29,285 @@ export default class HistoricModal extends React.Component {
         this.pushtToSeriesData = this.pushToSeriesData.bind(this)
         this.renderAxis = this.renderAxis.bind(this)
         this.handleCloseModal = this.handleCloseModal.bind(this)
-    }
-
-    handleCloseModal() {
-        this.props.onClose()
-    }
-
-    getSeriesData(zoneId) {
-        let data = this.storage.getZoneData(zoneId)
-        let seriesData = {
-            "empty": true,
-            "soilMoisture": [],
-            "airTemperature": [],
-            "airHumidity": [],
-            "actuatorsEvents": []
-        }
-        let this_instance = this
-
-        if (data.length) {
-            data.forEach(function (datum) {
-                this_instance.pushToSeriesData(datum, seriesData)
-            })
-            seriesData.empty = false
-        }
-
-        return seriesData
-    }
-
-
-    pushToSeriesData(data, seriesData) {
-        seriesData['soilMoisture'].push(
-            {
-                x: parseInt(data.timestamp),
-                y: parseInt(data.sensorsData.soilMoisture)
-            })
-        seriesData['airTemperature'].push(
-            {
-                x: parseInt(data.timestamp),
-                y: parseInt(data.sensorsData.airTemperature)
-            }
-        )
-        seriesData['airHumidity'].push(
-            {
-                x: parseInt(data.timestamp),
-                y: parseInt(data.sensorsData.airHumidity)
-            })
-
-        if (data.actuatorsData.length) {
-            let eventDuration = parseInt(data.actuatorsData[0].value) / 1000
-            let startTimestamp = parseInt(data.actuatorsData[0].timestamp)
-            let endTimestamp = startTimestamp + eventDuration
-
-            seriesData['actuatorsEvents'].push(
-                {
-                    x: startTimestamp,
-                    y: 100
-                },
-                {
-                    x: endTimestamp,
-                    y: 0
-                }
-            )
-        }
-    }
-
-    setGraphHover(graph) {
-        let Hover = Rickshaw.Class.create(Rickshaw.Graph.HoverDetail, {
-            render: function($super, args) {
-                // get the current point we are dealing with
-                var point = args.points.filter( function(p) {
-                    return p.active }
-                ).shift();
-
-                if (point.value.y === null) return;
-
-                // check if the series we are dealing with has the "noHoverDetail"
-                // attribute set to true. If so, we don't want to render this
-                // hover detail item, if not call the original render method as
-                // normal
-                if (point.series.noHoverDetail !== true) {
-                    $super(args);
-                }
-
-                if (point.series.units) {
-                    let units = point.series.units
-                    this.yFormatter =  function(y) {
-                        return y + units
-	                  }
-                }
-            }
-        });
-
-        let hoverDetail = new Hover( {
-	          graph: graph,
-	          xFormatter: function(x) {
-		            return timeConverter(x, true)
-	          }
-        })
-    }
-
-    renderAxis(graph) {
-        let thresholds = []
-
-        for (let thName in this.state.zone.thresholds) {
-            if (this.state.zone.thresholds[thName].enabled) {
-                thresholds.push(this.state.zone.thresholds[thName])
-            }
-        }
-
-        let formatYAxis = function(n) {
-	          var map = {
-		            20: '20',
-		            40: '40',
-		            60: '60',
-                80: '80'
-	          }
-            for (let th in thresholds) {
-                let threshold = thresholds[th]
-                map[threshold.value] = threshold.abrName
-            }
-
-	          return map[n]
-        }
-
-        let tickValues = [20, 40, 60, 80]
-        for (let th in thresholds) {
-            let threshold = thresholds[th]
-            tickValues.push(threshold.value)
-        }
-        tickValues = tickValues.sort()
-
-
-        let yAxis = new Rickshaw.Graph.Axis.Y({
-            graph: graph,
-            ticksTreatment: 'y-axis',
-            tickValues: tickValues,
-            tickFormat: formatYAxis
-        });
-
-        yAxis.render();
-
-        var xAxis = new Rickshaw.Graph.Axis.Time( {
-	          graph: graph,
-            ticksTreatment: "glow"
-        } )
-
-        xAxis.render();
-    }
-
-    renderLegends(graph) {
-        let legend = new Rickshaw.Graph.Legend( {
-	          graph: graph,
-	          element: this.refs.legend
-        } )
+        this.renderGraph = this.renderGraph.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
+        let seriesData = this.getSeriesData(this.state.zone.id)
+
         this.setState({
-            "opened": nextProps.opened
+            "opened": nextProps.opened,
+            "seriesData": seriesData
         })
     }
 
     componentDidMount() {
-        series[0].data = this.state.seriesData.soilMoisture
-        series[1].data = this.state.seriesData.airTemperature
-        series[2].data = this.state.seriesData.airHumidity
-        series[3].data = this.state.seriesData.actuatorsEvents
-
-        let graph = new Rickshaw.Graph( {
-	          element: this.refs.chart,
-            min: 0,
-            max: 100,
-	          width: 950,
-	          height: 580,
-	          renderer: 'multi',
-	          series: series
-	      })
-
-        graph.render()
-
-        this.setGraphHover(graph)
-        this.renderAxis(graph)
-//        this.renderLegends(graph)
+        this.renderGraph()
     }
 
-    render () {
-        let className = "modal hide"
-        let zone = this.state.zone
+    componentDidUpdate() {
+        if (!this.graph) {
+            this.renderGraph()
+        } else {
+            this.graph.render()
+        }
+    }
 
-        if (this.state.opened) {
-            className = "modal show"
+        renderGraph() {
+            let graph = new Rickshaw.Graph( {
+	              element: this.refs.chart,
+                min: 0,
+                max: 100,
+	              width: 950,
+	              height: 580,
+	              renderer: 'multi',
+	              series: [
+                    {
+                        color: '#99754D',
+                        name: "Humedad sustrato",
+                        renderer: 'line',
+                        units: "%",
+                        data: this.state.seriesData.soilMoisture
+                    },
+                    {
+                        color: '#17A1E6',
+                        name: "Temperatura aire",
+                        renderer: 'line',
+                        units: "ºC",
+                        data: this.state.seriesData.airTemperature
+                    },
+                    {
+                        color: '#FFC300',
+                        name: "Humedad aire",
+                        renderer: 'line',
+                        units: "%",
+                        data: this.state.seriesData.airHumidity
+
+                    },
+                    {
+                        color: 'blue',
+                        name: "Eventos de riego",
+                        renderer: 'bar',
+                        noHoverDetail: true,
+                        data: this.state.seriesData.actuatorsEvents
+                    }
+                ]
+	          })
+
+            graph.render()
+
+            this.setGraphHover(graph)
+            this.renderAxis(graph)
+
+            this.graph = graph
         }
 
-        let thClassName = {
-            soilMoisture: zone.thresholds.soilMoisture.enabled ? "show" : "hide",
-            airHumidity: zone.thresholds.airHumidity.enabled ? "show" : "hide",
-            airTemperature: zone.thresholds.airTemperature.enabled ? "show" : "hide"
+        handleCloseModal() {
+            this.props.onClose()
+        }
+
+        getSeriesData(zoneId) {
+            let data = this.storage.getZoneData(zoneId)
+            let seriesData = {
+                "empty": true,
+                "soilMoisture": [],
+                "airTemperature": [],
+                "airHumidity": [],
+                "actuatorsEvents": []
+            }
+            let this_instance = this
+
+            if (data.length) {
+                data.forEach(function (datum) {
+                    this_instance.pushToSeriesData(datum, seriesData)
+                })
+                seriesData.empty = false
+            }
+
+            return seriesData
         }
 
 
-        return (
-            <div id="historicModal" className={className}>
-                <div className="modal-header">
-                    <span className="title">Histórico</span>
-                    <span className="close" onClick={this.handleCloseModal}>&times;</span>
-                </div>
-                <div className="modal-content">
-                    <h3>{this.state.zone.name}</h3>
-                    <div id="chart_container">
-                        <div className="y-axis" ref="yAxis"></div>
-		                    <div id="chart" ref="chart"></div>
-		                    <div id="timeline"></div>
-		                    <div id="preview" ref="preview"></div>
-	                  </div>
-                    <div id="panel">
-                        <div className="thrContainer">
-                            <div className="lineSoilMoisture"></div><div className="thr">Humedad del sustrato</div>
-                        </div>
-                        <div className="thrContainer">
-                            <div className="lineAirHumidity"></div><div className="thr">Humedad del aire</div>
-                        </div>
-                        <div className="thrContainer">
-                            <div className="lineAirTemperature"></div><div className="thr">Temperatura del aire</div>
-                        </div>
-                        <div className={`thrContainer ${thClassName.soilMoisture}`}>
-                            <div className="thrLine w3-border-blue"></div><div className="thr">Umbral de riego (h) <span>&lt; {this.state.zone.thresholds.soilMoisture.value}%</span></div>
-                        </div>
-                        <div className={`thrContainer ${thClassName.airHumidity}`}>
-                            <div className="thrLine w3-border-red"></div><div className="thr">Umbral de riego (hr) <span>&lt; {this.state.zone.thresholds.airHumidity.value}%</span></div>
-                        </div>
+        pushToSeriesData(data, seriesData) {
+            seriesData['soilMoisture'].push(
+                {
+                    x: parseInt(data.timestamp),
+                    y: parseInt(data.sensorsData.soilMoisture)
+                })
+            seriesData['airTemperature'].push(
+                {
+                    x: parseInt(data.timestamp),
+                    y: parseInt(data.sensorsData.airTemperature)
+                }
+            )
+            seriesData['airHumidity'].push(
+                {
+                    x: parseInt(data.timestamp),
+                    y: parseInt(data.sensorsData.airHumidity)
+                })
 
-                        <div className={`thrContainer ${thClassName.airTemperature}`}>
-                            <div className="thrLine w3-border-black"></div><div className="thr">Umbral de riego (t) <span>&lt; {this.state.zone.thresholds.airTemperature.value}%</span></div>
+            if (data.actuatorsData.length) {
+                let eventDuration = parseInt(data.actuatorsData[0].value) / 1000
+                let startTimestamp = parseInt(data.actuatorsData[0].timestamp)
+                let endTimestamp = startTimestamp + eventDuration
+
+                seriesData['actuatorsEvents'].push(
+                    {
+                        x: startTimestamp,
+                        y: 100
+                    },
+                    {
+                        x: endTimestamp,
+                        y: 0
+                    }
+                )
+            }
+        }
+
+        setGraphHover(graph) {
+            let Hover = Rickshaw.Class.create(Rickshaw.Graph.HoverDetail, {
+                render: function($super, args) {
+                    // get the current point we are dealing with
+                    var point = args.points.filter( function(p) {
+                        return p.active }
+                    ).shift();
+
+                    if (point.value.y === null) return;
+
+                    // check if the series we are dealing with has the "noHoverDetail"
+                    // attribute set to true. If so, we don't want to render this
+                    // hover detail item, if not call the original render method as
+                    // normal
+                    if (point.series.noHoverDetail !== true) {
+                        $super(args);
+                    }
+
+                    if (point.series.units) {
+                        let units = point.series.units
+                        this.yFormatter =  function(y) {
+                            return y + units
+	                      }
+                    }
+                }
+            });
+
+            let hoverDetail = new Hover( {
+	              graph: graph,
+	              xFormatter: function(x) {
+		                return timeConverter(x, true)
+	              }
+            })
+        }
+
+        renderAxis(graph) {
+            let thresholds = []
+
+            for (let thName in this.state.zone.thresholds) {
+                if (this.state.zone.thresholds[thName].enabled) {
+                    thresholds.push(this.state.zone.thresholds[thName])
+                }
+            }
+
+            let formatYAxis = function(n) {
+	              var map = {
+		                20: '20',
+		                40: '40',
+		                60: '60',
+                    80: '80'
+	              }
+                for (let th in thresholds) {
+                    let threshold = thresholds[th]
+                    map[threshold.value] = threshold.abrName
+                }
+
+	              return map[n]
+            }
+
+            let tickValues = [20, 40, 60, 80]
+            for (let th in thresholds) {
+                let threshold = thresholds[th]
+                tickValues.push(threshold.value)
+            }
+            tickValues = tickValues.sort()
+
+
+            let yAxis = new Rickshaw.Graph.Axis.Y({
+                graph: graph,
+                ticksTreatment: 'y-axis',
+                tickValues: tickValues,
+                tickFormat: formatYAxis
+            });
+
+            yAxis.render();
+
+            var xAxis = new Rickshaw.Graph.Axis.Time( {
+	              graph: graph,
+                ticksTreatment: "glow"
+            } )
+
+            xAxis.render();
+        }
+
+        renderLegends(graph) {
+            let legend = new Rickshaw.Graph.Legend( {
+	              graph: graph,
+	              element: this.refs.legend
+            } )
+        }
+
+
+        render () {
+            let className = "modal hide"
+            let zone = this.state.zone
+
+            if (this.state.opened) {
+                className = "modal show"
+            }
+
+            let thClassName = {
+                soilMoisture: zone.thresholds.soilMoisture.enabled ? "show" : "hide",
+                airHumidity: zone.thresholds.airHumidity.enabled ? "show" : "hide",
+                airTemperature: zone.thresholds.airTemperature.enabled ? "show" : "hide"
+            }
+
+
+            return (
+                <div id="historicModal" className={className}>
+                    <div className="modal-header">
+                        <span className="title">Histórico</span>
+                        <span className="close" onClick={this.handleCloseModal}>&times;</span>
+                    </div>
+                    <div className="modal-content">
+                        <h3>{this.state.zone.name}</h3>
+                        <div id="chart_container">
+                            <div className="y-axis" ref="yAxis"></div>
+		                        <div id="chart" ref="chart"></div>
+		                        <div id="timeline"></div>
+		                        <div id="preview" ref="preview"></div>
+	                      </div>
+                        <div id="panel">
+                            <div className="thrContainer">
+                                <div className="lineSoilMoisture"></div><div className="thr">Humedad del sustrato</div>
+                            </div>
+                            <div className="thrContainer">
+                                <div className="lineAirHumidity"></div><div className="thr">Humedad del aire</div>
+                            </div>
+                            <div className="thrContainer">
+                                <div className="lineAirTemperature"></div><div className="thr">Temperatura del aire</div>
+                            </div>
+                            <div className={`thrContainer ${thClassName.soilMoisture}`}>
+                                <div className="thrLine w3-border-blue"></div><div className="thr">Umbral de riego (h) <span>&lt; {this.state.zone.thresholds.soilMoisture.value}%</span></div>
+                            </div>
+                            <div className={`thrContainer ${thClassName.airHumidity}`}>
+                                <div className="thrLine w3-border-red"></div><div className="thr">Umbral de riego (hr) <span>&lt; {this.state.zone.thresholds.airHumidity.value}%</span></div>
+                            </div>
+
+                            <div className={`thrContainer ${thClassName.airTemperature}`}>
+                                <div className="thrLine w3-border-black"></div><div className="thr">Umbral de riego (t) <span>&lt; {this.state.zone.thresholds.airTemperature.value}%</span></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        )
+            )
     }
 }

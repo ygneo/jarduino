@@ -806,7 +806,7 @@ input#codeTemplate {
 
 #panel {
     margin-left: 2ex;
-    float: left;
+    float: right;
     width: 20%;
 }
 

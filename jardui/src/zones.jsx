@@ -309,12 +309,14 @@ class IrrigationZone extends React.Component {
                               onHistoricClick={this.renderHistoric}
                               data={this.state.data}
                     />
+                    {this.state.modalOpened &&
                     <HistoricModal
                         opened={this.state.modalOpened}
                         onClose={this.handleCloseHistoricModal}
                         zone={this.state.zone}
                         ref="historicModal"
                     />
+                    }
                 </section>
 
 
