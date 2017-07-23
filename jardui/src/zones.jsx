@@ -299,8 +299,6 @@ class IrrigationZone extends React.Component {
         } else if (this.state.mode == "show") {
             className = "irrigation_zone"
 
-            console.log(this.state)
-
             element = (
                 <section className={className}>
                     <ZoneData zone={this.state.zone}
