@@ -228,7 +228,7 @@ export default class HistoricModal extends React.Component {
 	          element: this.refs.chart,
             min: 0,
             max: 100,
-	          width: 1024,
+	          width: 950,
 	          height: 580,
 	          renderer: 'multi',
 	          series: series
@@ -243,10 +243,18 @@ export default class HistoricModal extends React.Component {
 
     render () {
         let className = "modal hide"
+        let zone = this.state.zone
 
         if (this.state.opened) {
             className = "modal show"
         }
+
+        let thClassName = {
+            soilMoisture: zone.thresholds.soilMoisture.enabled ? "show" : "hide",
+            airHumidity: zone.thresholds.airHumidity.enabled ? "show" : "hide",
+            airTemperature: zone.thresholds.airTemperature.enabled ? "show" : "hide"
+        }
+
 
         return (
             <div id="historicModal" className={className}>
@@ -263,8 +271,25 @@ export default class HistoricModal extends React.Component {
 		                    <div id="preview" ref="preview"></div>
 	                  </div>
                     <div id="panel">
-                        <div id="legend" ref="legend"></div>
-                        <div id="smoother" ref="smoother"></div>
+                        <div className="thrContainer">
+                            <div className="lineSoilMoisture"></div><div className="thr">Humedad del sustrato</div>
+                        </div>
+                        <div className="thrContainer">
+                            <div className="lineAirHumidity"></div><div className="thr">Humedad del aire</div>
+                        </div>
+                        <div className="thrContainer">
+                            <div className="lineAirTemperature"></div><div className="thr">Temperatura del aire</div>
+                        </div>
+                        <div className={`thrContainer ${thClassName.soilMoisture}`}>
+                            <div className="thrLine w3-border-blue"></div><div className="thr">Umbral de riego (h) <span>&lt; {this.state.zone.thresholds.soilMoisture.value}%</span></div>
+                        </div>
+                        <div className={`thrContainer ${thClassName.airHumidity}`}>
+                            <div className="thrLine w3-border-red"></div><div className="thr">Umbral de riego (hr) <span>&lt; {this.state.zone.thresholds.airHumidity.value}%</span></div>
+                        </div>
+
+                        <div className={`thrContainer ${thClassName.airTemperature}`}>
+                            <div className="thrLine w3-border-black"></div><div className="thr">Umbral de riego (t) <span>&lt; {this.state.zone.thresholds.airTemperature.value}%</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
