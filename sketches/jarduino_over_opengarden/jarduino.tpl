@@ -209,20 +209,31 @@ void readSensorValues(int id, int sensorValues[][numSensorTypes]) {
   sensorValues[id][AIR_HUMIDITY] =  airHumidity;
 }
 
+void initZonesArray(int array[]) {
+  for (int i=0; i<numZones; i++) {
+    array[i] = 0;
+  }  
+}
+
 void loop() {
   static int checksDone = 0;
-  static int sumSoilMoisture[] = {0, 0};
-  static int sumAirHumidity[] = {0, 0};
-  static int sumAirTemperature[] = {0, 0};
-  int means[] = {0, 0};
-  int wateringDelays[] = {0, 0};
+  static int sumSoilMoisture[numZones];
+  static int sumAirHumidity[numZones];
+  static int sumAirTemperature[numZones];
+  int means[numZones];
+  int wateringDelays[numZones];
   uint32_t lastIrrigatingEvents[numZones][3];
   int delayTime = 0;
   int totalWateringDelay = 0;
   int sensorValues[numZones][numSensorTypes];
 
   initIrrigatingEvents(lastIrrigatingEvents, numZones);
-  
+  initZonesArray(sumSoilMoisture);
+  initZonesArray(sumAirHumidity);
+  initZonesArray(sumAirTemperature);
+  initZonesArray(means);
+  initZonesArray(wateringDelays);
+
   for (int i=0; i<numZones; i++) {
     readSensorValues(i, sensorValues);
   }
