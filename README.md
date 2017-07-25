@@ -44,3 +44,10 @@ Usage
 ```
 ./jarduino read
 ```
+
+- Launch jardUI (user interface)
+
+```
+./npm start
+```
+
