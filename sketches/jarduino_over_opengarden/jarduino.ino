@@ -1,28 +1,48 @@
 #include <OpenGarden.h>
+#include <TimeAlarms.h>
 #include "Wire.h" 
+
 
 #define SOIL_MOISTURE     0
 #define AIR_TEMPERATURE   1
 #define AIR_HUMIDITY      2
 
+#define ZONEID     0
+#define TIMESTAMP  1
+#define DURATION   2
+
 const int numSensorTypes = 3;
 
 const int numZones = 2;
 
-const int analogInPins[] = {A0}; // Analog input pins
+const int sensorsIn[] = {99, A0}; // For instance {99, A0} (open garden MOIST, A0)
+const int electroValvesOut[] = {991, 992}; // For instance {991, 992} (open garden electro 1 & 2)
 
-const int digitalOutPin[] = {2, 3}; // Rele-Electrovalve output
+const int minSoilMoisture[numZones] = {47, 6};
+const int minAirHumidity[numZones] = {0, 0};
+const int maxAirTemperature[numZones] = {100, 100};
 
-const int minSensorValue[] = {50, 10}; // Array of minimun values from the potentiometer to trigger watering
-
-const int checkingDelay = 1000; // Delay in ms between checks  (for the analog-to-digital converter to settle after last reading)
+const int checkingDelay = 1000;
 const int numChecksBeforeSending = 1; // Number of checks should be done before sending data to serial
-const long int wateringTime[] = {1000, 1000}; // Watering time in ms for every plant
 
+DateTime irrigatingStartDateTime[] = {DateTime(2017,7,26,9,28), DateTime(2017,7,26,9,29)}; // For instance {DateTime(2017, 6, 22, 13, 10, 0), DateTime(2017, 6, 22, 13, 35, 0)}
+const long int wateringTime[] = {120000, 2000}; // Watering time in ms for every plant
+const long int irrigatingFrequence[] = {28800, 54000}; // Irrigating frequence in seconds for every plant
+
+static uint32_t lastIrrigatingTimestamp[numZones];
+
+
+void emptyLastIrrigatingTimestamp() {
+  for (int i=0; i<numZones; i++) {
+    lastIrrigatingTimestamp[i] = 0;
+  }
+}
 
 void setup() {
   // initialize serial communications at 9600 bps:
   Serial.begin(9600);
+
+  OpenGarden.initRTC();
 
   OpenGarden.initIrrigation(1);
   OpenGarden.initIrrigation(2);
@@ -31,57 +51,45 @@ void setup() {
   OpenGarden.irrigationOFF(2);
 
   OpenGarden.initSensors();
+
+  emptyLastIrrigatingTimestamp();
 }
 
-int doWatering(int id) {
-  int valve_number = id + 1;
+int doWatering(int zoneId) {
+  int outId = electroValvesOut[zoneId];
 
-  OpenGarden.irrigationON(valve_number);
+  if (outId > 990) {
+    outId = outId - 990;
+  }
 
-  delay(wateringTime[id]);
+  OpenGarden.irrigationON(outId);
 
-  OpenGarden.irrigationOFF(valve_number);
+  delay(wateringTime[zoneId]);
 
-  return wateringTime[id];
+  OpenGarden.irrigationOFF(outId);
+
+  return wateringTime[zoneId];
 }
 
-int readSoilMoisture(int sensor_id) {
+int readSoilMoisture(int zoneId) {
   int soilMoisture = 0;
+  int inId = sensorsIn[zoneId];
 
-  if (sensor_id == 0) {
+  if (inId == 99) {
     OpenGarden.sensorPowerON();
-
-    soilMoisture = OpenGarden.readSoilMoisture();
-    soilMoisture = map(soilMoisture, 0, 1023, 1, 100);
     delay(500);
-
+    soilMoisture = OpenGarden.readSoilMoisture();
+    soilMoisture = map(soilMoisture, 0, 1023, 0, 100);
     OpenGarden.sensorPowerOFF();
   } else {
-    soilMoisture = analogRead(analogInPins[sensor_id - 1]);
-    soilMoisture = map(soilMoisture, 1023, 0, 1, 100);
+    soilMoisture = analogRead(inId);
+    soilMoisture = map(soilMoisture, 1023, 0, 0, 100);
   }
-    
+
   return soilMoisture;
 }
 
 /* ---- */
-
-int readAirHumidity() {
-  OpenGarden.sensorPowerON();
-  delay(1000);
-  float airHumidity = OpenGarden.readAirHumidity();
-  OpenGarden.sensorPowerOFF();
-  return airHumidity;
-}
-
-int readAirTemperature() {
-  OpenGarden.sensorPowerON();
-  delay(1000);
-  float airTemperature = OpenGarden.readAirTemperature();
-  OpenGarden.sensorPowerOFF();
-
-  return airTemperature;
-}
 
 void sendValuesToSerial (int values[][numSensorTypes])
 {
@@ -108,16 +116,19 @@ void sendValuesToSerial (int values[][numSensorTypes])
 }
 
 
-void sendWateringEventsToSerial (int wateringDelays[]) 
+void sendIrrigatingEventsToSerial (uint32_t irrigatingEvents[][3]) 
 {
+  DateTime now = OpenGarden.getTime();
   String valuesString;
 
   Serial.print("#actuators#");
   for (int i=0; i < numZones; i++) {
-    if (wateringDelays[i]) {
+    if (irrigatingEvents[i][TIMESTAMP] > 0) {
       valuesString += i;
       valuesString += ",";
-      valuesString += wateringDelays[i];
+      valuesString += now.unixtime(),
+      valuesString += ",";
+      valuesString += irrigatingEvents[i][DURATION];
       valuesString += "#";   
     }
   }
@@ -125,59 +136,161 @@ void sendWateringEventsToSerial (int wateringDelays[])
 
 }
 
-void sendToSerial (int values[][numSensorTypes], int wateringDelays[]) {
+void sendToSerial (int values[][numSensorTypes], uint32_t lastIrrigatingEvents[][3]) {
+  DateTime now = OpenGarden.getTime();
+
+  Serial.print("#time#");
+  Serial.print(now.unixtime());
+  Serial.print("#");
   sendValuesToSerial(values);
-  sendWateringEventsToSerial(wateringDelays);
+  sendIrrigatingEventsToSerial(lastIrrigatingEvents);
 }
 
-boolean mustWater(int id, int value) {
-  return (value <= minSensorValue[id]);
+boolean isIrrigatingTime(int id) {
+  DateTime now = OpenGarden.getTime();
+  uint32_t currentTimestamp = now.unixtime();
+  uint32_t diff;
+
+  /* Serial.println("id"); */
+  /* Serial.println(id); */
+  /* Serial.println("now"); */
+  /* OpenGarden.printTime(now); */
+  /* Serial.println(); */
+  /* Serial.println("now unixtime"); */
+  /* Serial.println(now.unixtime()); */
+  /* Serial.println("start"); */
+  /* OpenGarden.printTime(irrigatingStartDateTime[id]); */
+  /* Serial.println(); */
+  /* Serial.println("start unixtime"); */
+  /* Serial.println(irrigatingStartDateTime[id].unixtime()); */
+
+  if (now.unixtime() >= irrigatingStartDateTime[id].unixtime()) {
+    if (lastIrrigatingTimestamp[id] == 0) {
+      lastIrrigatingTimestamp[id] = currentTimestamp;
+      return true;
+    } else {
+      diff = currentTimestamp - lastIrrigatingTimestamp[id];
+      if (diff >= irrigatingFrequence[id]) {
+        lastIrrigatingTimestamp[id] = currentTimestamp;
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+boolean thresholdOvercomed(int sensorValues[], int id) {
+  return (sensorValues[SOIL_MOISTURE] <= minSoilMoisture[id] || sensorValues[AIR_HUMIDITY] <= minAirHumidity[id] || sensorValues[AIR_TEMPERATURE] >= maxAirTemperature[id]);
+}
+
+boolean mustIrrigate(int id, int sensorValues[]) {
+  return (isIrrigatingTime(id) && thresholdOvercomed(sensorValues, id));
+}
+
+void initIrrigatingEvents (uint32_t lastIrrigatingEvents[][3], int numZones) {
+    for (int i=0; i<numZones; i++) {
+        lastIrrigatingEvents[i][ZONEID] = i;
+        lastIrrigatingEvents[i][TIMESTAMP] = 0;
+        lastIrrigatingEvents[i][DURATION] = 0;
+    }
+}
+
+void readSensorValues(int id, int sensorValues[][numSensorTypes]) {
+  OpenGarden.sensorPowerON();
+  delay(1000);
+  float airHumidity = OpenGarden.readAirHumidity();
+  delay(1000);
+  float airTemperature = OpenGarden.readAirTemperature();
+  OpenGarden.sensorPowerOFF();
+
+  sensorValues[id][SOIL_MOISTURE] = readSoilMoisture(id);
+  sensorValues[id][AIR_TEMPERATURE] = airTemperature;
+  sensorValues[id][AIR_HUMIDITY] =  airHumidity;
+}
+
+void initZonesArray(int array[]) {
+  for (int i=0; i<numZones; i++) {
+    array[i] = 0;
+  }  
 }
 
 void loop() {
   static int checksDone = 0;
-  static int sum[] = {0, 0};
-  int means[] = {0, 0};
-  int wateringDelays[] = {0, 0};
+  static int sumSoilMoisture[numZones];
+  static int sumAirHumidity[numZones];
+  static int sumAirTemperature[numZones];
+  int means[numZones];
+  int wateringDelays[numZones];
+  uint32_t lastIrrigatingEvents[numZones][3];
   int delayTime = 0;
   int totalWateringDelay = 0;
   int sensorValues[numZones][numSensorTypes];
 
+  initIrrigatingEvents(lastIrrigatingEvents, numZones);
+  initZonesArray(sumSoilMoisture);
+  initZonesArray(sumAirHumidity);
+  initZonesArray(sumAirTemperature);
+  initZonesArray(means);
+  initZonesArray(wateringDelays);
+
   for (int i=0; i<numZones; i++) {
-    sensorValues[i][SOIL_MOISTURE] = readSoilMoisture(i);
-    sensorValues[i][AIR_TEMPERATURE] = readAirHumidity();
-    sensorValues[i][AIR_HUMIDITY] =  readAirTemperature();
+    readSensorValues(i, sensorValues);
   }
   checksDone++;
 
   for (int i=0; i<numZones; i++) {
-      sum[i] += sensorValues[i][SOIL_MOISTURE];
+      sumSoilMoisture[i] += sensorValues[i][SOIL_MOISTURE];
+  }
+  for (int i=0; i<numZones; i++) {
+      sumAirHumidity[i] += sensorValues[i][AIR_HUMIDITY];
+  }
+  for (int i=0; i<numZones; i++) {
+      sumAirTemperature[i] += sensorValues[i][AIR_TEMPERATURE];
   }
 
   if (checksDone >= numChecksBeforeSending) {
     for (int i=0; i<numZones; i++) {
-      means[i] = sum[i] / checksDone;
+      means[i] = sumSoilMoisture[i] / checksDone;
       sensorValues[i][SOIL_MOISTURE] = means[i];
+
+      means[i] = sumAirHumidity[i] / checksDone;
+      sensorValues[i][AIR_HUMIDITY] = means[i];
+
+      means[i] = sumAirTemperature[i] / checksDone;
+      sensorValues[i][AIR_TEMPERATURE] = means[i];
     }
 
     checksDone = 0;
     for (int i=0; i<numZones; i++) {
-      sum[i] = 0;
+      sumSoilMoisture[i] = 0;
+      sumAirHumidity[i] = 0;
+      sumAirTemperature[i] = 0;
     }
 
     for (int i=0; i<numZones; i++) {
-      if (mustWater(i, means[i])) {
-        wateringDelays[i] = doWatering(i);
+      if (mustIrrigate(i, sensorValues[i])) {
+        DateTime now = OpenGarden.getTime();
+
+        lastIrrigatingEvents[i][ZONEID] = i;
+        lastIrrigatingEvents[i][TIMESTAMP] = now.unixtime();
+        lastIrrigatingEvents[i][DURATION] = wateringTime[i];
       }
     }
 
-    sendToSerial(sensorValues, wateringDelays);
+    sendToSerial(sensorValues, lastIrrigatingEvents);
+
+    for (int i=0; i<numZones; i++) {
+      if (lastIrrigatingEvents[i][TIMESTAMP] > 0) { 
+        wateringDelays[i] = doWatering(i);
+      }
+    }
   }   
 
   for (int i=0; i<numZones; i++) {
      totalWateringDelay += wateringDelays[i];
    }
- 
+
    delayTime = checkingDelay - totalWateringDelay;
    if (delayTime > 0) {
      delay(delayTime);
